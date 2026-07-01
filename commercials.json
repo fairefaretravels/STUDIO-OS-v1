@@ -1,0 +1,14 @@
+[
+  {
+    "id": "commercial-1",
+    "title": "Commercial Break",
+    "cover": "https://canva.link/dbygxwqwww636mx",
+    "duration": 30
+  },
+  {
+    "id": "commercial-2",
+    "title": "Commercial Break",
+    "cover": "https://canva.link/5ko2rdjplbujbxa",
+    "duration": 30
+  }
+]
