@@ -1,78 +1,78 @@
 window.STUDIO = (function () {
 
+    let tracks = [];
+    let ads = [];
+
     async function loadJSON(file) {
         const res = await fetch(file);
         return res.json();
     }
 
-    function repeatToFill(block, durationLimit = 1500) {
-        const result = [];
-        let total = 0;
-
-        while (total < durationLimit) {
-            for (let item of block) {
-                if (total >= durationLimit) break;
-                result.push(item);
-                total += item.duration || 300;
-            }
-        }
-
-        return result;
+    function findTrack(id) {
+        return tracks.find(t => t.id === id);
     }
 
-    function insertCommercials(queue, commercials, interval = 5) {
-        const result = [];
-        let count = 0;
+    function buildMusicBlock(block) {
 
-        for (let item of queue) {
-            result.push(item);
-            count++;
+        let queue = [];
+        let total = 0;
+        let adIndex = 0;
 
-            if (count % interval === 0 && commercials.length) {
-                result.push(commercials[0]);
+        while (total < block.duration) {
+
+            for (let id of block.playlist) {
+
+                if (total >= block.duration) break;
+
+                const track = findTrack(id);
+                if (!track) continue;
+
+                queue.push(track);
+                total += track.duration;
+
+                // insert commercial
+                if (block.insertCommercialEvery &&
+                    total % block.insertCommercialEvery < track.duration) {
+
+                    queue.push(ads[adIndex % ads.length]);
+                    adIndex++;
+                }
             }
         }
 
-        return result;
+        return queue;
+    }
+
+    function buildShowBlock(block) {
+        const showTrack = tracks.find(t => t.id === block.id);
+        return showTrack ? [showTrack] : [];
     }
 
     async function buildPlaylist() {
 
-        const tracksData = await loadJSON("tracks.json");
-        const commercials = await loadJSON("commercials.json");
         const schedule = await loadJSON("schedule.json");
+        const data = await loadJSON("tracks.json");
+        const adData = await loadJSON("commercials.json");
+
+        tracks = data;
+        ads = adData;
 
         let finalQueue = [];
 
-        for (let block of schedule) {
+        for (let block of schedule.blocks) {
 
             if (block.type === "music_block") {
-
-                const blockTracks = block.playlist.map(id =>
-                    tracksData.find(t => t.id === id)
-                );
-
-                let filled = repeatToFill(blockTracks, block.length);
-
-                filled = insertCommercials(
-                    filled,
-                    commercials,
-                    block.insertCommercialEvery || 5
-                );
-
-                finalQueue.push(...filled);
+                finalQueue.push(...buildMusicBlock(block));
             }
 
             if (block.type === "show") {
-                finalQueue.push(block);
+                finalQueue.push(...buildShowBlock(block));
             }
         }
 
         return finalQueue;
     }
 
-    return {
-        buildPlaylist
-    };
+    return { buildPlaylist };
 
 })();
