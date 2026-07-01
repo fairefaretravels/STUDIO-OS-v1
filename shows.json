@@ -1,0 +1,30 @@
+[
+  {
+    "id": "slept-on",
+    "title": "SLEPT ON",
+    "type": "series",
+    "cover": "https://canva.link/8xrnvwn4uw1bhio",
+    "duration": 1800
+  },
+  {
+    "id": "g4e-live",
+    "title": "G4E LIVE",
+    "type": "live_show",
+    "cover": "https://canva.link/2vq3b9orlqnkcfm",
+    "duration": 3600
+  },
+  {
+    "id": "live-show-1",
+    "title": "THE LIVE SHOW",
+    "type": "talk_show",
+    "cover": "https://canva.link/joi4z1k3tolcxb0",
+    "duration": 1800
+  },
+  {
+    "id": "live-show-2",
+    "title": "THE LIVE SHOW",
+    "type": "talk_show",
+    "cover": "https://canva.link/9r9y3b33fl8q0xl",
+    "duration": 1800
+  }
+]
