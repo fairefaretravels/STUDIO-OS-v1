@@ -3,53 +3,46 @@ window.MEDIA = (function () {
     let queue = [];
     let index = 0;
 
-    function getElement(id) {
-        return document.getElementById(id);
+    function load(item) {
+
+        const player = document.getElementById("player");
+
+        document.getElementById("title").innerText =
+            item.title || "Commercial Break";
+
+        player.src = item.url;
+        player.play();
     }
 
-    function loadMedia(item) {
+    function next() {
 
-        const player = getElement("player");
-        const title = getElement("nowTitle");
-        const artist = getElement("nowArtist");
-
-        if (!item) return;
-
-        title.textContent = item.title || "Commercial Break";
-        artist.textContent = item.artist || "";
-
-        if (item.media) {
-            player.src = item.media;
-        }
-    }
-
-    function playNext() {
         index++;
 
         if (index >= queue.length) {
-            index = 0; // loop entire channel
+            index = 0;
         }
 
-        loadMedia(queue[index]);
+        load(queue[index]);
 
         setTimeout(() => {
-            playNext();
+            next();
         }, (queue[index].duration || 30) * 1000);
     }
 
     async function start() {
+
         queue = await STUDIO.buildPlaylist();
 
         index = 0;
-        loadMedia(queue[0]);
+
+        load(queue[0]);
 
         setTimeout(() => {
-            playNext();
+            next();
         }, (queue[0].duration || 30) * 1000);
     }
 
-    return {
-        start
-    };
+    return { start };
 
+})();
 })();
