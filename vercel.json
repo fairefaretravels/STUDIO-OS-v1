@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/studio", "destination": "/STUDIO/index.html" },
+    { "source": "/watch", "destination": "/watch.html" }
+  ]
+}
