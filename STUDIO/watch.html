@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radiomeltdown Watch</title>
+</head>
+
+<body>
+
+  <h1>LIVE STREAM</h1>
+
+  <video id="player" controls autoplay style="width:100%;">
+    <source id="source" src="" type="video/mp4">
+  </video>
+
+  <script>
+    function loadStream() {
+      const url = localStorage.getItem("currentStream");
+      if (!url) return;
+
+      const source = document.getElementById("source");
+      source.src = url;
+
+      document.getElementById("player").load();
+    }
+
+    loadStream();
+
+    // auto refresh stream every 10s
+    setInterval(loadStream, 10000);
+  </script>
+
+</body>
+</html>
