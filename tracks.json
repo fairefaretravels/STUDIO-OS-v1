@@ -1,9 +1,13 @@
 [
   {
+    "id": 1,
     "title": "Distant Lover",
     "artist": "The Switchlades",
+    "genre": "Rock",
+    "year": 2026,
+    "description": "Official release by The Switchlades.",
     "cover": "https://canva.link/ddr9n1up3nv7k7m",
-    "audio": "https://drive.google.com/file/d/1prjcSjbmm4P_FKfgylRjeFjWPupgtP-h/view",
-    "description": "Official release by The Switchlades."
+    "audio": "https://drive.google.com/file/d/1prjcSjbmm4P_FKfgylRjeFjWPupgtP-h/preview",
+    "featured": true
   }
 ]
