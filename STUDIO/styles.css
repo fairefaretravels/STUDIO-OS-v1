@@ -1,0 +1,31 @@
+body {
+  font-family: Arial;
+  background: #0b0b0b;
+  color: white;
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.panel {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+input {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+}
+
+button {
+  padding: 10px;
+  background: gold;
+  border: none;
+  cursor: pointer;
+}
