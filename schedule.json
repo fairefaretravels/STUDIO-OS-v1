@@ -1,7 +1,26 @@
-[
-  {
-    "time": "8:30 PM",
-    "type": "music",
-    "track": "Distant Lover"
-  }
-]
+{
+  "blocks": [
+    {
+      "type": "music_block",
+      "duration": 1500,
+      "repeat": true,
+      "insertCommercialEvery": 900,
+      "playlist": [
+        "distant-lover",
+        "always-getting-high"
+      ]
+    },
+
+    {
+      "type": "show",
+      "id": "slept-on",
+      "duration": 1800
+    },
+
+    {
+      "type": "show",
+      "id": "g4e-live",
+      "duration": 3600
+    }
+  ]
+}
