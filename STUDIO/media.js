@@ -1,45 +1,55 @@
-const CLOUD_NAME = "YOUR_CLOUD_NAME";
-const UPLOAD_PRESET = "YOUR_UNSIGNED_PRESET";
+window.MEDIA = (function () {
 
-let mediaLibrary = JSON.parse(localStorage.getItem("mediaLibrary")) || [];
+    let queue = [];
+    let index = 0;
 
-// Add media manually (from Cloudinary URL or Canva export)
-function addMedia(title, url, type = "video") {
-  const item = {
-    id: Date.now(),
-    title,
-    url,
-    type,
-    createdAt: new Date().toISOString()
-  };
+    function getElement(id) {
+        return document.getElementById(id);
+    }
 
-  mediaLibrary.push(item);
-  localStorage.setItem("mediaLibrary", JSON.stringify(mediaLibrary));
-  renderLibrary();
-}
+    function loadMedia(item) {
 
-// Render library in Studio
-function renderLibrary() {
-  const container = document.getElementById("library");
-  if (!container) return;
+        const player = getElement("player");
+        const title = getElement("nowTitle");
+        const artist = getElement("nowArtist");
 
-  container.innerHTML = "";
+        if (!item) return;
 
-  mediaLibrary.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "media-card";
+        title.textContent = item.title || "Commercial Break";
+        artist.textContent = item.artist || "";
 
-    div.innerHTML = `
-      <h4>${item.title}</h4>
-      <button onclick="loadToPlayer('${item.url}')">Play</button>
-    `;
+        if (item.media) {
+            player.src = item.media;
+        }
+    }
 
-    container.appendChild(div);
-  });
-}
+    function playNext() {
+        index++;
 
-// Load into Watch Player
-function loadToPlayer(url) {
-  localStorage.setItem("currentStream", url);
-  alert("Loaded into broadcast player");
-}
+        if (index >= queue.length) {
+            index = 0; // loop entire channel
+        }
+
+        loadMedia(queue[index]);
+
+        setTimeout(() => {
+            playNext();
+        }, (queue[index].duration || 30) * 1000);
+    }
+
+    async function start() {
+        queue = await STUDIO.buildPlaylist();
+
+        index = 0;
+        loadMedia(queue[0]);
+
+        setTimeout(() => {
+            playNext();
+        }, (queue[0].duration || 30) * 1000);
+    }
+
+    return {
+        start
+    };
+
+})();
