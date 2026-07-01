@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Studio OS v1</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="studio-grid">
+
+    <!-- UPLOAD PANEL -->
+    <div class="panel">
+      <h2>📥 Add Media (Cloudinary URL)</h2>
+
+      <input id="title" placeholder="Title">
+      <input id="url" placeholder="Cloudinary / MP4 URL">
+
+      <button onclick="saveMedia()">Add to Library</button>
+    </div>
+
+    <!-- LIBRARY -->
+    <div class="panel">
+      <h2>📚 Media Library</h2>
+      <div id="library"></div>
+    </div>
+
+    <!-- LIVE CONTROL -->
+    <div class="panel">
+      <h2>📡 Live Control</h2>
+      <button onclick="goLive()">Send to Watch</button>
+    </div>
+
+  </div>
+
+  <script src="media.js"></script>
+  <script src="studio.js"></script>
+
+</body>
+</html>
