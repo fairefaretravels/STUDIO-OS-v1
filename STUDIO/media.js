@@ -12,7 +12,6 @@ window.MEDIA = (function () {
     }
 
     function load(item) {
-
         const player = document.getElementById("player");
 
         document.getElementById("title").innerText =
@@ -27,45 +26,29 @@ window.MEDIA = (function () {
 
         player.oncanplay = () => {
             setLoading(false);
-            player.play().catch(() => {});
+            player.play().catch(err => {
+                console.error("PLAY FAILED:", err);
+            });
         };
     }
 
     function next() {
-
         if (isTransitioning) return;
         isTransitioning = true;
 
         const player = document.getElementById("player");
-
-        // fade out effect (simple TV-style cut)
         player.style.opacity = 0.3;
 
         setTimeout(() => {
-
-            index++;
-
-            if (index >= queue.length) {
-                index = 0;
-            }
-
+            index = (index + 1) % queue.length;
             load(queue[index]);
-
             player.style.opacity = 1;
-
             isTransitioning = false;
-
-            setTimeout(() => {
-                next();
-            }, (queue[index].duration || 30) * 1000);
-
         }, 600);
     }
 
     async function start(q) {
-
         queue = q || await STUDIO.generate();
-
         index = 0;
 
         if (!queue || !queue.length) {
@@ -74,15 +57,8 @@ window.MEDIA = (function () {
         }
 
         load(queue[0]);
-
-        setTimeout(() => {
-            next();
-        }, (queue[0].duration || 30) * 1000);
     }
 
-    return {
-        start
-    };
+    return { start };
 
-})();
 })();
