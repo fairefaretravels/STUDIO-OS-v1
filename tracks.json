@@ -22,19 +22,17 @@
     "title": "Distant Lover",
     "artist": "The Switchlades",
     "type": "music",
-    "url": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
-    "cover": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
-    "duration": 210,
-    "_note": "Currently only exists as a Canva link and a Google Drive share link. Export the audio/video from Canva (or convert the Drive link) and upload to Cloudinary, then replace this url/cover."
+    "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782973867/The_Swichblades_-_Distant_Lover_dwhpkq.mp4",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1782971056/stv-logo1_nuf7fb.jpg",
+    "duration": 406,
   },
   {
     "id": "switchlades-always-getting-high",
-    "title": "Always Getting High",
-    "artist": "The Switchlades",
+    "title": "Get This Cash",
+    "artist": "Frost The Boss feat Ms Candy",
     "type": "music",
-    "url": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
-    "cover": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
-    "duration": 210,
-    "_note": "Not yet sourced anywhere. Needs export + Cloudinary upload before the music_block will play."
+    "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/FROST_THE_BOSS_X_Mz.CANDY_-_MAKE_THIS_CASH_SHOT_BY_MOEHAZE_t74zro.mp4",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1782971056/stv-logo1_nuf7fb.jpg",
+    "duration": 343,
   }
 ]
