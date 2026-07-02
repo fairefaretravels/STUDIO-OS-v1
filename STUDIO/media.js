@@ -170,4 +170,3 @@ window.MEDIA = (function () {
     };
 
 })();
-})();
