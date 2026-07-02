@@ -68,6 +68,16 @@ window.MEDIA = (function () {
         return typeof src === "string" && src.includes("drive.google.com");
     }
 
+    // Accepts any drive.google.com share format (/view, /edit, ?usp=sharing, etc.)
+    // and rewrites it to the embeddable /preview form. If the file ID can't be
+    // parsed, the original src is returned unchanged (load will still fail loudly
+    // via onerror rather than silently, so bad links stay visible in console).
+    function toDrivePreview(src) {
+        const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/) || src.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (!match) return src;
+        return `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+
     function load(item) {
         const player = document.getElementById("player");
         const frame = document.getElementById("playerFrame");
@@ -93,14 +103,15 @@ window.MEDIA = (function () {
         }
 
         if (isDriveLink(src)) {
-            // Google Drive /preview links are embed pages, not direct video files.
-            // A <video> tag can't play these — route through an iframe instead.
+            // Google Drive /view or /edit share links are page wrappers, not
+            // direct video files, and refuse to load in an iframe. Only the
+            // /preview form is embeddable, so always normalize to that here.
             player.pause();
             player.removeAttribute("src");
             player.style.display = "none";
 
             frame.style.display = "block";
-            frame.src = src;
+            frame.src = toDrivePreview(src);
 
             setLoading(false, item);
             // Drive iframes don't fire an "ended" event we can listen to,
@@ -153,47 +164,20 @@ window.MEDIA = (function () {
         }, 600);
     }
 
-    async function loadDashboard(){
-  try {
-    const [queue, shows, tracksList] = await Promise.all([
-      STUDIO.generate(),
-      safeFetchJSON('./shows.json', []),
-      safeFetchJSON('./tracks.json', [])
-    ]);
+    async function start(q) {
+        queue = q || await STUDIO.generate();
+        index = 0;
 
-    if (!queue.length){
-      console.error('EMPTY QUEUE — check schedule.json or STUDIO.generate()');
-      return;
+        if (!queue || !queue.length) {
+            console.error("EMPTY QUEUE");
+            return;
+        }
+
+        load(queue[0]);
     }
 
-    // tag episodes with their parent show's type for classification/coloring
-    const showTypeById = {};
-    shows.forEach(s => showTypeById[s.id] = s.type);
-    queue.forEach(item => {
-      if (item.type === 'show' || item.type === 'show_episode') {
-        item.showType = showTypeById[item.id] || item.showType;
-      }
-    });
-
-    const { timeline } = buildTimeline(queue, 4);
-    if (!timeline.length){
-      console.error('EMPTY TIMELINE');
-      return;
-    }
-
-    const nowIndex = findNowIndex(timeline);
-    renderOnAir(timeline[nowIndex], timeline[nowIndex + 1]);
-    renderLineup(timeline, nowIndex);
-    renderDonut(queue);
-    renderStats(queue, shows, tracksList);
-
-  } catch (err) {
-    console.error('DASHBOARD LOAD FAILED:', err);
-  }
-}
-
-loadDashboard();
-setInterval(loadDashboard, 60000); // re-sync now-playing every minute
+    return {
+        start
     };
 
 })();
