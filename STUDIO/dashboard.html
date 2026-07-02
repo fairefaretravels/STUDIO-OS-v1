@@ -41,6 +41,57 @@ window.addEventListener("DOMContentLoaded", () => {
   console.log("STUDIO OS READY");
 });
 </script>
+<script>
+const library = [];
 
+function renderLibrary() {
+  const list = document.getElementById("library");
+
+  if (library.length === 0) {
+    list.innerHTML = "<p>No media added yet.</p>";
+    return;
+  }
+
+  list.innerHTML = library.map(item => `
+    <div class="media-item">
+      <strong>${item.title}</strong><br>
+      <small>${item.url}</small>
+    </div>
+  `).join("");
+}
+
+function saveMedia() {
+  const title = document.getElementById("mediatitle").value.trim();
+  const url = document.getElementById("mediaurl").value.trim();
+
+  if (!title || !url) {
+    alert("Enter both a title and a URL.");
+    return;
+  }
+
+  library.push({
+    title,
+    url
+  });
+
+  renderLibrary();
+
+  document.getElementById("mediatitle").value = "";
+  document.getElementById("mediaurl").value = "";
+
+  alert("Media added successfully!");
+}
+
+function goLive() {
+  if (!library.length) {
+    alert("No media in the library.");
+    return;
+  }
+
+  alert(`Ready to send ${library.length} media item(s) to the live player.`);
+}
+
+renderLibrary();
+</script>
 </body>
 </html>
