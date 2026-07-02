@@ -1,0 +1,34 @@
+{
+  "segments": [
+    {
+      "name": "morning",
+      "start": "06:00",
+      "duration": 4,
+      "type": "light",
+      "music_ratio": 0.6,
+      "show_ratio": 0.3,
+      "ad_ratio": 0.1
+    },
+    {
+      "name": "midday",
+      "start": "10:00",
+      "duration": 6,
+      "type": "mixed",
+      "music_ratio": 0.4,
+      "show_ratio": 0.4,
+      "ad_ratio": 0.2
+    },
+    {
+      "name": "evening",
+      "start": "16:00",
+      "duration": 6,
+      "type": "prime",
+      "music_ratio": 0.3,
+      "show_ratio": 0.5,
+      "ad_ratio": 0.2
+    }
+  ],
+
+  "music_block_target": 25,
+  "max_repeats": 2
+}
