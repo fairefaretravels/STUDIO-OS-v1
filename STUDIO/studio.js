@@ -1,49 +1,42 @@
 window.STUDIO = (function () {
 
     // -----------------------------
-    // LOAD JSON
+    // SAFE LOAD JSON (NEVER CRASHES)
     // -----------------------------
-    async function loadJSON(file) {
-        const res = await fetch(file);
-        if (!res.ok) throw new Error(`Failed to load ${file}: ${res.status}`);
-        return res.json();
-    }
-
-    async function loadJSONSafe(file, fallback) {
+    async function loadJSON(file, fallback = null) {
         try {
-            return await loadJSON(file);
-        } catch (e) {
-            console.warn(`Optional file "${file}" not loaded, using fallback.`, e);
+            const res = await fetch(`./${file}`);
+            if (!res.ok) throw new Error(`${file} failed: ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            console.warn(`[STUDIO] Using fallback for ${file}`, err);
             return fallback;
         }
     }
 
     // -----------------------------
-    // LOOKUPS
+    // SAFE RESOLVERS
     // -----------------------------
-    function resolveTrack(id, tracksList) {
-        const track = tracksList.find(t => t.id === id);
-        if (!track) console.warn(`Track id "${id}" not found in tracks.json`);
-        return track;
+    function resolveTrack(id, tracks) {
+        return tracks.find(t => t.id === id) || null;
     }
 
-    function resolveShow(id, showsList) {
-        const show = showsList.find(s => s.id === id);
-        if (!show) console.warn(`Show id "${id}" not found in shows.json`);
-        return show;
+    function resolveShow(id, shows) {
+        return shows.find(s => s.id === id) || null;
     }
 
-    function pickCommercial(commercials) {
-        if (!commercials || !commercials.length) return null;
-        return commercials[Math.floor(Math.random() * commercials.length)];
+    function pickCommercial(comms) {
+        if (!comms?.length) return null;
+        return comms[Math.floor(Math.random() * comms.length)];
     }
 
     // -----------------------------
-    // EXPAND A SHOW INTO PLAYABLE QUEUE ITEMS
-    // (handles both single-video shows and series with episodes[])
+    // EXPAND SHOWS
     // -----------------------------
     function expandShow(show) {
-        if (Array.isArray(show.episodes) && show.episodes.length) {
+        if (!show) return [];
+
+        if (Array.isArray(show.episodes)) {
             return show.episodes.map(ep => ({
                 id: ep.id,
                 title: `${show.title}: ${ep.title}`,
@@ -55,11 +48,6 @@ window.STUDIO = (function () {
             }));
         }
 
-        if (!show.url && !show.src) {
-            console.warn(`Show "${show.id}" has no url/src and no episodes[] — skipping. Add a playable url or an episodes[] array to shows.json.`);
-            return [];
-        }
-
         return [{
             ...show,
             type: "show"
@@ -67,44 +55,41 @@ window.STUDIO = (function () {
     }
 
     // -----------------------------
-    // BUILD A MUSIC BLOCK
-    // Loops the playlist (if repeat: true) until block.duration is filled,
-    // inserting a commercial every insertCommercialEvery seconds of playback.
+    // MUSIC BLOCK BUILDER
     // -----------------------------
-    function buildMusicBlock(block, tracksList, commercials) {
-        const queue = [];
+    function buildMusicBlock(block, tracks, commercials) {
         const playlist = (block.playlist || [])
-            .map(id => resolveTrack(id, tracksList))
+            .map(id => resolveTrack(id, tracks))
             .filter(Boolean);
 
-        if (!playlist.length) {
-            console.warn("Music block has no resolvable tracks — skipping block.", block);
-            return queue;
-        }
+        if (!playlist.length) return [];
 
-        const targetDuration = block.duration || 1500;
-        let elapsed = 0;
-        let sinceLastCommercial = 0;
+        const queue = [];
         let i = 0;
+        let elapsed = 0;
+        let adTimer = 0;
 
-        while (elapsed < targetDuration) {
+        const target = block.duration || 1200;
+
+        while (elapsed < target) {
             const track = playlist[i % playlist.length];
-            queue.push({ ...track });
 
-            const dur = track.duration || 300;
+            queue.push({
+                ...track,
+                type: track.type || "music"
+            });
+
+            const dur = track.duration || 180;
             elapsed += dur;
-            sinceLastCommercial += dur;
+            adTimer += dur;
 
-            if (block.insertCommercialEvery && sinceLastCommercial >= block.insertCommercialEvery) {
+            if (block.insertCommercialEvery && adTimer >= block.insertCommercialEvery) {
                 const ad = pickCommercial(commercials);
-                if (ad) {
-                    queue.push({ ...ad, type: "commercial" });
-                }
-                sinceLastCommercial = 0;
+                if (ad) queue.push({ ...ad, type: "commercial" });
+                adTimer = 0;
             }
 
             i++;
-
             if (!block.repeat && i >= playlist.length) break;
         }
 
@@ -112,59 +97,54 @@ window.STUDIO = (function () {
     }
 
     // -----------------------------
-    // GENERATE FULL QUEUE FROM schedule.json
+    // MAIN GENERATOR (SAFE MODE)
     // -----------------------------
     async function generate() {
 
-        const [schedule, shows, tracksList, commercials] = await Promise.all([
-            loadJSON("schedule.json"),
-            loadJSON("shows.json"),
-            loadJSON("tracks.json"),
-            loadJSONSafe("commercials.json", [])
-        ]);
+        const schedule = await loadJSON("schedule.json", { blocks: [] });
+        const shows = await loadJSON("shows.json", []);
+        const tracks = await loadJSON("tracks.json", []);
+        const commercials = await loadJSON("commercials.json", []);
 
         const queue = [];
 
-        for (const block of (schedule.blocks || [])) {
-            switch (block.type) {
+        for (const block of schedule.blocks || []) {
 
-                case "music_block": {
-                    const items = buildMusicBlock(block, tracksList, commercials);
-                    if (block.label) items.forEach(it => { if (it.type !== "commercial") it.blockLabel = block.label; });
+            try {
+
+                if (block.type === "music_block") {
+                    const items = buildMusicBlock(block, tracks, commercials);
+                    items.forEach(i => i.blockLabel = block.label || i.blockLabel);
                     queue.push(...items);
-                    break;
                 }
 
-                case "show": {
+                if (block.type === "show") {
                     const show = resolveShow(block.id, shows);
-                    if (show) {
-                        const items = expandShow(show);
-                        if (block.label) items.forEach(it => it.blockLabel = block.label);
-                        queue.push(...items);
-                    }
-                    break;
+                    const items = expandShow(show);
+                    items.forEach(i => i.blockLabel = block.label || i.blockLabel);
+                    queue.push(...items);
                 }
 
-                case "track": {
-                    const track = resolveTrack(block.id, tracksList);
+                if (block.type === "track") {
+                    const track = resolveTrack(block.id, tracks);
                     if (track) {
-                        const item = { ...track };
-                        if (block.label) item.blockLabel = block.label;
-                        queue.push(item);
+                        queue.push({
+                            ...track,
+                            type: "track",
+                            blockLabel: block.label || track.blockLabel
+                        });
                     }
-                    break;
                 }
 
-                default:
-                    console.warn(`Unknown block type "${block.type}" in schedule.json — skipping.`, block);
+            } catch (e) {
+                console.warn("[STUDIO] Block failed:", block, e);
             }
         }
 
+        console.log(`[STUDIO] Queue generated: ${queue.length} items`);
         return queue;
     }
 
-    return {
-        generate
-    };
+    return { generate };
 
 })();
