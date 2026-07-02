@@ -1,42 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>STUDIO OS v2</title>
+  <title>STUDIO OS - LIVE</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0b0f14;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: #111827;
+      border-bottom: 1px solid #222;
+    }
+
+    .live {
+      color: red;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    /* PLAYER AREA */
+    .player-box {
+      background: #111;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    video, iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      background: black;
+    }
+
+    /* INFO PANEL */
+    .info {
+      background: #111827;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .title {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .artist {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .status {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      background: red;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.3; }
+    }
+  </style>
 </head>
 
 <body>
 
-  <h1>LIVE CHANNEL</h1>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>STUDIO OS LIVE CHANNEL</div>
+    <div class="live">● LIVE</div>
+  </div>
 
-  <video id="player" controls autoplay style="width:100%"></video>
+  <!-- MAIN -->
+  <div class="container">
 
-  <h2 id="title"></h2>
+    <!-- PLAYER -->
+    <div class="player-box">
+      <video id="player" controls autoplay></video>
+    </div>
+
+    <!-- INFO -->
+    <div class="info">
+      <div class="status">
+        <div class="dot"></div>
+        <div>NOW PLAYING</div>
+      </div>
+
+      <div class="title" id="title">Loading...</div>
+      <div class="artist" id="artist"></div>
+
+      <hr style="border-color:#222">
+
+      <div style="color:#888;font-size:12px">
+        STUDIO OS Broadcast Engine v3
+      </div>
+    </div>
+
+  </div>
 
   <script src="studio.js"></script>
   <script src="media.js"></script>
 
   <script>
-    window.onload = () => {
-      MEDIA.start();
+    window.onload = async () => {
+      const queue = await STUDIO.generate();
+      MEDIA.start(queue);
     };
   </script>
-  <script>
-window.onload = async () => {
-
-    console.log("STARTING STUDIO OS...");
-
-    const queue = await STUDIO.generate();
-
-    console.log("QUEUE GENERATED:", queue);
-
-    if (!queue || !queue.length) {
-        console.error("QUEUE IS EMPTY");
-        return;
-    }
-
-    MEDIA.start(queue);
-};
-</script>
 
 </body>
 </html>
