@@ -5,27 +5,41 @@ window.MEDIA = (function () {
     let isTransitioning = false;
     let advanceTimer = null;
 
+    // ---------- SAFE DOM CACHE ----------
+    const UI = {
+        title: () => document.getElementById("title"),
+        artist: () => document.getElementById("artist"),
+        player: () => document.getElementById("player"),
+        frame: () => document.getElementById("playerFrame"),
+        npTitle: () => document.getElementById("npTitle"),
+        npSub: () => document.getElementById("npSub"),
+        ltHeadline: () => document.getElementById("ltHeadline"),
+        ltSubheadline: () => document.getElementById("ltSubheadline"),
+        tickerText: () => document.getElementById("tickerText"),
+        banner: () => document.getElementById("nowPlayingBanner"),
+        commercialOverlay: () => document.getElementById("commercialOverlay")
+    };
+
     function setLoading(state, item) {
-        const title = document.getElementById("title");
+        const title = UI.title();
         if (!title) return;
-        if (state) {
-            title.innerText = "Loading Next Segment...";
-        } else {
-            title.innerText = item.title || item.name || "Commercial Break";
-        }
+
+        title.innerText = state
+            ? "Loading Next Segment..."
+            : (item?.title || item?.name || "Commercial Break");
     }
 
     function updateBroadcastUI(item) {
-        const titleText = item.title || item.name || "Commercial Break";
-        const subtitleText = item.artist || item.category || item.type || "Live Programming";
+        const titleText = item?.title || item?.name || "Commercial Break";
+        const subtitleText = item?.artist || item?.category || item?.type || "Live Programming";
 
-        const npTitle = document.getElementById("npTitle");
-        const npSub = document.getElementById("npSub");
-        const ltHeadline = document.getElementById("ltHeadline");
-        const ltSubheadline = document.getElementById("ltSubheadline");
-        const tickerText = document.getElementById("tickerText");
-        const banner = document.getElementById("nowPlayingBanner");
-        const commercialOverlay = document.getElementById("commercialOverlay");
+        const npTitle = UI.npTitle();
+        const npSub = UI.npSub();
+        const ltHeadline = UI.ltHeadline();
+        const ltSubheadline = UI.ltSubheadline();
+        const tickerText = UI.tickerText();
+        const banner = UI.banner();
+        const commercialOverlay = UI.commercialOverlay();
 
         if (npTitle) npTitle.innerText = titleText;
         if (npSub) npSub.innerText = subtitleText;
@@ -44,11 +58,8 @@ window.MEDIA = (function () {
         }
 
         if (commercialOverlay) {
-            if ((item.type || "").toLowerCase() === "commercial") {
-                commercialOverlay.classList.add("show");
-            } else {
-                commercialOverlay.classList.remove("show");
-            }
+            const isCommercial = (item?.type || "").toLowerCase() === "commercial";
+            commercialOverlay.classList.toggle("show", isCommercial);
         }
     }
 
@@ -68,33 +79,41 @@ window.MEDIA = (function () {
         return typeof src === "string" && src.includes("drive.google.com");
     }
 
-    // Accepts any drive.google.com share format (/view, /edit, ?usp=sharing, etc.)
-    // and rewrites it to the embeddable /preview form. If the file ID can't be
-    // parsed, the original src is returned unchanged (load will still fail loudly
-    // via onerror rather than silently, so bad links stay visible in console).
     function toDrivePreview(src) {
-        const match = src.match(/\/d\/([a-zA-Z0-9_-]+)/) || src.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        const match =
+            src.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
+            src.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+
         if (!match) return src;
         return `https://drive.google.com/file/d/${match[1]}/preview`;
     }
 
+    function resetPlayerState(player, frame) {
+        if (player) {
+            player.pause?.();
+            player.removeAttribute("src");
+            player.load?.();
+        }
+        if (frame) frame.src = "about:blank";
+    }
+
     function load(item) {
-        const player = document.getElementById("player");
-        const frame = document.getElementById("playerFrame");
+        const player = UI.player();
+        const frame = UI.frame();
 
         if (!player || !frame) {
             console.error("PLAYER ELEMENT(S) NOT FOUND");
             return;
         }
 
-        document.getElementById("title").innerText = item.title || item.name || "Commercial Break";
-        document.getElementById("artist").innerText = item.artist || item.category || "";
+        const src = item?.url || item?.src;
 
-        setLoading(true);
+        UI.title().innerText = item?.title || item?.name || "Commercial Break";
+        UI.artist().innerText = item?.artist || item?.category || "";
+
+        setLoading(true, item);
         updateBroadcastUI(item);
         clearScheduledAdvance();
-
-        const src = item.url || item.src;
 
         if (!src) {
             console.error("MISSING MEDIA URL:", item);
@@ -102,73 +121,89 @@ window.MEDIA = (function () {
             return;
         }
 
+        // ---------- DRIVE ----------
         if (isDriveLink(src)) {
-            // Google Drive /view or /edit share links are page wrappers, not
-            // direct video files, and refuse to load in an iframe. Only the
-            // /preview form is embeddable, so always normalize to that here.
-            player.pause();
-            player.removeAttribute("src");
-            player.style.display = "none";
 
+            resetPlayerState(player, frame);
+
+            player.style.display = "none";
             frame.style.display = "block";
             frame.src = toDrivePreview(src);
 
             setLoading(false, item);
-            // Drive iframes don't fire an "ended" event we can listen to,
-            // so advance the queue on a timer based on the item's duration.
-            scheduleAdvance(item.duration || 30);
 
-        } else {
-            frame.style.display = "none";
-            frame.src = "about:blank";
-
-            player.style.display = "block";
-            player.loop = !!item.loop;
-            player.src = src;
-
-            player.oncanplay = () => {
-                setLoading(false, item);
-                player.play().catch(err => {
-                    console.error("PLAY FAILED:", err);
-                });
-                if (item.loop) {
-                    // looping videos never fire "onended" — advance on a timer instead
-                    scheduleAdvance(item.duration || 30);
-                }
-            };
-
-            player.onended = () => {
-                if (!item.loop) next();
-            };
-
-            player.onerror = () => {
-                console.error("MEDIA LOAD ERROR:", item);
-                next();
-            };
+            scheduleAdvance(item?.duration || 30);
+            return;
         }
+
+        // ---------- VIDEO ----------
+        frame.style.display = "none";
+        frame.src = "about:blank";
+
+        player.style.display = "block";
+        player.loop = !!item?.loop;
+        player.src = src;
+
+        player.oncanplay = () => {
+            setLoading(false, item);
+
+            player.play().catch(err => {
+                console.error("PLAY FAILED:", err);
+            });
+
+            // only schedule if looping
+            if (item?.loop) {
+                scheduleAdvance(item?.duration || 30);
+            }
+        };
+
+        player.onended = () => {
+            if (!item?.loop) next();
+        };
+
+        player.onerror = () => {
+            console.error("MEDIA LOAD ERROR:", item);
+
+            item._failCount = (item._failCount || 0) + 1;
+            if (item._failCount > 2) {
+                console.warn("Skipping permanently failed item:", item);
+            }
+
+            next();
+        };
+
+        // cleanup race conditions
+        player.onplay = clearScheduledAdvance;
+        player.onpause = clearScheduledAdvance;
     }
 
     function next() {
         if (isTransitioning) return;
+        if (!queue || queue.length === 0) {
+            console.error("QUEUE EMPTY - STOPPING");
+            return;
+        }
+
         isTransitioning = true;
         clearScheduledAdvance();
 
-        const player = document.getElementById("player");
+        const player = UI.player();
         if (player) player.style.opacity = 0.3;
 
         setTimeout(() => {
             index = (index + 1) % queue.length;
             load(queue[index]);
+
             if (player) player.style.opacity = 1;
             isTransitioning = false;
         }, 600);
     }
 
     async function start(q) {
-        queue = q || await STUDIO.generate();
+        queue = q || (STUDIO?.generate ? await STUDIO.generate() : []);
         index = 0;
 
-        if (!queue || !queue.length) {
+        if (!queue || queue.length === 0) {
             console.error("EMPTY QUEUE");
             return;
         }
@@ -176,8 +211,6 @@ window.MEDIA = (function () {
         load(queue[0]);
     }
 
-    return {
-        start
-    };
+    return { start };
 
 })();
