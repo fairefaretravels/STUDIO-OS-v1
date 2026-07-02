@@ -3,26 +3,19 @@ window.MEDIA = (function () {
     let queue = [];
     let index = 0;
 
-    function load(item) {
+   function load(item) {
 
-        console.log("NOW PLAYING:", item);
+    const player = document.getElementById("player");
 
-        const player = document.getElementById("player");
-        const title = document.getElementById("title");
+    document.getElementById("title").innerText =
+        item.title || "Commercial Break";
 
-        if (!item || !item.url) {
-            console.error("INVALID ITEM:", item);
-            return;
-        }
+    document.getElementById("artist").innerText =
+        item.artist || "";
 
-        title.innerText = item.title || "Commercial Break";
-
-        player.src = item.url;
-        player.load();
-        player.play().catch(err => {
-            console.error("PLAYBACK ERROR:", err);
-        });
-    }
+    player.src = item.url;
+    player.play();
+}
 
     function next() {
 
