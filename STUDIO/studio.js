@@ -10,49 +10,71 @@ window.STUDIO = (function () {
         return res.json();
     }
 
-    function pick(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
+    function pick(arr, lastUsed = []) {
+
+        // anti-repeat logic
+        const filtered = arr.filter(x => {
+            const count = lastUsed.filter(y => y.id === x.id).length;
+            return count < (rules.max_repeats || 2);
+        });
+
+        return filtered[Math.floor(Math.random() * filtered.length)];
     }
 
-    // 👇 THIS IS STEP 2 (PASTE HERE)
-    function buildTimeline() {
+    function add(queue, item, state) {
+        queue.push(item);
+        state.time += item.duration || 30;
+        state.history.push(item);
+    }
+
+    function buildSegment(segment) {
 
         const queue = [];
-        let time = 0;
-        const DAY_LIMIT = 24 * 60 * 60;
+        const state = {
+            time: 0,
+            history: []
+        };
 
-        function add(item) {
-            queue.push(item);
-            time += item.duration || 30;
-        }
+        const limit = segment.duration * 60 * 60;
 
-        while (time < DAY_LIMIT) {
+        while (state.time < limit) {
 
             const roll = Math.random();
 
-            if (roll < rules.content_weights.music) {
+            const musicPool = tracks.filter(t => t.type === "music");
+            const showPool = shows;
+            const adPool = ads;
 
-                let blockTime = 0;
+            if (roll < segment.music_ratio) {
 
-                while (blockTime < rules.music_block_minutes * 60) {
+                // MUSIC BLOCK (structured 25-min chunks)
+                let block = 0;
 
-                    const track = pick(tracks.filter(t => t.type === "music"));
+                while (block < (rules.music_block_target * 60)) {
+
+                    const track = pick(musicPool, state.history);
                     if (!track) break;
 
-                    add(track);
-                    blockTime += track.duration || 300;
+                    add(queue, track, state);
+                    block += track.duration || 300;
 
-                    if (blockTime % (rules.commercial_every_minutes * 60) < 30) {
+                    // smart ad insertion
+                    if (block % (10 * 60) < 30) {
 
-                        const ad = pick(ads);
-                        add({ type: "commercial", ...ad });
+                        const ad = pick(adPool, state.history);
+                        if (ad) add(queue, { type: "commercial", ...ad }, state);
                     }
                 }
 
+            } else if (roll < segment.music_ratio + segment.show_ratio) {
+
+                const show = pick(showPool, state.history);
+                if (show) add(queue, show, state);
+
             } else {
 
-                const show = pick(shows);
-                if (show) add(show);
+                const ad = pick(adPool, state.history);
+                if (ad) add(queue, { type: "commercial", ...ad }, state);
             }
         }
 
@@ -66,45 +88,17 @@ window.STUDIO = (function () {
         ads = await loadJSON("commercials.json");
         rules = await loadJSON("station_rules.json");
 
-        return buildTimeline(); // 👈 IMPORTANT
+        let final = [];
+
+        for (let segment of rules.segments) {
+            final.push(...buildSegment(segment));
+        }
+
+        return final;
     }
 
     return {
         generate
     };
-
-})();
-
-    function buildShowBlock(block) {
-        const showTrack = tracks.find(t => t.id === block.id);
-        return showTrack ? [showTrack] : [];
-    }
-
-    async function buildPlaylist() {
-
-        const schedule = await loadJSON("schedule.json");
-        const data = await loadJSON("tracks.json");
-        const adData = await loadJSON("commercials.json");
-
-        tracks = data;
-        ads = adData;
-
-        let finalQueue = [];
-
-        for (let block of schedule.blocks) {
-
-            if (block.type === "music_block") {
-                finalQueue.push(...buildMusicBlock(block));
-            }
-
-            if (block.type === "show") {
-                finalQueue.push(...buildShowBlock(block));
-            }
-        }
-
-        return finalQueue;
-    }
-
-    return { buildPlaylist };
 
 })();
