@@ -6,8 +6,7 @@
     "type": "music_video",
     "duration": 300,
     "loop": true,
-    "cover": "https://canva.link/ddr9n1up3nv7k7m",
-    "media": "https://drive.google.com/file/d/1prjcSjbmm4P_FKfgylRjeFjWPupgtP-h/preview",
+    "url": "https://drive.google.com/file/d/1prjcSjbmm4P_FKfgylRjeFjWPupgtP-h/preview",
     "featured": true
   },
   {
@@ -17,7 +16,7 @@
     "type": "music_video",
     "duration": 300,
     "loop": true,
-    "media": "https://drive.google.com/file/d/13j-7MsKqvQqNimj9dBpK4_CEzyumlVRU/preview"
+    "url": "https://drive.google.com/file/d/13j-7MsKqvQqNimj9dBpK4_CEzyumlVRU/preview"
   },
   {
     "id": "video-mix",
@@ -26,7 +25,7 @@
     "type": "music_mix",
     "duration": 1800,
     "loop": false,
-    "media": "https://drive.google.com/file/d/1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj/preview"
+    "url": "https://drive.google.com/file/d/1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj/preview"
   },
   {
     "id": "vibezz",
@@ -35,7 +34,7 @@
     "type": "music_show",
     "duration": 1800,
     "loop": false,
-    "media": "https://drive.google.com/file/d/1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk/preview"
+    "url": "https://drive.google.com/file/d/1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk/preview"
   },
   {
     "id": "griff-trailer",
@@ -44,6 +43,6 @@
     "type": "trailer",
     "duration": 180,
     "loop": false,
-    "media": "https://drive.google.com/file/d/1Lsv0wkyP86Hd34ocoVcqfDGYw_A-bfIC/preview"
+    "url": "https://drive.google.com/file/d/1Lsv0wkyP86Hd34ocoVcqfDGYw_A-bfIC/preview"
   }
 ]
