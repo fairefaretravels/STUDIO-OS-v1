@@ -6,8 +6,8 @@
       "repeat": true,
       "insertCommercialEvery": 900,
       "playlist": [
-        "distant-lover",
-        "always-getting-high"
+        "switchlades-distant-lover",
+        "switchlades-always-getting-high"
       ]
     },
     {
@@ -21,8 +21,14 @@
       "duration": 3600
     },
     {
+      "type": "track",
+      "id": "griff-trailer",
+      "duration": 180
+    },
+    {
       "type": "show",
       "id": "professor-griff",
+      "label": "MOMENTS IN MUSIC SERIES",
       "duration": 964
     }
   ]
