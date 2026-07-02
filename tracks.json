@@ -1,48 +1,34 @@
-[
-  {
-    "id": "switchlades-distant-lover",
-    "title": "Distant Lover",
-    "artist": "The Switchlades",
-    "type": "music_video",
-    "duration": 300,
-    "loop": true,
-    "url": "https://drive.google.com/file/d/1prjcSjbmm4P_FKfgylRjeFjWPupgtP-h/preview",
-    "featured": true
-  },
-  {
-    "id": "switchlades-always-getting-high",
-    "title": "Always Getting High",
-    "artist": "The Switchblades",
-    "type": "music_video",
-    "duration": 300,
-    "loop": true,
-    "url": "https://drive.google.com/file/d/13j-7MsKqvQqNimj9dBpK4_CEzyumlVRU/preview"
-  },
-  {
-    "id": "video-mix",
-    "title": "Video Mix",
-    "artist": "Studio TV",
-    "type": "music_mix",
-    "duration": 1800,
-    "loop": false,
-    "url": "https://drive.google.com/file/d/1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj/preview"
-  },
-  {
-    "id": "vibezz",
-    "title": "VIBEZZ",
-    "artist": "Studio TV",
-    "type": "music_show",
-    "duration": 1800,
-    "loop": false,
-    "url": "https://drive.google.com/file/d/1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk/preview"
-  },
-  {
-    "id": "griff-trailer",
-    "title": "Professor Griff Documentary Trailer",
-    "artist": "Studio TV",
-    "type": "trailer",
-    "duration": 180,
-    "loop": false,
-    "url": "https://drive.google.com/file/d/1Lsv0wkyP86Hd34ocoVcqfDGYw_A-bfIC/preview"
-  }
-]
+{
+  "blocks": [
+    {
+      "type": "music_block",
+      "duration": 1500,
+      "repeat": true,
+      "insertCommercialEvery": 900,
+      "playlist": [
+        "switchlades-distant-lover",
+        "switchlades-always-getting-high"
+      ]
+    },
+    {
+      "type": "show",
+      "id": "slept-on",
+      "duration": 1800
+    },
+    {
+      "type": "show",
+      "id": "g4e-live",
+      "duration": 3600
+    },
+    {
+      "type": "track",
+      "id": "griff-trailer",
+      "duration": 180
+    },
+    {
+      "type": "show",
+      "id": "professor-griff",
+      "duration": 964
+    }
+  ]
+}
