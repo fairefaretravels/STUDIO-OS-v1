@@ -128,19 +128,30 @@ window.STUDIO = (function () {
         for (const block of (schedule.blocks || [])) {
             switch (block.type) {
 
-                case "music_block":
-                    queue.push(...buildMusicBlock(block, tracksList, commercials));
+                case "music_block": {
+                    const items = buildMusicBlock(block, tracksList, commercials);
+                    if (block.label) items.forEach(it => { if (it.type !== "commercial") it.blockLabel = block.label; });
+                    queue.push(...items);
                     break;
+                }
 
                 case "show": {
                     const show = resolveShow(block.id, shows);
-                    if (show) queue.push(...expandShow(show));
+                    if (show) {
+                        const items = expandShow(show);
+                        if (block.label) items.forEach(it => it.blockLabel = block.label);
+                        queue.push(...items);
+                    }
                     break;
                 }
 
                 case "track": {
                     const track = resolveTrack(block.id, tracksList);
-                    if (track) queue.push({ ...track });
+                    if (track) {
+                        const item = { ...track };
+                        if (block.label) item.blockLabel = block.label;
+                        queue.push(item);
+                    }
                     break;
                 }
 
