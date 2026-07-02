@@ -891,17 +891,18 @@ function renderStats(queue, shows, tracksList){
   document.getElementById('statLibrary').textContent = libraryCount;
 }
 
-/* ---------- Main load ---------- */
 async function loadDashboard(){
   try {
-    const [queue, shows, tracksList] = await Promise.all([
-      STUDIO.generate(),
-      fetch('shows.json').then(r => r.json()),
-      fetch('tracks.json').then(r => r.json())
+
+    const queue = await (window.STUDIO?.generate?.() || Promise.resolve([]));
+
+    const [shows, tracksList] = await Promise.all([
+      fetch('./shows.json').then(r => r.json()).catch(() => []),
+      fetch('./tracks.json').then(r => r.json()).catch(() => [])
     ]);
 
     if (!queue.length){
-      console.error('EMPTY QUEUE — check schedule.json');
+      console.error('EMPTY QUEUE — check schedule.json or STUDIO.generate()');
       return;
     }
 
