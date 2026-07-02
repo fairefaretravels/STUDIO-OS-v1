@@ -1,14 +1,16 @@
 [
   {
-    "id": "commercial-1",
-    "title": "Commercial Break",
-    "cover": "https://canva.link/dbygxwqwww636mx",
-    "duration": 30
+    "id": "placeholder-ad-1",
+    "title": "STV Digital Network",
+    "category": "Station ID",
+    "duration": 30,
+    "url": "REPLACE_WITH_REAL_AD_URL.mp4"
   },
   {
-    "id": "commercial-2",
-    "title": "Commercial Break",
-    "cover": "https://canva.link/5ko2rdjplbujbxa",
-    "duration": 30
+    "id": "placeholder-ad-2",
+    "title": "More STV Coming Up",
+    "category": "Bumper",
+    "duration": 15,
+    "url": "REPLACE_WITH_REAL_AD_URL.mp4"
   }
 ]
