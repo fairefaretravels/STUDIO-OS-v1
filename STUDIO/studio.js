@@ -10,16 +10,41 @@ window.STUDIO = (function () {
         return res.json();
     }
 
-    function pick(arr, lastUsed = []) {
+    function weightedPick(pool, analytics, history = []) {
 
-        // anti-repeat logic
-        const filtered = arr.filter(x => {
-            const count = lastUsed.filter(y => y.id === x.id).length;
-            return count < (rules.max_repeats || 2);
-        });
+    const scored = pool.map(item => {
 
-        return filtered[Math.floor(Math.random() * filtered.length)];
+        const data = analytics?.tracks?.[item.id];
+
+        let base = 1;
+
+        if (data) {
+            const success = data.completions || 0;
+            const fails = data.dropoffs || 0;
+            base = 1 + (success * 0.3) - (fails * 0.5);
+        }
+
+        // anti-repeat penalty
+        const recentPenalty =
+            history.filter(h => h.id === item.id).length * 0.5;
+
+        return {
+            item,
+            weight: base - recentPenalty
+        };
+    });
+
+    const totalWeight = scored.reduce((sum, s) => sum + Math.max(s.weight, 0.1), 0);
+
+    let rand = Math.random() * totalWeight;
+
+    for (let s of scored) {
+        rand -= Math.max(s.weight, 0.1);
+        if (rand <= 0) return s.item;
     }
+
+    return scored[0].item;
+}
 
     function add(queue, item, state) {
         queue.push(item);
