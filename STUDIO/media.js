@@ -22,13 +22,29 @@ window.MEDIA = (function () {
 
         setLoading(true);
 
-        player.src = item.url;
+        const src = item.url || item.src;
+        if (!src) {
+            console.error("MISSING MEDIA URL:", item);
+            next();
+            return;
+        }
+
+        player.src = src;
 
         player.oncanplay = () => {
             setLoading(false);
             player.play().catch(err => {
                 console.error("PLAY FAILED:", err);
             });
+        };
+
+        player.onended = () => {
+            next();
+        };
+
+        player.onerror = () => {
+            console.error("MEDIA LOAD ERROR:", item);
+            next();
         };
     }
 
@@ -45,6 +61,26 @@ window.MEDIA = (function () {
             player.style.opacity = 1;
             isTransitioning = false;
         }, 600);
+    }
+
+    async function start(q) {
+        queue = q || await STUDIO.generate();
+        index = 0;
+
+        if (!queue || !queue.length) {
+            console.error("EMPTY QUEUE");
+            return;
+        }
+
+        load(queue[0]);
+    }
+
+    return {
+        start
+    };
+
+})();
+
     }
 
     async function start(q) {
