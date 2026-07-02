@@ -9,6 +9,23 @@
     "_note": "Duration is a guess (15s) based on it being a slide/static video — confirm actual runtime and update if different."
   },
   {
+    "id": "mack-in-the-dark",
+    "title": "Mack Magic Mobile Bar",
+    "category": "Sponsor",
+    "duration": 15,
+    "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782972594/Mackinthedark_lut8nf.mp4",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781972599/Mack_Magic_Mobile_Bar_logo_202606201221_ulgxgs.jpg",
+    "_note": "Duration is a guess (15s) — confirm actual runtime and update if different."
+  },
+  {
+    "id": "soluv",
+    "title": "So Luv",
+    "category": "Commercial",
+    "duration": 15,
+    "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782972584/soluv_thvauh.mp4",
+    "_note": "Duration is a guess (15s) — confirm actual runtime, and confirm whether this is an ad or should live in tracks.json instead."
+  },
+  {
     "id": "placeholder-ad-1",
     "title": "STV Digital Network",
     "category": "Station ID",
