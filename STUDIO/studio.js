@@ -1,47 +1,79 @@
 window.STUDIO = (function () {
 
     let tracks = [];
+    let shows = [];
     let ads = [];
+    let rules = {};
 
     async function loadJSON(file) {
         const res = await fetch(file);
         return res.json();
     }
 
-    function findTrack(id) {
-        return tracks.find(t => t.id === id);
+    function pick(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function buildMusicBlock(block) {
+    // 👇 THIS IS STEP 2 (PASTE HERE)
+    function buildTimeline() {
 
-        let queue = [];
-        let total = 0;
-        let adIndex = 0;
+        const queue = [];
+        let time = 0;
+        const DAY_LIMIT = 24 * 60 * 60;
 
-        while (total < block.duration) {
+        function add(item) {
+            queue.push(item);
+            time += item.duration || 30;
+        }
 
-            for (let id of block.playlist) {
+        while (time < DAY_LIMIT) {
 
-                if (total >= block.duration) break;
+            const roll = Math.random();
 
-                const track = findTrack(id);
-                if (!track) continue;
+            if (roll < rules.content_weights.music) {
 
-                queue.push(track);
-                total += track.duration;
+                let blockTime = 0;
 
-                // insert commercial
-                if (block.insertCommercialEvery &&
-                    total % block.insertCommercialEvery < track.duration) {
+                while (blockTime < rules.music_block_minutes * 60) {
 
-                    queue.push(ads[adIndex % ads.length]);
-                    adIndex++;
+                    const track = pick(tracks.filter(t => t.type === "music"));
+                    if (!track) break;
+
+                    add(track);
+                    blockTime += track.duration || 300;
+
+                    if (blockTime % (rules.commercial_every_minutes * 60) < 30) {
+
+                        const ad = pick(ads);
+                        add({ type: "commercial", ...ad });
+                    }
                 }
+
+            } else {
+
+                const show = pick(shows);
+                if (show) add(show);
             }
         }
 
         return queue;
     }
+
+    async function generate() {
+
+        tracks = await loadJSON("tracks.json");
+        shows = await loadJSON("shows.json");
+        ads = await loadJSON("commercials.json");
+        rules = await loadJSON("station_rules.json");
+
+        return buildTimeline(); // 👈 IMPORTANT
+    }
+
+    return {
+        generate
+    };
+
+})();
 
     function buildShowBlock(block) {
         const showTrack = tracks.find(t => t.id === block.id);
