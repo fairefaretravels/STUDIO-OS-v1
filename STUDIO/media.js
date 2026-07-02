@@ -18,7 +18,59 @@ window.MEDIA = (function () {
 
         index++;
 
-        if (index >= queue.length) {
+  window.MEDIA = (function () {
+
+    let queue = [];
+    let index = 0;
+
+    function load(item) {
+
+        console.log("NOW PLAYING:", item);
+
+        const player = document.getElementById("player");
+
+        if (!item || !item.url) {
+            console.error("INVALID ITEM:", item);
+            return;
+        }
+
+        player.src = item.url;
+        player.play();
+    }
+
+    function next() {
+
+        index++;
+
+        if (index >= queue.length) index = 0;
+
+        load(queue[index]);
+
+        setTimeout(() => {
+            next();
+        }, (queue[index].duration || 30) * 1000);
+    }
+
+    function start(q) {
+
+        queue = q;
+        index = 0;
+
+        if (!queue.length) {
+            console.error("EMPTY QUEUE");
+            return;
+        }
+
+        load(queue[0]);
+
+        setTimeout(() => {
+            next();
+        }, (queue[0].duration || 30) * 1000);
+    }
+
+    return { start };
+
+})();      if (index >= queue.length) {
             index = 0;
         }
 
