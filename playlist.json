@@ -5,7 +5,7 @@
     "type": "series",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/d62425463c8e42ad8574ff40e961c9a7_kap3f7.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/IMG_8449_ycehtq.heic",
-    "duration": 3
+    "duration": 240
   },
   {
     "id": "g4e-live",
@@ -13,7 +13,7 @@
     "type": "live_show",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/f18ea060546e4d70868c2f6321d1713f_k6hssr.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/IMG_8449_ycehtq.heic",
-    "duration": 3
+    "duration": 240
   },
   {
     "id": "live-show-1",
@@ -21,7 +21,7 @@
     "type": "talk_show",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/7369ce6bf1638f15e00f9170efc81285_zhfbup.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/stv-logo_kigykz.jpg",
-    "duration": 30
+    "duration": 240
   },
   {
     "id": "griff-01",
@@ -29,7 +29,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956585/How_a_hollow_pot_became_a_drum_peq07b.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_a_hollow_pot_became_a_drum_peq07b.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-02",
@@ -37,7 +37,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956585/How_gatekeepers_censor_political_hip_hop_qtdtke.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_gatekeepers_censor_political_hip_hop_qtdtke.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-03",
@@ -45,7 +45,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956582/Would_Public_Enemy_Be_Censored_Today__zozlyp.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Would_Public_Enemy_Be_Censored_Today__zozlyp.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-04",
@@ -53,7 +53,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956374/Why_drums_are_the_foundation_of_my_music_pvspde.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Why_drums_are_the_foundation_of_my_music_pvspde.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-05",
@@ -61,7 +61,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956368/How_I_Outsmarted_a_Backstage_Thief_zgbdwc.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_I_Outsmarted_a_Backstage_Thief_zgbdwc.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-06",
@@ -69,7 +69,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956368/Rant__Media_as_Sorcery_1_c5cvpj.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1782970125/Rant__Media_as_Sorcery_f1kryt_poster.png",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-07",
@@ -77,7 +77,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956363/Road_manager_tricks_attacker_and_locks_him_in_a_room_fsyh1a.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Road_manager_tricks_attacker_and_locks_him_in_a_room_fsyh1a.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-08",
@@ -85,7 +85,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956359/Why_drums_are_the_foundation_of_my_music_1_cvh5yi.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Why_drums_are_the_foundation_of_my_music_1_cvh5yi.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-09",
@@ -93,7 +93,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956355/How_I_Outsmarted_a_Backstage_Thief_1_quzr2b.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_I_Outsmarted_a_Backstage_Thief_1_quzr2b.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-10",
@@ -101,7 +101,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956354/Hip_Hop__Censorship_and_the_Flavor_Flav_Divide_b5odow.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Hip_Hop__Censorship_and_the_Flavor_Flav_Divide_b5odow.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-11",
@@ -109,7 +109,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956345/Is_Jesus_Invented__Professor_Griff_on_Religion_and_the__Slave_Bible__ovjgrn.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Is_Jesus_Invented__Professor_Griff_on_Religion_and_the__Slave_Bible__ovjgrn.jpg",
-    "duration": 60
+    "duration": 200
   },
   {
     "id": "griff-12",
@@ -117,7 +117,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956345/How_a_hollow_pot_became_a_drum_1_sty0yw.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_a_hollow_pot_became_a_drum_1_sty0yw.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-13",
@@ -125,7 +125,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956342/How_gatekeepers_censor_political_hip_hop_1_wfuhre.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_gatekeepers_censor_political_hip_hop_1_wfuhre.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-14",
@@ -133,7 +133,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956339/Would_Public_Enemy_Be_Censored_Today__1_lz0g4v.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Would_Public_Enemy_Be_Censored_Today__1_lz0g4v.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-15",
@@ -141,7 +141,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956320/Turning_65__why_I_m_making_my_music_documentary_now_sluqp7.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Turning_65__why_I_m_making_my_music_documentary_now_sluqp7.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-16",
@@ -149,7 +149,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956309/A_day_on_the_tour_bus__scholars_in_back__fun_in_front_oljywm.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/A_day_on_the_tour_bus__scholars_in_back__fun_in_front_oljywm.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-17",
@@ -157,7 +157,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956295/I_Joined_the_Military_to_Learn_Tactics_for_Change_qic1v8.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/I_Joined_the_Military_to_Learn_Tactics_for_Change_qic1v8.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-18",
@@ -165,7 +165,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956255/Outro_bloopers___Come_on__fumble_y1jq5b.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Outro_bloopers___Come_on__fumble_y1jq5b.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-19",
@@ -173,7 +173,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956235/When_a_European_show_turned_into_a_physical_fight_isddiw.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/When_a_European_show_turned_into_a_physical_fight_isddiw.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-20",
@@ -181,7 +181,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956234/When_a_show_almost_turned_into_a_fight_g0fx2a.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/When_a_show_almost_turned_into_a_fight_g0fx2a.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "griff-21",
@@ -189,7 +189,7 @@
     "type": "show_episode",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782355124/griffclip1_phzl8w.mp4",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/griffclip1_phzl8w.jpg",
-    "duration": 60
+    "duration": 120
   },
   {
     "id": "mack-magic-mobile-bar",
