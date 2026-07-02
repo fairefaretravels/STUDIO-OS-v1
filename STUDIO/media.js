@@ -6,21 +6,66 @@ window.MEDIA = (function () {
 
     function setLoading(state) {
         const title = document.getElementById("title");
+        if (!title) return;
+
         if (state) {
             title.innerText = "Loading Next Segment...";
+        }
+    }
+
+    function updateBroadcastUI(item) {
+        const titleText = item.title || item.name || "Commercial Break";
+        const subtitleText = item.artist || item.category || item.type || "Live Programming";
+
+        const npTitle = document.getElementById("npTitle");
+        const npSub = document.getElementById("npSub");
+        const ltHeadline = document.getElementById("ltHeadline");
+        const ltSubheadline = document.getElementById("ltSubheadline");
+        const tickerText = document.getElementById("tickerText");
+        const banner = document.getElementById("nowPlayingBanner");
+        const commercialOverlay = document.getElementById("commercialOverlay");
+
+        if (npTitle) npTitle.innerText = titleText;
+        if (npSub) npSub.innerText = subtitleText;
+        if (ltHeadline) ltHeadline.innerText = titleText;
+        if (ltSubheadline) ltSubheadline.innerText = subtitleText;
+
+        if (tickerText) {
+            tickerText.innerText =
+                `STV LIVE • NOW PLAYING: ${titleText} • ${subtitleText} • Breaking updates • Entertainment • News • Weather • Community coverage • Stay tuned`;
+        }
+
+        if (banner) {
+            banner.classList.remove("show");
+            setTimeout(() => banner.classList.add("show"), 50);
+            setTimeout(() => banner.classList.remove("show"), 5000);
+        }
+
+        if (commercialOverlay) {
+            if ((item.type || "").toLowerCase() === "commercial") {
+                commercialOverlay.classList.add("show");
+            } else {
+                commercialOverlay.classList.remove("show");
+            }
         }
     }
 
     function load(item) {
         const player = document.getElementById("player");
 
+        if (!player) {
+            console.error("PLAYER ELEMENT NOT FOUND");
+            return;
+        }
+
         document.getElementById("title").innerText =
-            item.title || "Commercial Break";
+            item.title || item.name || "Commercial Break";
 
         document.getElementById("artist").innerText =
-            item.artist || "";
+            item.artist || item.category || "";
 
         setLoading(true);
+        updateBroadcastUI(item);
 
         const src = item.url || item.src;
         if (!src) {
@@ -53,12 +98,18 @@ window.MEDIA = (function () {
         isTransitioning = true;
 
         const player = document.getElementById("player");
-        player.style.opacity = 0.3;
+        if (player) {
+            player.style.opacity = 0.3;
+        }
 
         setTimeout(() => {
             index = (index + 1) % queue.length;
             load(queue[index]);
-            player.style.opacity = 1;
+
+            if (player) {
+                player.style.opacity = 1;
+            }
+
             isTransitioning = false;
         }, 600);
     }
@@ -78,23 +129,5 @@ window.MEDIA = (function () {
     return {
         start
     };
-
-})();
-
-    }
-
-    async function start(q) {
-        queue = q || await STUDIO.generate();
-        index = 0;
-
-        if (!queue || !queue.length) {
-            console.error("EMPTY QUEUE");
-            return;
-        }
-
-        load(queue[0]);
-    }
-
-    return { start };
 
 })();
