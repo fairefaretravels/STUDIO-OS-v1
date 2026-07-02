@@ -5,7 +5,7 @@
     "type": "series",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/IMG_8449_ycehtq.heic",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/d62425463c8e42ad8574ff40e961c9a7_kap3f7.mov",
-    "duration": 1800
+    "duration": 3
   },
   {
     "id": "g4e-live",
@@ -13,34 +13,34 @@
     "type": "live_show",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/IMG_8449_ycehtq.heic",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/f18ea060546e4d70868c2f6321d1713f_k6hssr.mov",
-    "duration": 3600
+    "duration": 3
   },
   {
     "id": "live-show-1",
     "title": "THE LIVE SHOW",
     "type": "talk_show",
-    "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/MMslide_eqqhtb.mp4",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/stv-logo_kigykz.jpg",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/7369ce6bf1638f15e00f9170efc81285_zhfbup.mp4",
-    "duration": 1800
+    "duration": 30
   },
   {
     "id": "vibezz",
     "title": "VIBEZZ",
     "type": "series",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
-    "duration": 120,
+    "duration": 60,
     "episodes": [
       {
         "id": "vibezz-pt1",
         "title": "Video Mix Part 1",
-        "video": "https://drive.google.com/uc?export=download&id=1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk",
+        "url": "https://drive.google.com/uc?export=download&id=1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk",
         "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
         "duration": 60
       },
       {
         "id": "vibezz-pt2",
         "title": "Video Mix Part 2",
-        "video": "https://drive.google.com/uc?export=download&id=1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj",
+        "url": "https://drive.google.com/uc?export=download&id=1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj",
         "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
         "duration": 60
       }
