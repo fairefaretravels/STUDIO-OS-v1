@@ -126,10 +126,26 @@ video {
   <script src="media.js"></script>
 
   <script>
-    window.onload = async () => {
-      const queue = await STUDIO.generate();
-      MEDIA.start(queue);
-    };
+   window.addEventListener("DOMContentLoaded", async () => {
+
+    try {
+        console.log("Generating schedule...");
+
+        const queue = await STUDIO.generate();
+
+        console.log("Queue loaded:", queue);
+
+        if (!queue || !queue.length) {
+            console.error("EMPTY SCHEDULE");
+            return;
+        }
+
+        MEDIA.start(queue);
+
+    } catch (err) {
+        console.error("STUDIO START FAILED:", err);
+    }
+});
   </script>
 
 </body>
