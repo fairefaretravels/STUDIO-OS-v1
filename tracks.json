@@ -1,34 +1,40 @@
-{
-  "blocks": [
-    {
-      "type": "music_block",
-      "duration": 1500,
-      "repeat": true,
-      "insertCommercialEvery": 900,
-      "playlist": [
-        "switchlades-distant-lover",
-        "switchlades-always-getting-high"
-      ]
-    },
-    {
-      "type": "show",
-      "id": "slept-on",
-      "duration": 1800
-    },
-    {
-      "type": "show",
-      "id": "g4e-live",
-      "duration": 3600
-    },
-    {
-      "type": "track",
-      "id": "griff-trailer",
-      "duration": 180
-    },
-    {
-      "type": "show",
-      "id": "professor-griff",
-      "duration": 964
-    }
-  ]
-}
+[
+  {
+    "id": "griff-trailer",
+    "title": "Professor Griff — Trailer",
+    "artist": "Professor Griff",
+    "type": "trailer",
+    "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782355124/griffclip1_phzl8w.mp4",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/griffclip1_phzl8w.jpg",
+    "duration": 180
+  },
+  {
+    "id": "stv-teaser",
+    "title": "STV Broadcast Network — Teaser",
+    "artist": "STV",
+    "type": "trailer",
+    "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782971075/Copy_of_tv_TEASER_szqmgm.mp4",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1782971056/stv-logo1_nuf7fb.jpg",
+    "duration": 30
+  },
+  {
+    "id": "switchlades-distant-lover",
+    "title": "Distant Lover",
+    "artist": "The Switchlades",
+    "type": "music",
+    "url": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
+    "cover": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
+    "duration": 210,
+    "_note": "Currently only exists as a Canva link and a Google Drive share link. Export the audio/video from Canva (or convert the Drive link) and upload to Cloudinary, then replace this url/cover."
+  },
+  {
+    "id": "switchlades-always-getting-high",
+    "title": "Always Getting High",
+    "artist": "The Switchlades",
+    "type": "music",
+    "url": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
+    "cover": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
+    "duration": 210,
+    "_note": "Not yet sourced anywhere. Needs export + Cloudinary upload before the music_block will play."
+  }
+]
