@@ -116,11 +116,13 @@ window.MEDIA = (function () {
         clearScheduledAdvance();
 
         if (!src) {
-            console.error("MISSING MEDIA URL:", item);
-            next();
-            return;
-        }
-
+    console.error("MISSING MEDIA URL:", item);
+    setTimeout(() => {
+        isTransitioning = false;
+        next();
+    }, 0);
+    return;
+}
         // ---------- DRIVE ----------
         if (isDriveLink(src)) {
 
