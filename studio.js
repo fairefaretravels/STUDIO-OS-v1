@@ -1,8 +1,12 @@
 window.STUDIO = (function () {
 
+    // Root-relative so it always resolves to the real repo root,
+    // regardless of whether /watch gets served as /watch or /watch/.
+    const BASE = "/STUDIO-OS-v1/";
+
     async function loadJSON(file, fallback = []) {
         try {
-            const res = await fetch(`./${file}`);
+            const res = await fetch(`${BASE}${file}`);
             if (!res.ok) throw new Error(`${file} failed: ${res.status}`);
             return await res.json();
         } catch (err) {
@@ -19,4 +23,5 @@ window.STUDIO = (function () {
     }
 
     return { generate };
+
 })();
