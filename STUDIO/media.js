@@ -4,14 +4,16 @@ window.MEDIA = (function () {
     let index = 0;
     let isTransitioning = false;
 
-    function setLoading(state) {
-        const title = document.getElementById("title");
-        if (!title) return;
+    function setLoading(state, item) {
+    const title = document.getElementById("title");
+    if (!title) return;
 
-        if (state) {
-            title.innerText = "Loading Next Segment...";
-        }
+    if (state) {
+        title.innerText = "Loading Next Segment...";
+    } else {
+        title.innerText = item.title || item.name || "Commercial Break";
     }
+}
 
     function updateBroadcastUI(item) {
         const titleText = item.title || item.name || "Commercial Break";
@@ -77,11 +79,11 @@ window.MEDIA = (function () {
         player.src = src;
 
         player.oncanplay = () => {
-            setLoading(false);
-            player.play().catch(err => {
-                console.error("PLAY FAILED:", err);
-            });
-        };
+    setLoading(false, item);
+    player.play().catch(err => {
+        console.error("PLAY FAILED:", err);
+    });
+};
 
         player.onended = () => {
             next();
