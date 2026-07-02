@@ -16,6 +16,12 @@
       "duration": 1800
     },
     {
+      "type": "track",
+      "id": "stv-teaser",
+      "label": "COMING UP ON STV",
+      "duration": 30
+    },
+    {
       "type": "show",
       "id": "g4e-live",
       "duration": 3600
@@ -28,8 +34,12 @@
     {
       "type": "show",
       "id": "professor-griff",
-      "label": "MOMENTS IN MUSIC SERIES",
       "duration": 964
+    },
+    {
+      "type": "show",
+      "id": "vibezz",
+      "duration": 120
     }
   ]
 }
