@@ -1,165 +1,155 @@
 window.STUDIO = (function () {
 
-    let tracks = [];
-    let shows = [];
-    let ads = [];
-    let rules = {};
-    let analytics = {};
-
     // -----------------------------
     // LOAD JSON
     // -----------------------------
     async function loadJSON(file) {
         const res = await fetch(file);
+        if (!res.ok) throw new Error(`Failed to load ${file}: ${res.status}`);
         return res.json();
     }
 
+    async function loadJSONSafe(file, fallback) {
+        try {
+            return await loadJSON(file);
+        } catch (e) {
+            console.warn(`Optional file "${file}" not loaded, using fallback.`, e);
+            return fallback;
+        }
+    }
+
     // -----------------------------
-    // AI WEIGHTED PICKER
+    // LOOKUPS
     // -----------------------------
-    function weightedPick(pool, analyticsData, history = []) {
+    function resolveTrack(id, tracksList) {
+        const track = tracksList.find(t => t.id === id);
+        if (!track) console.warn(`Track id "${id}" not found in tracks.json`);
+        return track;
+    }
 
-        if (!pool || pool.length === 0) return null;
+    function resolveShow(id, showsList) {
+        const show = showsList.find(s => s.id === id);
+        if (!show) console.warn(`Show id "${id}" not found in shows.json`);
+        return show;
+    }
 
-        const scored = pool.map(item => {
+    function pickCommercial(commercials) {
+        if (!commercials || !commercials.length) return null;
+        return commercials[Math.floor(Math.random() * commercials.length)];
+    }
 
-            const data = analyticsData?.tracks?.[item.id];
-
-            let base = 1;
-
-            if (data) {
-                const success = data.completions || 0;
-                const fails = data.dropoffs || 0;
-                base = 1 + (success * 0.3) - (fails * 0.5);
-            }
-
-            // anti-repeat penalty
-            const recentPenalty =
-                history.filter(h => h.id === item.id).length * 0.5;
-
-            const weight = Math.max(base - recentPenalty, 0.1);
-
-            return { item, weight };
-        });
-
-        const total = scored.reduce((sum, s) => sum + s.weight, 0);
-
-        let rand = Math.random() * total;
-
-        for (let s of scored) {
-            rand -= s.weight;
-            if (rand <= 0) return s.item;
+    // -----------------------------
+    // EXPAND A SHOW INTO PLAYABLE QUEUE ITEMS
+    // (handles both single-video shows and series with episodes[])
+    // -----------------------------
+    function expandShow(show) {
+        if (Array.isArray(show.episodes) && show.episodes.length) {
+            return show.episodes.map(ep => ({
+                id: ep.id,
+                title: `${show.title}: ${ep.title}`,
+                artist: show.title,
+                type: "show_episode",
+                duration: ep.duration || 60,
+                url: ep.video || ep.url,
+                cover: ep.cover
+            }));
         }
 
-        return scored[0].item;
+        if (!show.url && !show.src) {
+            console.warn(`Show "${show.id}" has no url/src and no episodes[] — skipping. Add a playable url or an episodes[] array to shows.json.`);
+            return [];
+        }
+
+        return [{
+            ...show,
+            type: "show"
+        }];
     }
 
     // -----------------------------
-    // ADD ITEM TO QUEUE
+    // BUILD A MUSIC BLOCK
+    // Loops the playlist (if repeat: true) until block.duration is filled,
+    // inserting a commercial every insertCommercialEvery seconds of playback.
     // -----------------------------
-    function add(queue, item, state) {
-        if (!item) return;
-
-        queue.push(item);
-        state.time += item.duration || 30;
-        state.history.push(item);
-    }
-
-    // -----------------------------
-    // BUILD SEGMENT
-    // -----------------------------
-    function buildSegment(segment) {
-
+    function buildMusicBlock(block, tracksList, commercials) {
         const queue = [];
-        const state = {
-            time: 0,
-            history: []
-        };
+        const playlist = (block.playlist || [])
+            .map(id => resolveTrack(id, tracksList))
+            .filter(Boolean);
 
-        const segmentLimit = (segment.duration || 1) * 60 * 60; // hours → seconds
+        if (!playlist.length) {
+            console.warn("Music block has no resolvable tracks — skipping block.", block);
+            return queue;
+        }
 
-        const musicPool = tracks.filter(t => t.type === "music");
-        const showPool = shows;
-        const adPool = ads;
+        const targetDuration = block.duration || 1500;
+        let elapsed = 0;
+        let sinceLastCommercial = 0;
+        let i = 0;
 
-        while (state.time < segmentLimit) {
+        while (elapsed < targetDuration) {
+            const track = playlist[i % playlist.length];
+            queue.push({ ...track });
 
-            const roll = Math.random();
+            const dur = track.duration || 300;
+            elapsed += dur;
+            sinceLastCommercial += dur;
 
-            // -------------------------
-            // MUSIC BLOCK
-            // -------------------------
-            if (roll < segment.music_ratio) {
-
-                let blockTime = 0;
-                const target = (rules.music_block_target || 25) * 60;
-
-                while (blockTime < target && state.time < segmentLimit) {
-
-                    const track = weightedPick(musicPool, analytics, state.history);
-                    if (!track) break;
-
-                    add(queue, track, state);
-                    blockTime += track.duration || 300;
-
-                    // safe ad insertion (time-based, not modulo bug)
-                    if (state.time % (rules.commercial_every_minutes * 60 || 600) < 5) {
-
-                        const ad = weightedPick(adPool, analytics, state.history);
-                        if (ad) {
-                            add(queue, { ...ad, type: "commercial" }, state);
-                        }
-                    }
+            if (block.insertCommercialEvery && sinceLastCommercial >= block.insertCommercialEvery) {
+                const ad = pickCommercial(commercials);
+                if (ad) {
+                    queue.push({ ...ad, type: "commercial" });
                 }
-
+                sinceLastCommercial = 0;
             }
 
-            // -------------------------
-            // SHOW BLOCK
-            // -------------------------
-            else if (roll < segment.music_ratio + segment.show_ratio) {
+            i++;
 
-                const show = weightedPick(showPool, analytics, state.history);
-                add(queue, show, state);
-            }
-
-            // -------------------------
-            // AD BLOCK
-            // -------------------------
-            else {
-
-                const ad = weightedPick(adPool, analytics, state.history);
-                if (ad) add(queue, { ...ad, type: "commercial" }, state);
-            }
+            if (!block.repeat && i >= playlist.length) break;
         }
 
         return queue;
     }
 
     // -----------------------------
-    // GENERATE FULL SCHEDULE
+    // GENERATE FULL QUEUE FROM schedule.json
     // -----------------------------
     async function generate() {
 
-        tracks = await loadJSON("tracks.json");
-        shows = await loadJSON("shows.json");
-        ads = await loadJSON("commercials.json");
-        rules = await loadJSON("station_rules.json");
+        const [schedule, shows, tracksList, commercials] = await Promise.all([
+            loadJSON("schedule.json"),
+            loadJSON("shows.json"),
+            loadJSON("tracks.json"),
+            loadJSONSafe("commercials.json", [])
+        ]);
 
-        // optional analytics (safe fallback)
-        try {
-            analytics = await loadJSON("analytics.json");
-        } catch (e) {
-            analytics = { tracks: {} };
+        const queue = [];
+
+        for (const block of (schedule.blocks || [])) {
+            switch (block.type) {
+
+                case "music_block":
+                    queue.push(...buildMusicBlock(block, tracksList, commercials));
+                    break;
+
+                case "show": {
+                    const show = resolveShow(block.id, shows);
+                    if (show) queue.push(...expandShow(show));
+                    break;
+                }
+
+                case "track": {
+                    const track = resolveTrack(block.id, tracksList);
+                    if (track) queue.push({ ...track });
+                    break;
+                }
+
+                default:
+                    console.warn(`Unknown block type "${block.type}" in schedule.json — skipping.`, block);
+            }
         }
 
-        let finalQueue = [];
-
-        for (let segment of (rules.segments || [])) {
-            finalQueue.push(...buildSegment(segment));
-        }
-
-        return finalQueue;
+        return queue;
     }
 
     return {
