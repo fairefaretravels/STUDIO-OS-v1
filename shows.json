@@ -22,16 +22,13 @@
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/MMslide_eqqhtb.mp4",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/7369ce6bf1638f15e00f9170efc81285_zhfbup.mp4",
     "duration": 1800,
-    "_note": "Still only exists as a Canva share link. Not currently referenced in schedule.json blocks."
   },
   {
-    "id": "live-show-2",
-    "title": "THE LIVE SHOW",
-    "type": "talk_show",
-    "cover": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
-    "url": "PLACEHOLDER_NEEDS_CLOUDINARY_URL",
-    "duration": 1800,
-    "_note": "Still only exists as a Canva share link. Not currently referenced in schedule.json blocks."
+    ""id": "vibezz",
+        "title": "Video Mix",
+        "video": "https://drive.google.com/file/d/1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj/view?usp=sharing",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
+        "duration": 60
   },
   {
     "id": "vibezz",
