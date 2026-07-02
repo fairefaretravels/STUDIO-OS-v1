@@ -1,0 +1,21 @@
+{
+  "tracks": {
+    "distant-lover": {
+      "plays": 10,
+      "completions": 8,
+      "dropoffs": 2
+    },
+    "always-getting-high": {
+      "plays": 6,
+      "completions": 5,
+      "dropoffs": 1
+    }
+  },
+
+  "shows": {
+    "slept-on": {
+      "plays": 4,
+      "completions": 4
+    }
+  }
+}
