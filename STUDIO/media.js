@@ -2,39 +2,68 @@ window.MEDIA = (function () {
 
     let queue = [];
     let index = 0;
+    let isTransitioning = false;
 
-   function load(item) {
+    function setLoading(state) {
+        const title = document.getElementById("title");
+        if (state) {
+            title.innerText = "Loading Next Segment...";
+        }
+    }
 
-    const player = document.getElementById("player");
+    function load(item) {
 
-    document.getElementById("title").innerText =
-        item.title || "Commercial Break";
+        const player = document.getElementById("player");
 
-    document.getElementById("artist").innerText =
-        item.artist || "";
+        document.getElementById("title").innerText =
+            item.title || "Commercial Break";
 
-    player.src = item.url;
-    player.play();
-}
+        document.getElementById("artist").innerText =
+            item.artist || "";
+
+        setLoading(true);
+
+        player.src = item.url;
+
+        player.oncanplay = () => {
+            setLoading(false);
+            player.play().catch(() => {});
+        };
+    }
 
     function next() {
 
-        index++;
+        if (isTransitioning) return;
+        isTransitioning = true;
 
-        if (index >= queue.length) {
-            index = 0;
-        }
+        const player = document.getElementById("player");
 
-        load(queue[index]);
+        // fade out effect (simple TV-style cut)
+        player.style.opacity = 0.3;
 
         setTimeout(() => {
-            next();
-        }, (queue[index].duration || 30) * 1000);
+
+            index++;
+
+            if (index >= queue.length) {
+                index = 0;
+            }
+
+            load(queue[index]);
+
+            player.style.opacity = 1;
+
+            isTransitioning = false;
+
+            setTimeout(() => {
+                next();
+            }, (queue[index].duration || 30) * 1000);
+
+        }, 600);
     }
 
     async function start(q) {
 
-        // allow either passed queue OR STUDIO-generated
         queue = q || await STUDIO.generate();
 
         index = 0;
@@ -55,4 +84,5 @@ window.MEDIA = (function () {
         start
     };
 
+})();
 })();
