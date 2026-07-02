@@ -20,6 +20,23 @@
       MEDIA.start();
     };
   </script>
+  <script>
+window.onload = async () => {
+
+    console.log("STARTING STUDIO OS...");
+
+    const queue = await STUDIO.generate();
+
+    console.log("QUEUE GENERATED:", queue);
+
+    if (!queue || !queue.length) {
+        console.error("QUEUE IS EMPTY");
+        return;
+    }
+
+    MEDIA.start(queue);
+};
+</script>
 
 </body>
 </html>
