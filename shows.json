@@ -26,5 +26,105 @@
     "type": "talk_show",
     "cover": "https://canva.link/9r9y3b33fl8q0xl",
     "duration": 1800
+  },
+  {
+    "id": "professor-griff",
+    "title": "PROFESSOR GRIFF",
+    "type": "series",
+    "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/griffclip1_phzl8w.jpg",
+    "duration": 964,
+    "episodes": [
+      {
+        "id": "road-manager-trick",
+        "title": "Road Manager Tricks Attacker and Locks Him in a Room",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956363/Road_manager_tricks_attacker_and_locks_him_in_a_room_fsyh1a.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Road_manager_tricks_attacker_and_locks_him_in_a_room_fsyh1a.jpg",
+        "duration": 118
+      },
+      {
+        "id": "show-almost-fight",
+        "title": "When a Show Almost Turned Into a Fight",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956234/When_a_show_almost_turned_into_a_fight_g0fx2a.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/When_a_show_almost_turned_into_a_fight_g0fx2a.jpg",
+        "duration": 41
+      },
+      {
+        "id": "european-show-fight",
+        "title": "When a European Show Turned Into a Physical Fight",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956235/When_a_European_show_turned_into_a_physical_fight_isddiw.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/When_a_European_show_turned_into_a_physical_fight_isddiw.jpg",
+        "duration": 31
+      },
+      {
+        "id": "outro-bloopers",
+        "title": "Outro Bloopers: \"Come On, Fumble\"",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956255/Outro_bloopers___Come_on__fumble_y1jq5b.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Outro_bloopers___Come_on__fumble_y1jq5b.jpg",
+        "duration": 57
+      },
+      {
+        "id": "joined-military",
+        "title": "I Joined the Military to Learn Tactics for Change",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956295/I_Joined_the_Military_to_Learn_Tactics_for_Change_qic1v8.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/I_Joined_the_Military_to_Learn_Tactics_for_Change_qic1v8.jpg",
+        "duration": 51
+      },
+      {
+        "id": "tour-bus-day",
+        "title": "A Day on the Tour Bus: Scholars in Back, Fun in Front",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956309/A_day_on_the_tour_bus__scholars_in_back__fun_in_front_oljywm.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/A_day_on_the_tour_bus__scholars_in_back__fun_in_front_oljywm.jpg",
+        "duration": 61
+      },
+      {
+        "id": "turning-65-documentary",
+        "title": "Turning 65: Why I'm Making My Music Documentary Now",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956320/Turning_65__why_I_m_making_my_music_documentary_now_sluqp7.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Turning_65__why_I_m_making_my_music_documentary_now_sluqp7.jpg",
+        "duration": 88
+      },
+      {
+        "id": "public-enemy-censored",
+        "title": "Would Public Enemy Be Censored Today?",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956339/Would_Public_Enemy_Be_Censored_Today__1_lz0g4v.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Would_Public_Enemy_Be_Censored_Today__1_lz0g4v.jpg",
+        "duration": 78
+      },
+      {
+        "id": "hollow-pot-drum",
+        "title": "How a Hollow Pot Became a Drum",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956345/How_a_hollow_pot_became_a_drum_1_sty0yw.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_a_hollow_pot_became_a_drum_1_sty0yw.jpg",
+        "duration": 64
+      },
+      {
+        "id": "jesus-invented-slave-bible",
+        "title": "Is Jesus Invented? Professor Griff on Religion and the \"Slave Bible\"",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956345/Is_Jesus_Invented__Professor_Griff_on_Religion_and_the__Slave_Bible__ovjgrn.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Is_Jesus_Invented__Professor_Griff_on_Religion_and_the__Slave_Bible__ovjgrn.jpg",
+        "duration": 64
+      },
+      {
+        "id": "backstage-thief",
+        "title": "How I Outsmarted a Backstage Thief",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956355/How_I_Outsmarted_a_Backstage_Thief_1_quzr2b.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_I_Outsmarted_a_Backstage_Thief_1_quzr2b.jpg",
+        "duration": 104
+      },
+      {
+        "id": "drums-foundation",
+        "title": "Why Drums Are the Foundation of My Music",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956359/Why_drums_are_the_foundation_of_my_music_1_cvh5yi.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Why_drums_are_the_foundation_of_my_music_1_cvh5yi.jpg",
+        "duration": 106
+      },
+      {
+        "id": "rant-media-sorcery",
+        "title": "Rant: Media as Sorcery",
+        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956368/Rant__Media_as_Sorcery_1_c5cvpj.mp4",
+        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Rant__Media_as_Sorcery_1_c5cvpj.jpg",
+        "duration": 101
+      }
+    ]
   }
 ]
