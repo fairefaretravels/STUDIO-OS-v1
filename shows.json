@@ -5,7 +5,7 @@
     "type": "series",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/IMG_8449_ycehtq.heic",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/d62425463c8e42ad8574ff40e961c9a7_kap3f7.mov",
-    "duration": 1800,
+    "duration": 1800
   },
   {
     "id": "g4e-live",
@@ -13,7 +13,7 @@
     "type": "live_show",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/IMG_8449_ycehtq.heic",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/f18ea060546e4d70868c2f6321d1713f_k6hssr.mov",
-    "duration": 3600,
+    "duration": 3600
   },
   {
     "id": "live-show-1",
@@ -21,14 +21,7 @@
     "type": "talk_show",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/MMslide_eqqhtb.mp4",
     "url": "https://res.cloudinary.com/dyqfcbgqo/video/upload/7369ce6bf1638f15e00f9170efc81285_zhfbup.mp4",
-    "duration": 1800,
-  },
-  {
-    ""id": "vibezz",
-        "title": "Video Mix",
-        "video": "https://drive.google.com/file/d/1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj/view?usp=sharing",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
-        "duration": 60
+    "duration": 1800
   },
   {
     "id": "vibezz",
@@ -36,24 +29,24 @@
     "type": "series",
     "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
     "duration": 120,
-    "_note": "Episode titles/durations are placeholders — real names and runtimes weren't provided yet, update once known. Cruizn.jpeg is used as the show cover/end-card per your note that it 'goes at the end of vibezz'.",
     "episodes": [
       {
         "id": "vibezz-pt1",
-        "title": "Vibezz — Part 1",
-        "video": "https://drive.google.com/file/d/1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk/view?usp=sharing",
+        "title": "Video Mix Part 1",
+        "video": "https://drive.google.com/uc?export=download&id=1gV92Ksxo8MzgeExucfY1O-KTCUicIoJk",
         "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
         "duration": 60
       },
       {
         "id": "vibezz-pt2",
-        "title": "Vibezz — Part 2",
-        "video": "https://drive.google.com/file/d/1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj/view?usp=sharing",
+        "title": "Video Mix Part 2",
+        "video": "https://drive.google.com/uc?export=download&id=1M4Jin6UaOVumke4pY5C-9XVhkYqdaohj",
         "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1781970541/Cruizn.jpeg_mav9a8.png",
         "duration": 60
       }
     ]
   },
+
   {
     "id": "professor-griff",
     "title": "PROFESSOR GRIFF",
@@ -61,111 +54,7 @@
     "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/griffclip1_phzl8w.jpg",
     "duration": 964,
     "episodes": [
-      {
-        "id": "road-manager-trick",
-        "title": "Road Manager Tricks Attacker and Locks Him in a Room",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956363/Road_manager_tricks_attacker_and_locks_him_in_a_room_fsyh1a.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Road_manager_tricks_attacker_and_locks_him_in_a_room_fsyh1a.jpg",
-        "duration": 118
-      },
-      {
-        "id": "show-almost-fight",
-        "title": "When a Show Almost Turned Into a Fight",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956234/When_a_show_almost_turned_into_a_fight_g0fx2a.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/When_a_show_almost_turned_into_a_fight_g0fx2a.jpg",
-        "duration": 41
-      },
-      {
-        "id": "european-show-fight",
-        "title": "When a European Show Turned Into a Physical Fight",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956235/When_a_European_show_turned_into_a_physical_fight_isddiw.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/When_a_European_show_turned_into_a_physical_fight_isddiw.jpg",
-        "duration": 31
-      },
-      {
-        "id": "outro-bloopers",
-        "title": "Outro Bloopers: \"Come On, Fumble\"",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956255/Outro_bloopers___Come_on__fumble_y1jq5b.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Outro_bloopers___Come_on__fumble_y1jq5b.jpg",
-        "duration": 57
-      },
-      {
-        "id": "joined-military",
-        "title": "I Joined the Military to Learn Tactics for Change",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956295/I_Joined_the_Military_to_Learn_Tactics_for_Change_qic1v8.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/I_Joined_the_Military_to_Learn_Tactics_for_Change_qic1v8.jpg",
-        "duration": 51
-      },
-      {
-        "id": "tour-bus-day",
-        "title": "A Day on the Tour Bus: Scholars in Back, Fun in Front",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956309/A_day_on_the_tour_bus__scholars_in_back__fun_in_front_oljywm.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/A_day_on_the_tour_bus__scholars_in_back__fun_in_front_oljywm.jpg",
-        "duration": 61
-      },
-      {
-        "id": "turning-65-documentary",
-        "title": "Turning 65: Why I'm Making My Music Documentary Now",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956320/Turning_65__why_I_m_making_my_music_documentary_now_sluqp7.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Turning_65__why_I_m_making_my_music_documentary_now_sluqp7.jpg",
-        "duration": 88
-      },
-      {
-        "id": "public-enemy-censored",
-        "title": "Would Public Enemy Be Censored Today?",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956339/Would_Public_Enemy_Be_Censored_Today__1_lz0g4v.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Would_Public_Enemy_Be_Censored_Today__1_lz0g4v.jpg",
-        "duration": 78
-      },
-      {
-        "id": "hollow-pot-drum",
-        "title": "How a Hollow Pot Became a Drum",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956345/How_a_hollow_pot_became_a_drum_1_sty0yw.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_a_hollow_pot_became_a_drum_1_sty0yw.jpg",
-        "duration": 64
-      },
-      {
-        "id": "jesus-invented-slave-bible",
-        "title": "Is Jesus Invented? Professor Griff on Religion and the \"Slave Bible\"",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956345/Is_Jesus_Invented__Professor_Griff_on_Religion_and_the__Slave_Bible__ovjgrn.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Is_Jesus_Invented__Professor_Griff_on_Religion_and_the__Slave_Bible__ovjgrn.jpg",
-        "duration": 64
-      },
-      {
-        "id": "backstage-thief",
-        "title": "How I Outsmarted a Backstage Thief",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956355/How_I_Outsmarted_a_Backstage_Thief_1_quzr2b.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_I_Outsmarted_a_Backstage_Thief_1_quzr2b.jpg",
-        "duration": 104
-      },
-      {
-        "id": "drums-foundation",
-        "title": "Why Drums Are the Foundation of My Music",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956359/Why_drums_are_the_foundation_of_my_music_1_cvh5yi.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Why_drums_are_the_foundation_of_my_music_1_cvh5yi.jpg",
-        "duration": 106
-      },
-      {
-        "id": "rant-media-sorcery",
-        "title": "Rant: Media as Sorcery",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782956368/Rant__Media_as_Sorcery_1_c5cvpj.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/image/upload/v1782970125/Rant__Media_as_Sorcery_f1kryt_poster.png",
-        "duration": 101
-      },
-      {
-        "id": "gatekeepers-censor-hip-hop",
-        "title": "How Gatekeepers Censor Political Hip Hop",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782971591/How_gatekeepers_censor_political_hip_hop_1_letaiz.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/How_gatekeepers_censor_political_hip_hop_1_letaiz.jpg",
-        "duration": 60
-      },
-      {
-        "id": "flavor-flav-divide",
-        "title": "Hip Hop, Censorship, and the Flavor Flav Divide",
-        "video": "https://res.cloudinary.com/dyqfcbgqo/video/upload/v1782971595/Hip_Hop__Censorship_and_the_Flavor_Flav_Divide_cf3tqj.mp4",
-        "cover": "https://res.cloudinary.com/dyqfcbgqo/video/upload/so_0/Hip_Hop__Censorship_and_the_Flavor_Flav_Divide_cf3tqj.jpg",
-        "duration": 60
-      }
+      ...
     ]
   }
 ]
