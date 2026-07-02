@@ -10,17 +10,20 @@
         "always-getting-high"
       ]
     },
-
     {
       "type": "show",
       "id": "slept-on",
       "duration": 1800
     },
-
     {
       "type": "show",
       "id": "g4e-live",
       "duration": 3600
+    },
+    {
+      "type": "show",
+      "id": "professor-griff",
+      "duration": 964
     }
   ]
 }
