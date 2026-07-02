@@ -1,28 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>STUDIO OS - LIVE</title>
 
   <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #111827;
+      --panel-border: #222;
+      --text: #ffffff;
+      --muted: #aaaaaa;
+      --danger: #d40000;
+      --danger-bright: #ff2d2d;
+      --gold: #ffd54a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      background: #0b0f14;
-      color: white;
+      background: var(--bg);
+      color: var(--text);
       font-family: Arial, sans-serif;
     }
 
-    /* TOP BAR */
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 20px;
-      background: #111827;
-      border-bottom: 1px solid #222;
+      background: var(--panel);
+      border-bottom: 1px solid var(--panel-border);
     }
 
     .live {
-      color: red;
+      color: #ff3b3b;
       font-weight: bold;
       letter-spacing: 2px;
     }
@@ -32,27 +48,32 @@
       grid-template-columns: 2fr 1fr;
       gap: 20px;
       padding: 20px;
+      align-items: start;
     }
 
-    /* PLAYER AREA */
     .player-box {
+      position: relative;
       background: #111;
       border-radius: 12px;
       overflow: hidden;
+      min-height: 500px;
     }
 
-    video, iframe {
+    video,
+    iframe {
       width: 100%;
       height: 500px;
+      display: block;
       border: none;
       background: black;
     }
-video {
-    transition: opacity 0.6s ease;
-}
-    /* INFO PANEL */
+
+    video {
+      transition: opacity 0.6s ease;
+    }
+
     .info {
-      background: #111827;
+      background: var(--panel);
       border-radius: 12px;
       padding: 15px;
     }
@@ -63,7 +84,7 @@ video {
     }
 
     .artist {
-      color: #aaa;
+      color: var(--muted);
       margin-bottom: 20px;
     }
 
@@ -71,6 +92,7 @@ video {
       display: flex;
       gap: 10px;
       align-items: center;
+      margin-bottom: 12px;
     }
 
     .dot {
@@ -82,282 +104,319 @@ video {
     }
 
     @keyframes blink {
-      50% { opacity: 0.3; }
+      50% {
+        opacity: 0.3;
+      }
     }
-    .player-box {
-  position: relative;
-}
 
-.broadcast-overlay {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  overflow: hidden;
-}
+    .broadcast-overlay {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      overflow: hidden;
+    }
 
-.channel-bug {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  background: rgba(180, 0, 0, 0.92);
-  color: white;
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 1px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  box-shadow: 0 0 18px rgba(0,0,0,0.35);
-  text-transform: uppercase;
-}
+    .channel-bug {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(180, 0, 0, 0.92);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
+      text-transform: uppercase;
+    }
 
-.now-playing-banner {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  min-width: 320px;
-  max-width: 520px;
-  background: linear-gradient(90deg, rgba(180,0,0,0.95), rgba(30,30,30,0.9));
-  color: white;
-  padding: 10px 14px;
-  border-left: 5px solid #ffd54a;
-  transform: translateX(-120%);
-  opacity: 0;
-  transition: transform 0.6s ease, opacity 0.6s ease;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-}
-
-.now-playing-banner.show {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.np-label {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: #ffd54a;
-  margin-bottom: 4px;
-}
-
-.np-title {
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.np-sub {
-  font-size: 13px;
-  color: rgba(255,255,255,0.82);
-  margin-top: 3px;
-}
-
-.lower-third {
-  position: absolute;
-  left: 18px;
-  bottom: 56px;
-  display: flex;
-  align-items: stretch;
-  min-width: 500px;
-  max-width: 72%;
-  background: rgba(10, 10, 10, 0.82);
-  backdrop-filter: blur(4px);
-  border-top: 3px solid #c40000;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  opacity: 0.98;
-}
-
-.lt-accent {
-  width: 10px;
-  background: linear-gradient(180deg, #ff2d2d, #8b0000);
-}
-
-.lt-content {
-  padding: 12px 16px;
-}
-
-.lt-kicker {
-  font-size: 11px;
-  font-weight: 800;
-  color: #ff5252;
-  letter-spacing: 1.5px;
-  margin-bottom: 3px;
-}
-
-.lt-headline {
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1.05;
-  color: white;
-  text-transform: uppercase;
-}
-
-.lt-subheadline {
-  font-size: 14px;
-  color: rgba(255,255,255,0.82);
-  margin-top: 5px;
-}
-
-.ticker-wrap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 42px;
-  display: flex;
-  background: rgba(120, 0, 0, 0.95);
-  border-top: 1px solid rgba(255,255,255,0.12);
-}
-
-.ticker-label {
-  flex: 0 0 130px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #e00000;
-  color: white;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.ticker-track {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-}
-
-.ticker-text {
-  white-space: nowrap;
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-  padding-left: 100%;
-  animation: tickerScroll 20s linear infinite;
-}
-
-@keyframes tickerScroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.commercial-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(40,40,40,0.85), rgba(0,0,0,0.95));
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.commercial-overlay.show {
-  display: flex;
-}
-
-.commercial-card {
-  text-align: center;
-  padding: 40px 60px;
-  background: rgba(20,20,20,0.9);
-  border: 2px solid rgba(255,255,255,0.08);
-  box-shadow: 0 0 40px rgba(0,0,0,0.4);
-}
-
-.commercial-label {
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: #ff5a5a;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.commercial-title {
-  font-size: 36px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.commercial-sub {
-  margin-top: 8px;
-  color: rgba(255,255,255,0.7);
-  font-size: 14px;
-}
     .logo-bug {
-  background: transparent;
-  padding: 0;
-}
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+    }
 
-.logo-bug img {
-  width: 90px;
-  height: auto;
-  opacity: 0.92;
-  filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
-}
+    .logo-bug img {
+      width: 90px;
+      height: auto;
+      opacity: 0.92;
+      filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+      display: block;
+    }
 
+    .now-playing-banner {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      min-width: 320px;
+      max-width: 520px;
+      background: linear-gradient(90deg, rgba(180, 0, 0, 0.95), rgba(30, 30, 30, 0.9));
+      color: white;
+      padding: 10px 14px;
+      border-left: 5px solid var(--gold);
+      transform: translateX(-120%);
+      opacity: 0;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
 
+    .now-playing-banner.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .np-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .np-title {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .np-sub {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.82);
+      margin-top: 3px;
+    }
+
+    .lower-third {
+      position: absolute;
+      left: 18px;
+      bottom: 56px;
+      display: flex;
+      align-items: stretch;
+      min-width: 500px;
+      max-width: 72%;
+      background: rgba(10, 10, 10, 0.82);
+      backdrop-filter: blur(4px);
+      border-top: 3px solid #c40000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      opacity: 0.98;
+    }
+
+    .lt-accent {
+      width: 10px;
+      background: linear-gradient(180deg, var(--danger-bright), #8b0000);
+    }
+
+    .lt-content {
+      padding: 12px 16px;
+    }
+
+    .lt-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ff5252;
+      letter-spacing: 1.5px;
+      margin-bottom: 3px;
+    }
+
+    .lt-headline {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.05;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .lt-subheadline {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.82);
+      margin-top: 5px;
+    }
+
+    .ticker-wrap {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 42px;
+      display: flex;
+      background: rgba(120, 0, 0, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .ticker-label {
+      flex: 0 0 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e00000;
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .ticker-track {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-text {
+      white-space: nowrap;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      padding-left: 100%;
+      animation: tickerScroll 20s linear infinite;
+    }
+
+    @keyframes tickerScroll {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    .commercial-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(40, 40, 40, 0.85), rgba(0, 0, 0, 0.95));
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .commercial-overlay.show {
+      display: flex;
+    }
+
+    .commercial-card {
+      text-align: center;
+      padding: 40px 60px;
+      background: rgba(20, 20, 20, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .commercial-label {
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: #ff5a5a;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .commercial-title {
+      font-size: 36px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .commercial-sub {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .lower-third {
+        min-width: auto;
+        max-width: calc(100% - 36px);
+      }
+    }
+
+    @media (max-width: 700px) {
+      video,
+      iframe,
+      .player-box {
+        min-height: 320px;
+        height: 320px;
+      }
+
+      .now-playing-banner {
+        min-width: auto;
+        max-width: calc(100% - 36px);
+      }
+
+      .lt-headline {
+        font-size: 18px;
+      }
+
+      .lt-subheadline {
+        font-size: 12px;
+      }
+
+      .ticker-label {
+        flex-basis: 100px;
+        font-size: 10px;
+      }
+
+      .ticker-text {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- TOP BAR -->
   <div class="topbar">
     <div>STUDIO OS LIVE CHANNEL</div>
     <div class="live">● LIVE</div>
   </div>
 
-  <!-- MAIN -->
   <div class="container">
-
-    <!-- PLAYER -->
     <div class="player-box">
       <video id="player" controls autoplay muted></video>
-    </div>
-    
-<div class="broadcast-overlay">
-  <div class="channel-bug logo-bug">
-  <img src="media/stv-logo.png" alt="STV Live">
-</div>
 
-  <div class="now-playing-banner" id="nowPlayingBanner">
-    <div class="np-label">NOW PLAYING</div>
-    <div class="np-title" id="npTitle">Loading...</div>
-    <div class="np-sub" id="npSub">Stand by</div>
-  </div>
+      <div class="broadcast-overlay">
+        <div class="channel-bug logo-bug">
+          <img src="media/stv-logo.png" alt="STV Live" />
+        </div>
 
-  <div class="lower-third" id="lowerThird">
-    <div class="lt-accent"></div>
-    <div class="lt-content">
-      <div class="lt-kicker">LIVE</div>
-      <div class="lt-headline" id="ltHeadline">STV Broadcast Network</div>
-      <div class="lt-subheadline" id="ltSubheadline">Programming will begin shortly</div>
-    </div>
-  </div>
+        <div class="now-playing-banner" id="nowPlayingBanner">
+          <div class="np-label">NOW PLAYING</div>
+          <div class="np-title" id="npTitle">Loading...</div>
+          <div class="np-sub" id="npSub">Stand by</div>
+        </div>
 
-  <div class="ticker-wrap">
-    <div class="ticker-label">HEADLINES</div>
-    <div class="ticker-track">
-      <div class="ticker-text" id="tickerText">
-        STV LIVE • Breaking updates • Entertainment • News • Weather • Music • Community programming • Stay tuned for more
+        <div class="lower-third" id="lowerThird">
+          <div class="lt-accent"></div>
+          <div class="lt-content">
+            <div class="lt-kicker">LIVE</div>
+            <div class="lt-headline" id="ltHeadline">STV Broadcast Network</div>
+            <div class="lt-subheadline" id="ltSubheadline">Programming will begin shortly</div>
+          </div>
+        </div>
+
+        <div class="ticker-wrap">
+          <div class="ticker-label">HEADLINES</div>
+          <div class="ticker-track">
+            <div class="ticker-text" id="tickerText">
+              STV LIVE • Breaking updates • Entertainment • News • Weather • Music • Community programming • Stay tuned for more
+            </div>
+          </div>
+        </div>
+
+        <div class="commercial-overlay" id="commercialOverlay">
+          <div class="commercial-card">
+            <div class="commercial-label">WE'LL BE RIGHT BACK</div>
+            <div class="commercial-title">Commercial Break</div>
+            <div class="commercial-sub">STV Broadcast Network</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="commercial-overlay" id="commercialOverlay">
-    <div class="commercial-card">
-      <div class="commercial-label">WE'LL BE RIGHT BACK</div>
-      <div class="commercial-title">Commercial Break</div>
-      <div class="commercial-sub">STV Broadcast Network</div>
-    </div>
-  </div>
-</div>
-
-    <!-- INFO -->
     <div class="info">
       <div class="status">
         <div class="dot"></div>
@@ -367,22 +426,20 @@ video {
       <div class="title" id="title">Loading...</div>
       <div class="artist" id="artist"></div>
 
-      <hr style="border-color:#222">
+      <hr style="border-color:#222" />
 
-      <div style="color:#888;font-size:12px">
+      <div style="color:#888; font-size:12px;">
         STUDIO OS Broadcast Engine v3
       </div>
     </div>
-
   </div>
 
   <script src="studio.js"></script>
   <script src="media.js"></script>
 
   <script>
-   window.addEventListener("DOMContentLoaded", async () => {
-
-    try {
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
         console.log("Generating schedule...");
 
         const queue = await STUDIO.generate();
@@ -390,17 +447,15 @@ video {
         console.log("Queue loaded:", queue);
 
         if (!queue || !queue.length) {
-            console.error("EMPTY SCHEDULE");
-            return;
+          console.error("EMPTY SCHEDULE");
+          return;
         }
 
         MEDIA.start(queue);
-
-    } catch (err) {
+      } catch (err) {
         console.error("STUDIO START FAILED:", err);
-    }
-});
+      }
+    });
   </script>
-
 </body>
 </html>
