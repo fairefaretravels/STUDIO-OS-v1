@@ -897,9 +897,15 @@ async function loadDashboard(){
     const queue = await (window.STUDIO?.generate?.() || Promise.resolve([]));
 
     const [shows, tracksList] = await Promise.all([
-      fetch('./shows.json').then(r => r.json()).catch(() => []),
-      fetch('./tracks.json').then(r => r.json()).catch(() => [])
-    ]);
+    const [shows, tracksList] = await Promise.all([
+  fetch('./shows.json')
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => []),
+
+  fetch('./tracks.json')
+    .then(r => r.ok ? r.json() : [])
+    .catch(() => [])
+]);
 
     if (!queue.length){
       console.error('EMPTY QUEUE — check schedule.json or STUDIO.generate()');
