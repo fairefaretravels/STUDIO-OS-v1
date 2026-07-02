@@ -891,20 +891,19 @@ function renderStats(queue, shows, tracksList){
   document.getElementById('statLibrary').textContent = libraryCount;
 }
 
-async function loadDashboard(){
+async function safeFetchJSON(url, fallback = []) {
   try {
+    const r = await fetch(url);
+    if (!r.ok) return fallback;
+    return await r.json();
+  } catch {
+    return fallback;
+  }
+}
 
-    const queue = await (window.STUDIO?.generate?.() || Promise.resolve([]));
-
-    const [shows, tracksList] = await Promise.all([
-    const [shows, tracksList] = await Promise.all([
-  fetch('./shows.json')
-    .then(r => r.ok ? r.json() : [])
-    .catch(() => []),
-
-  fetch('./tracks.json')
-    .then(r => r.ok ? r.json() : [])
-    .catch(() => [])
+const [shows, tracksList] = await Promise.all([
+  safeFetchJSON('./shows.json', []),
+  safeFetchJSON('./tracks.json', [])
 ]);
 
     if (!queue.length){
