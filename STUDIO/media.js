@@ -153,20 +153,47 @@ window.MEDIA = (function () {
         }, 600);
     }
 
-    async function start(q) {
-        queue = q || await STUDIO.generate();
-        index = 0;
+    async function loadDashboard(){
+  try {
+    const [queue, shows, tracksList] = await Promise.all([
+      STUDIO.generate(),
+      safeFetchJSON('./shows.json', []),
+      safeFetchJSON('./tracks.json', [])
+    ]);
 
-        if (!queue || !queue.length) {
-            console.error("EMPTY QUEUE");
-            return;
-        }
-
-        load(queue[0]);
+    if (!queue.length){
+      console.error('EMPTY QUEUE — check schedule.json or STUDIO.generate()');
+      return;
     }
 
-    return {
-        start
+    // tag episodes with their parent show's type for classification/coloring
+    const showTypeById = {};
+    shows.forEach(s => showTypeById[s.id] = s.type);
+    queue.forEach(item => {
+      if (item.type === 'show' || item.type === 'show_episode') {
+        item.showType = showTypeById[item.id] || item.showType;
+      }
+    });
+
+    const { timeline } = buildTimeline(queue, 4);
+    if (!timeline.length){
+      console.error('EMPTY TIMELINE');
+      return;
+    }
+
+    const nowIndex = findNowIndex(timeline);
+    renderOnAir(timeline[nowIndex], timeline[nowIndex + 1]);
+    renderLineup(timeline, nowIndex);
+    renderDonut(queue);
+    renderStats(queue, shows, tracksList);
+
+  } catch (err) {
+    console.error('DASHBOARD LOAD FAILED:', err);
+  }
+}
+
+loadDashboard();
+setInterval(loadDashboard, 60000); // re-sync now-playing every minute
     };
 
 })();
