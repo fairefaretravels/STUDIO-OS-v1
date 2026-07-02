@@ -19,5 +19,4 @@ window.STUDIO = (function () {
     }
 
     return { generate };
-
 })();
