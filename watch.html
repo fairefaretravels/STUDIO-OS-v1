@@ -288,10 +288,21 @@ video {
   color: rgba(255,255,255,0.7);
   font-size: 14px;
 }
+    .logo-bug {
+  background: transparent;
+  padding: 0;
+}
+
+.logo-bug img {
+  width: 90px;
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+}
+
 
   </style>
 </head>
-
 <body>
 
   <!-- TOP BAR -->
@@ -307,8 +318,11 @@ video {
     <div class="player-box">
       <video id="player" controls autoplay muted></video>
     </div>
+    
 <div class="broadcast-overlay">
-  <div class="channel-bug">STV LIVE</div>
+  <div class="channel-bug logo-bug">
+  <img src="media/stv-logo.png" alt="STV Live">
+</div>
 
   <div class="now-playing-banner" id="nowPlayingBanner">
     <div class="np-label">NOW PLAYING</div>
