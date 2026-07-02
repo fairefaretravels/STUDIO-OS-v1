@@ -41,8 +41,6 @@
     grid-template-columns: 236px 1fr;
     min-height:100vh;
   }
-
-  /* SIDEBAR */
   .sidebar{
     background: #090a10;
     border-right: 1px solid var(--border);
@@ -51,96 +49,48 @@
     flex-direction:column;
     gap: 22px;
   }
-  .brand{
-    display:flex;
-    flex-direction:column;
-    padding: 0 8px 14px 8px;
-  }
+  .brand{ display:flex; flex-direction:column; padding: 0 8px 14px 8px; }
   .brand-mark{
-    font-size:22px;
-    font-weight:800;
-    letter-spacing: 0.5px;
+    font-size:22px; font-weight:800; letter-spacing: 0.5px;
     background: linear-gradient(90deg, #ff5b6a, #7c5cff);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .brand-sub{
-    font-size:9.5px;
-    letter-spacing:2px;
-    color: var(--text-faint);
-    margin-top:2px;
-    font-weight:600;
-  }
+  .brand-sub{ font-size:9.5px; letter-spacing:2px; color: var(--text-faint); margin-top:2px; font-weight:600; }
   .nav-group{ display:flex; flex-direction:column; gap:2px; }
-  .nav-label{
-    font-size:10px;
-    letter-spacing:1.2px;
-    color: var(--text-faint);
-    padding: 10px 10px 6px 10px;
-    font-weight:700;
-  }
+  .nav-label{ font-size:10px; letter-spacing:1.2px; color: var(--text-faint); padding: 10px 10px 6px 10px; font-weight:700; }
   .nav-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    color: var(--text-dim);
-    cursor:pointer;
-    font-size: 13.5px;
-    font-weight:500;
-    transition: background .15s, color .15s;
-    user-select:none;
+    display:flex; align-items:center; gap:10px; padding: 8px 10px; border-radius: 8px;
+    color: var(--text-dim); cursor:pointer; font-size: 13.5px; font-weight:500;
+    transition: background .15s, color .15s; user-select:none;
   }
   .nav-item svg{ width:16px; height:16px; flex-shrink:0; opacity:.85; }
   .nav-item:hover{ background: #171b28; color: var(--text); }
   .nav-item.active{
     background: linear-gradient(90deg, rgba(124,92,255,.18), rgba(124,92,255,.03));
-    color: #fff;
-    border: 1px solid rgba(124,92,255,.35);
+    color: #fff; border: 1px solid rgba(124,92,255,.35);
   }
   .ai-status{
-    margin-top:auto;
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-    display:flex;
-    align-items:center;
-    gap:10px;
+    margin-top:auto; background: var(--panel); border:1px solid var(--border);
+    border-radius: var(--radius); padding: 12px; display:flex; align-items:center; gap:10px;
   }
   .ai-status .dot{ width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
   .ai-status-icon{
     width:34px;height:34px;border-radius:9px;
     background: linear-gradient(135deg, #7c5cff, #4b2fcc);
-    display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center; flex-shrink:0;
   }
   .ai-status-text{ display:flex; flex-direction:column; gap:1px; }
   .ai-status-text .t1{ font-weight:700; font-size:12.5px; }
   .ai-status-text .t2{ font-size:11px; color:var(--green); display:flex; align-items:center; gap:5px; }
   .ai-status-text .t3{ font-size:10.5px; color:var(--text-faint); }
-
-  /* MAIN */
   .main{ padding: 22px 26px 40px 26px; }
-  .topbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom: 22px;
-  }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 22px; }
   .topbar h1{ font-size: 21px; font-weight:700; letter-spacing:-.2px; }
   .topbar-right{ display:flex; align-items:center; gap:16px; }
   .onair-pill{
-    display:flex; align-items:center; gap:7px;
-    background: rgba(34,197,94,.12);
-    border: 1px solid rgba(34,197,94,.35);
-    color: var(--green);
-    font-weight:700;
-    font-size:12px;
-    padding: 6px 12px;
-    border-radius: 999px;
+    display:flex; align-items:center; gap:7px; background: rgba(34,197,94,.12);
+    border: 1px solid rgba(34,197,94,.35); color: var(--green); font-weight:700;
+    font-size:12px; padding: 6px 12px; border-radius: 999px;
   }
   .onair-pill .dot{ width:7px;height:7px;border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green);}
   .clock{ text-align:right; }
@@ -153,81 +103,52 @@
   }
   .bell svg{ width:16px;height:16px; color:var(--text-dim); }
   .bell .badge{
-    position:absolute; top:-4px; right:-4px;
-    background: var(--red); color:#fff; font-size:9.5px; font-weight:700;
-    width:16px;height:16px;border-radius:50%;
+    position:absolute; top:-4px; right:-4px; background: var(--red); color:#fff;
+    font-size:9.5px; font-weight:700; width:16px;height:16px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
   }
   .user{ display:flex; align-items:center; gap:9px; }
   .user-avatar{
     width:36px;height:36px;border-radius:50%;
     background: linear-gradient(135deg,#7c5cff,#e0479e);
-    display:flex;align-items:center;justify-content:center;
-    font-weight:700; font-size:13px;
+    display:flex;align-items:center;justify-content:center; font-weight:700; font-size:13px;
   }
   .user-text{ display:flex; flex-direction:column; }
   .user-text .n{ font-size:12.5px; font-weight:600; }
   .user-text .r{ font-size:10.5px; color:var(--text-faint); }
-
-  /* TOP ROW */
-  .top-grid{
-    display:grid;
-    grid-template-columns: 1.2fr 1.2fr 1fr;
-    gap: 16px;
-    margin-bottom: 18px;
-  }
-  .card{
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px;
-  }
-  .card-head{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:14px;
-  }
-  .card-title{
-    display:flex; align-items:center; gap:8px;
-    font-weight:700; font-size:13.5px;
-  }
+  .top-grid{ display:grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 16px; margin-bottom: 18px; }
+  .card{ background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .card-title{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:13.5px; }
   .card-title.red{ color:var(--red); }
   .card-title.purple{ color:var(--purple); }
   .card-title.gold{ color:var(--gold); }
   .beta-tag{
     font-size:9.5px; font-weight:700; color:var(--text-dim);
-    background: var(--panel-2); border:1px solid var(--border);
-    padding:2px 7px; border-radius:6px;
+    background: var(--panel-2); border:1px solid var(--border); padding:2px 7px; border-radius:6px;
   }
   .view-all{ font-size:11.5px; color:var(--purple); cursor:pointer; font-weight:600; }
-
-  /* On air now */
   .onair-thumb{
-    position:relative;
-    width:100%; aspect-ratio: 16/8.4;
-    border-radius:10px; overflow:hidden;
-    background: linear-gradient(160deg,#3a2f2c,#1a1410);
-    margin-bottom:12px;
+    position:relative; width:100%; aspect-ratio: 16/8.4; border-radius:10px; overflow:hidden;
+    background: linear-gradient(160deg,#3a2f2c,#1a1410); margin-bottom:12px;
   }
   .onair-thumb img{ width:100%;height:100%;object-fit:cover; display:block; }
   .live-tag{
-    position:absolute; top:10px; left:10px;
-    background: var(--red); color:#fff; font-size:10px; font-weight:800;
-    padding: 4px 8px; border-radius:5px;
+    position:absolute; top:10px; left:10px; background: var(--red); color:#fff;
+    font-size:10px; font-weight:800; padding: 4px 8px; border-radius:5px;
     display:flex; align-items:center; gap:4px;
   }
   .show-badge{
     position:absolute; bottom:10px; left:10px; right:10px;
-    background: linear-gradient(90deg,#8a3a1f,#4a1e10);
-    padding: 8px 12px; border-radius:6px;
+    background: linear-gradient(90deg,#8a3a1f,#4a1e10); padding: 8px 12px; border-radius:6px;
   }
   .show-badge .name1{ font-size:12px; font-weight:600; color:#fff; opacity:.9;}
   .show-badge .name2{ font-size:19px; font-weight:800; color:#fff; letter-spacing:.5px; }
   .onair-info .show-title{ font-size:17px; font-weight:700; margin-bottom:3px; }
   .onair-info .show-meta{ font-size:12px; color:var(--text-dim); margin-bottom:12px; }
   .btn{
-    border:none; cursor:pointer; font-weight:700; font-size:12.5px;
-    padding: 9px 16px; border-radius:8px;
-    display:inline-flex; align-items:center; gap:7px;
+    border:none; cursor:pointer; font-weight:700; font-size:12.5px; padding: 9px 16px;
+    border-radius:8px; display:inline-flex; align-items:center; gap:7px;
     transition: transform .1s, filter .15s;
   }
   .btn:hover{ filter:brightness(1.12); }
@@ -236,19 +157,13 @@
   .btn-ghost{ background: var(--panel-2); color: var(--text); border:1px solid var(--border); }
   .next-row{
     display:flex; align-items:center; gap:8px; margin-top:12px;
-    padding-top:12px; border-top:1px solid var(--border);
-    font-size:12px; color:var(--text-dim);
+    padding-top:12px; border-top:1px solid var(--border); font-size:12px; color:var(--text-dim);
   }
   .next-row b{ color:var(--text); font-weight:600; }
-
-  /* AI Programmer */
   .ai-body{ display:flex; gap:18px; align-items:center; }
   .ring-wrap{ position:relative; width:118px;height:118px; flex-shrink:0; }
   .ring-wrap svg{ transform: rotate(-90deg); }
-  .ring-center{
-    position:absolute; inset:0; display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-  }
+  .ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
   .ring-center .pct{ font-size:22px; font-weight:800; }
   .ring-center .lbl{ font-size:9.5px; color:var(--text-faint); font-weight:600; }
   .ai-checklist{ flex:1; }
@@ -257,13 +172,8 @@
   .check-item{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text-dim); margin-bottom:6px; }
   .check-item svg{ width:13px;height:13px; color:var(--green); flex-shrink:0; }
   .run-btn{ width:100%; justify-content:center; margin-top:14px; }
-
-  /* Today overview */
   .overview-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-  .stat-tile{
-    border-radius:10px; padding:14px;
-    display:flex; flex-direction:column; gap:8px;
-  }
+  .stat-tile{ border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px; }
   .stat-tile .icon{ width:26px;height:26px; opacity:.9; }
   .stat-tile .val{ font-size:22px; font-weight:800; }
   .stat-tile .lbl{ font-size:11px; font-weight:600; }
@@ -275,8 +185,6 @@
   .tile-blue .lbl{ color:#8fc7ff; }
   .tile-amber{ background: rgba(242,176,57,.13); border:1px solid rgba(242,176,57,.3); }
   .tile-amber .lbl{ color:#f3cd85; }
-
-  /* SCHEDULE */
   .schedule-card{ background: var(--panel); border:1px solid var(--border); border-radius: var(--radius); padding:18px; margin-bottom:18px; }
   .schedule-head{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
   .schedule-title{ display:flex; align-items:center; gap:9px; font-size:15px; font-weight:700; }
@@ -290,40 +198,21 @@
   .date-range{ font-size:12.5px; font-weight:700; color:var(--text-dim); padding: 0 4px; }
   .btn-fill{ background: var(--purple-dim); color:#fff; }
   .btn-add{ background: var(--panel-2); border:1px solid var(--border); color:#fff; }
-
   .main-content-row{ display:grid; grid-template-columns: 1fr 320px; gap:18px; align-items:start; }
-
   .grid-wrap{ overflow-x:auto; border-radius:10px; border:1px solid var(--border); }
   table.grid{ border-collapse:collapse; width:100%; }
   table.grid th{
-    background: var(--panel-2);
-    text-align:left; padding: 9px 10px;
-    font-size:10.5px; color:var(--text-faint); font-weight:700;
-    border-bottom:1px solid var(--border);
-    position:sticky; top:0;
+    background: var(--panel-2); text-align:left; padding: 9px 10px; font-size:10.5px;
+    color:var(--text-faint); font-weight:700; border-bottom:1px solid var(--border); position:sticky; top:0;
   }
-  table.grid td{
-    border-bottom: 1px solid var(--border);
-    padding:0;
-    vertical-align:top;
-    font-size:11px;
-  }
+  table.grid td{ border-bottom: 1px solid var(--border); padding:0; vertical-align:top; font-size:11px; }
   table.grid td:first-child, table.grid th:first-child{
-    background: var(--panel-2);
-    color:var(--text-faint);
-    font-weight:700;
-    font-size:11px;
-    padding: 10px 10px;
-    white-space:nowrap;
-    width: 100px;
+    background: var(--panel-2); color:var(--text-faint); font-weight:700; font-size:11px;
+    padding: 10px 10px; white-space:nowrap; width: 100px;
   }
   .cell-block{
-    padding: 10px 12px;
-    height:100%;
-    display:flex; align-items:center; justify-content:space-between;
-    gap:6px;
-    cursor:pointer;
-    transition: filter .12s;
+    padding: 10px 12px; height:100%; display:flex; align-items:center; justify-content:space-between;
+    gap:6px; cursor:pointer; transition: filter .12s;
   }
   .cell-block:hover{ filter:brightness(1.15); }
   .cell-block .info{ min-width:0; }
@@ -331,8 +220,6 @@
   .cell-block .name{ font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cell-block .cat{ font-size:9.5px; color:rgba(255,255,255,.75); }
   .cell-block svg{ width:12px;height:12px; color:rgba(255,255,255,.7); flex-shrink:0; }
-
-  /* Legend colors */
   .c-news{ background: linear-gradient(90deg,#7a1f1f,#5c1616); }
   .c-music{ background: linear-gradient(90deg,#1f6d4c,#164f38); }
   .c-talk{ background: linear-gradient(90deg,#5b3f8f,#432e6e); }
@@ -345,8 +232,6 @@
   .c-show{ background: linear-gradient(90deg,#204a6e,#173853); }
   .c-commercial{ background: linear-gradient(90deg,#3a3a3a,#232323); }
   .c-trailer{ background: linear-gradient(90deg,#8a5a2b,#6b451f); }
-
-  /* Content mix + AI recs sidebar */
   .side-col{ display:flex; flex-direction:column; gap:18px; }
   .mix-card, .rec-card{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
   .donut-wrap{ display:flex; flex-direction:column; align-items:center; gap:14px; }
@@ -359,7 +244,6 @@
   .legend-left{ display:flex; align-items:center; gap:7px; color:var(--text-dim); }
   .legend-dot{ width:8px;height:8px;border-radius:50%; flex-shrink:0; }
   .legend-item b{ font-weight:700; }
-
   .rec-sub{ font-size:11px; color:var(--text-faint); margin-bottom:14px; margin-top:-8px; }
   .rec-item{ display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-top:1px solid var(--border); }
   .rec-item:first-of-type{ border-top:none; padding-top:0; }
@@ -371,16 +255,13 @@
   .apply-btn{
     background: var(--panel-2); border:1px solid var(--border); color:var(--text);
     font-size:11px; font-weight:700; padding:6px 12px; border-radius:7px; cursor:pointer;
-    flex-shrink:0; white-space:nowrap; margin-top:2px;
-    transition: all .15s;
+    flex-shrink:0; white-space:nowrap; margin-top:2px; transition: all .15s;
   }
   .apply-btn:hover{ background:var(--green); border-color:var(--green); color:#06210f; }
   .apply-btn.applied{ background:var(--green); border-color:var(--green); color:#06210f; pointer-events:none; }
-
   ::-webkit-scrollbar{ height:8px; width:8px; }
   ::-webkit-scrollbar-thumb{ background:#2a3042; border-radius:8px; }
   ::-webkit-scrollbar-track{ background:transparent; }
-
   @media (max-width: 1180px){
     .top-grid{ grid-template-columns: 1fr; }
     .main-content-row{ grid-template-columns: 1fr; }
@@ -390,34 +271,28 @@
     .sidebar{ display:none; }
   }
   .live-now {
-  position: relative;
-  outline: 2px solid #e50914;
-  outline-offset: -2px;
-  animation: liveGlow 2s ease-in-out infinite;
-}
-@keyframes liveGlow {
-  0%, 100% { box-shadow: 0 0 0 rgba(229,9,20,0); }
-  50%      { box-shadow: 0 0 14px rgba(229,9,20,0.55); }
-}
+    position: relative; outline: 2px solid #e50914; outline-offset: -2px;
+    animation: liveGlow 2s ease-in-out infinite;
+  }
+  @keyframes liveGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(229,9,20,0); }
+    50%      { box-shadow: 0 0 14px rgba(229,9,20,0.55); }
+  }
 </style>
 </head>
 <body>
 <div class="app">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">STV</div>
       <div class="brand-sub">BROADCAST NETWORK</div>
     </div>
-
     <div class="nav-group">
       <div class="nav-item active" data-tab="dashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
         Dashboard
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">PROGRAMMING</div>
       <div class="nav-item active" data-tab="schedule">
@@ -437,7 +312,6 @@
         Playlists
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">ADS & SPONSORS</div>
       <div class="nav-item">
@@ -453,7 +327,6 @@
         Ad Analytics
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">LIVE OPERATIONS</div>
       <div class="nav-item">
@@ -469,7 +342,6 @@
         Viewers
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">ANALYTICS</div>
       <div class="nav-item">
@@ -485,7 +357,6 @@
         Performance
       </div>
     </div>
-
     <div class="nav-group">
       <div class="nav-label">SETTINGS</div>
       <div class="nav-item">
@@ -501,7 +372,6 @@
         Users
       </div>
     </div>
-
     <div class="ai-status">
       <div class="ai-status-icon">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4L12 2z"/></svg>
@@ -514,9 +384,7 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
-
     <div class="topbar">
       <h1>AI Programming & Broadcast Control</h1>
       <div class="topbar-right">
@@ -536,10 +404,7 @@
       </div>
     </div>
 
-    <!-- TOP GRID -->
     <div class="top-grid">
-
-      <!-- ON AIR NOW -->
       <div class="card">
         <div class="card-head">
           <div class="card-title red">
@@ -565,7 +430,6 @@
         <div class="next-row">Next: <b id="onairNext">—</b></div>
       </div>
 
-      <!-- AI PROGRAMMER STATUS -->
       <div class="card">
         <div class="card-head">
           <div class="card-title purple">
@@ -601,7 +465,6 @@
         </button>
       </div>
 
-      <!-- TODAY'S OVERVIEW -->
       <div class="card">
         <div class="card-head">
           <div class="card-title gold">
@@ -635,7 +498,6 @@
       </div>
     </div>
 
-    <!-- SCHEDULE + SIDE COLUMN -->
     <div class="main-content-row">
       <div class="schedule-card">
         <div class="schedule-head">
@@ -647,7 +509,6 @@
             <button class="btn btn-fill" onclick="location.reload()">↻ Refresh</button>
           </div>
         </div>
-
         <div class="grid-wrap">
           <table class="grid" id="scheduleTable"></table>
         </div>
@@ -678,7 +539,6 @@
             <span class="view-all">View All</span>
           </div>
           <div class="rec-sub">Based on viewer behavior</div>
-
           <div class="rec-item">
             <div class="rec-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></div>
             <div class="rec-text">
@@ -687,7 +547,6 @@
             </div>
             <button class="apply-btn" onclick="applyRec(this)">Apply</button>
           </div>
-
           <div class="rec-item">
             <div class="rec-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4L12 2z"/></svg></div>
             <div class="rec-text">
@@ -696,7 +555,6 @@
             </div>
             <button class="apply-btn" onclick="applyRec(this)">Apply</button>
           </div>
-
           <div class="rec-item">
             <div class="rec-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 3v18M16 3v18"/></svg></div>
             <div class="rec-text">
@@ -708,14 +566,12 @@
         </div>
       </div>
     </div>
-
   </main>
 </div>
 
 <script src="./studio.js"></script>
 <script src="./media.js"></script>
 <script>
-/* ---------- Live clock ---------- */
 function tick(){
   const now = new Date();
   const opts = { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true };
@@ -724,7 +580,6 @@ function tick(){
 }
 tick(); setInterval(tick, 1000);
 
-/* Gentle live-viewer flutter for realism (not tied to a real analytics feed) */
 setInterval(()=>{
   const el = document.getElementById('liveViewers');
   let v = parseInt(el.textContent.replace(/,/g,''));
@@ -732,7 +587,6 @@ setInterval(()=>{
   el.textContent = v.toLocaleString();
 }, 2500);
 
-/* ---------- Category → color class + display label ---------- */
 function classify(item){
   const t = (item.type || '').toLowerCase();
   if (t === 'commercial') return { cls: 'c-commercial', label: 'Commercial' };
@@ -747,17 +601,13 @@ function classify(item){
   return { cls: 'c-life', label: item.type || 'Programming' };
 }
 
-/* ---------- Build a repeating timeline from the real queue ---------- */
 function buildTimeline(queue, loops = 3){
   const totalDuration = queue.reduce((s, it) => s + (it.duration || 30), 0);
   if (!totalDuration) return { timeline: [], totalDuration: 0 };
-
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
-
   const timeline = [];
   let cursor = new Date(dayStart);
-
   for (let loop = 0; loop < loops; loop++) {
     queue.forEach(item => {
       const start = new Date(cursor);
@@ -767,7 +617,6 @@ function buildTimeline(queue, loops = 3){
       cursor = end;
     });
   }
-
   return { timeline, totalDuration };
 }
 
@@ -783,12 +632,10 @@ function fmtTime(d){
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-/* ---------- Render ON AIR NOW box ---------- */
 function renderOnAir(entry, nextEntry){
   const item = entry.item;
   const info = classify(item);
   const label = item.blockLabel || info.label.toUpperCase();
-
   document.getElementById('onairBlockLabel').textContent = label;
   document.getElementById('onairName2').textContent = (item.title || 'STV LIVE').toUpperCase();
   document.getElementById('onairTitle').textContent = item.title || 'STV Live';
@@ -813,11 +660,9 @@ function renderOnAir(entry, nextEntry){
   }
 }
 
-/* ---------- Render Today's Lineup table ---------- */
 function renderLineup(timeline, nowIndex){
   const table = document.getElementById('scheduleTable');
   const rows = timeline.slice(nowIndex, nowIndex + 14);
-
   let html = '<thead><tr><th>TIME</th><th>PROGRAMMING</th></tr></thead><tbody>';
   rows.forEach((entry, i) => {
     const info = classify(entry.item);
@@ -841,16 +686,14 @@ function renderLineup(timeline, nowIndex){
   table.innerHTML = html;
 }
 
-/* ---------- Content mix donut from real durations ---------- */
 function renderDonut(queue){
   const buckets = {};
   queue.forEach(item => {
-    if ((item.type || '') === 'commercial') return; // exclude ad time from content mix
+    if ((item.type || '') === 'commercial') return;
     const info = classify(item);
     const key = info.label;
     buckets[key] = (buckets[key] || 0) + (item.duration || 30);
   });
-
   const totalTime = Object.values(buckets).reduce((s, v) => s + v, 0) || 1;
   const palette = ['#e5484d', '#22c55e', '#a78bfa', '#e0479e', '#e0813f', '#3aa0ff', '#2bb3a3', '#c8a96e'];
   const mix = Object.entries(buckets)
@@ -879,13 +722,11 @@ function renderDonut(queue){
   document.getElementById('donutTotal').textContent = queue.length;
 }
 
-/* ---------- Today's Overview stats from real data ---------- */
 function renderStats(queue, shows, tracksList){
   const showItems = queue.filter(i => i.type === 'show' || i.type === 'show_episode');
   const adSlots = queue.filter(i => i.type === 'commercial');
   const libraryCount = tracksList.length + shows.reduce((s, sh) =>
     s + (Array.isArray(sh.episodes) ? sh.episodes.length : 1), 0);
-
   document.getElementById('statPrograms').textContent = showItems.length;
   document.getElementById('statAds').textContent = adSlots.length;
   document.getElementById('statLibrary').textContent = libraryCount;
@@ -901,17 +742,23 @@ async function safeFetchJSON(url, fallback = []) {
   }
 }
 
-const [shows, tracksList] = await Promise.all([
-  safeFetchJSON('./shows.json', []),
-  safeFetchJSON('./tracks.json', [])
-]);
+/* Fixed: this used to be missing its function wrapper entirely (dangling
+   catch with no matching try), and never called STUDIO.generate() — it
+   referenced an undefined `queue` variable. That syntax error broke the
+   whole script block, which is why every button on the page was dead. */
+async function loadDashboard(){
+  try {
+    const [queue, shows, tracksList] = await Promise.all([
+      STUDIO.generate(),
+      safeFetchJSON('./shows.json', []),
+      safeFetchJSON('./tracks.json', [])
+    ]);
 
     if (!queue.length){
       console.error('EMPTY QUEUE — check schedule.json or STUDIO.generate()');
       return;
     }
 
-    // tag episodes with their parent show's type for classification/coloring
     const showTypeById = {};
     shows.forEach(s => showTypeById[s.id] = s.type);
     queue.forEach(item => {
@@ -938,14 +785,13 @@ const [shows, tracksList] = await Promise.all([
 }
 
 loadDashboard();
-setInterval(loadDashboard, 60000); // re-sync now-playing every minute
+setInterval(loadDashboard, 60000);
 
-/* ---------- Interactions ---------- */
 function watchLive(){
-  const btn = event.currentTarget;
-  const original = btn.innerHTML;
-  btn.innerHTML = '▶ Streaming…';
-  setTimeout(()=> btn.innerHTML = original, 1400);
+  // Previously only faked a button-text change and showed no video anywhere.
+  // The real player (overlay, ticker, commercial-break screen) lives in
+  // watch.html — open it so the user can actually see the live stream.
+  window.open('./watch.html', '_blank');
 }
 
 function runAI(){
