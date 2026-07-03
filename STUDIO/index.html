@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STV On Air — Go Live Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b12;
+    --panel: #15151f;
+    --panel-line: #262633;
+    --orange: #ff6b35;
+    --gold: #f4c430;
+    --purple: #8b5cf6;
+    --text: #f2f0ea;
+    --text-dim: #8d8a9c;
+    --live-red: #ff2d55;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ============ LANDING BUTTONS ============ */
+  .landing {
+    padding: 28px 24px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .landing h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.08em;
+    font-size: clamp(28px, 5vw, 44px);
+    margin: 0 0 18px;
+    background: linear-gradient(90deg, var(--orange), var(--gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .landing-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .lbtn {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.06em;
+    font-size: 18px;
+    padding: 14px 28px;
+    border-radius: 6px;
+    border: 1px solid var(--panel-line);
+    background: var(--panel);
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .lbtn:hover { transform: translateY(-2px); }
+  .lbtn.radio:hover { border-color: var(--purple); color: var(--purple); }
+  .lbtn.tv:hover { border-color: var(--gold); color: var(--gold); }
+  .lbtn.golive {
+    background: var(--live-red);
+    border-color: var(--live-red);
+    color: #fff;
+  }
+  .lbtn.golive:hover { box-shadow: 0 0 24px rgba(255,45,85,0.5); }
+  .lbtn.call:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ============ MULTIVIEW ============ */
+  .multiview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (max-width: 800px) {
+    .multiview { grid-template-columns: 1fr; }
+  }
+  .box {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+  }
+  .box-label {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--panel-line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--live-red);
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .box iframe, .box video {
+    width: 100%;
+    flex: 1;
+    border: none;
+    background: #000;
+    object-fit: cover;
+  }
+
+  /* Box 3: action buttons */
+  .box.actions { padding: 14px; gap: 10px; display: flex; flex-direction: column; justify-content: center; }
+  .action-btn {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--panel-line);
+    background: #1c1c28;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.15s ease;
+  }
+  .action-btn:hover { background: #24243333; border-color: var(--gold); }
+  .action-btn.go-live { background: var(--live-red); border-color: var(--live-red); color: #fff; }
+  .action-btn.studio { border-color: var(--purple); color: var(--purple); }
+  .action-btn.call { border-color: var(--orange); color: var(--orange); }
+  .action-btn.end { color: var(--text-dim); }
+
+  /* ============ STREAM DECK ============ */
+  .deck-wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px 30px; }
+  .deck-title {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    font-size: 13px;
+    margin: 0 0 10px 2px;
+  }
+  .deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+  }
+  .deck-key {
+    aspect-ratio: 1;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .deck-key:hover { border-color: var(--gold); color: var(--text); }
+</style>
+</head>
+<body>
+
+  <!-- LANDING SCREEN BUTTONS (drop this block into the main site header) -->
+  <div class="landing">
+    <h1>STV On Air</h1>
+    <div class="landing-buttons">
+      <a class="lbtn radio" href="#radio">Radio</a>
+      <a class="lbtn tv" href="#tv">TV</a>
+      <a class="lbtn golive" href="https://vdo.ninja/?scene&room=whatsthe411&roomkey=DfmbmuvdavLBPykP&sas&sl" target="_blank" rel="noopener">Go Live</a>
+      <a class="lbtn call" href="https://invite.cam/U2FsdGVkX1+QMWbI16QX0ILSVj1jNeskyDKYX3E8G51ClAtp8s0PxmpGtDXJUKfWlotC+2reCVz8G6AQGUL2YQ==" target="_blank" rel="noopener">Call the Show</a>
+    </div>
+  </div>
+
+  <!-- OBS-STYLE MULTIVIEW -->
+  <div class="multiview">
+
+    <!-- Box 1: your camera / what's going out live right now -->
+    <div class="box">
+      <div class="box-label"><span><span class="live-dot"></span>CAM / LIVE OUT</span></div>
+      <iframe id="liveScenePreview"
+        src="https://vdo.ninja/?scene&room=whatsthe411&roomkey=DfmbmuvdavLBPykP&sas&sl&cleanoutput"
+        allow="autoplay; camera; microphone" muted></iframe>
+    </div>
+
+    <!-- Box 2: what's on now, wired to the on-air state -->
+    <div class="box">
+      <div class="box-label"><span>WHAT'S ON NOW</span><span id="onairMeta" style="color:var(--text-dim);font-weight:400;font-size:11px;"></span></div>
+      <video id="nowPlayingVideo" autoplay muted loop playsinline></video>
+    </div>
+
+    <!-- Box 3: action buttons -->
+    <div class="box actions">
+      <a class="action-btn go-live" href="https://vdo.ninja/?scene&room=whatsthe411&roomkey=DfmbmuvdavLBPykP&sas&sl" target="_blank" rel="noopener">Go Live</a>
+      <a class="action-btn studio" href="https://vdo.ninja/?director=whatsthe411&roomkey=DfmbmuvdavLBPykP&requireapproval&showdirector" target="_blank" rel="noopener">Studio / DJ-VJ</a>
+      <a class="action-btn call" href="https://invite.cam/U2FsdGVkX1+QMWbI16QX0ILSVj1jNeskyDKYX3E8G51ClAtp8s0PxmpGtDXJUKfWlotC+2reCVz8G6AQGUL2YQ==" target="_blank" rel="noopener">Call the Show</a>
+      <button class="action-btn end" onclick="document.getElementById('liveScenePreview').src += ''">End / Refresh</button>
+    </div>
+
+  </div>
+
+  <!-- STREAM DECK: everything else, below the multiview -->
+  <div class="deck-wrap">
+    <p class="deck-title">STREAM DECK</p>
+    <div class="deck">
+      <div class="deck-key" data-action="mute-cam">Mute Cam</div>
+      <div class="deck-key" data-action="swap-scene">Swap Scene</div>
+      <div class="deck-key" data-action="push-clip">Push Clip to Now Playing</div>
+      <div class="deck-key" data-action="open-chat">Open Chat</div>
+      <div class="deck-key" data-action="toggle-overlay">Toggle Overlay</div>
+      <div class="deck-key" data-action="ticker">Update Ticker</div>
+      <div class="deck-key" data-action="record">Start Recording</div>
+      <div class="deck-key" data-action="schedule">Open Schedule</div>
+    </div>
+  </div>
+
+<script>
+/* ---- On-air sync: drives Box 2's "What's On Now" ----
+   Placeholder queue -- swap this for your real playlist.json fetch
+   or the Cloudinary tag endpoint:
+   https://res.cloudinary.com/dyqfcbgqo/video/list/stv-onair.json */
+async function loadNowPlaying() {
+  try {
+    const res = await fetch('https://res.cloudinary.com/dyqfcbgqo/video/list/stv-onair.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.resources || !data.resources.length) return;
+    const first = data.resources[0];
+    const videoEl = document.getElementById('nowPlayingVideo');
+    videoEl.src = `https://res.cloudinary.com/dyqfcbgqo/video/upload/${first.public_id}.${first.format}`;
+    document.getElementById('onairMeta').textContent = first.public_id;
+  } catch (err) {
+    console.warn('[NOW PLAYING] fetch failed', err);
+  }
+}
+loadNowPlaying();
+setInterval(loadNowPlaying, 30000);
+
+/* Stream deck keys -- wire these up to whatever they should trigger */
+document.querySelectorAll('.deck-key').forEach(key => {
+  key.addEventListener('click', () => {
+    console.log('Stream deck action:', key.dataset.action);
+    // TODO: wire each action up
+  });
+});
+</script>
+
+</body>
+</html>
