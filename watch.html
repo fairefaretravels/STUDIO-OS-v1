@@ -221,7 +221,45 @@
       border: 1px solid var(--panel-border);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
+<div class="info" style="margin-top: 18px;">
 
+  <div class="status">
+    <div class="dot"></div>
+    <div>JOIN BY PHONE / TABLET</div>
+  </div>
+
+  <!-- QR CODE -->
+  <div style="text-align:center; padding: 10px;">
+    <img
+      src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://invite.cam/U2FsdGVkX1+QMWbI16QX0ILSVj1jNeskyDKYX3E8G51ClAtp8s0PxmpGtDXJUKfWlotC+2reCVz8G6AQGUL2YQ=="
+      alt="Join QR Code"
+      style="width: 220px; height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"
+    />
+  </div>
+
+  <div class="artist" style="text-align:center;">
+    Scan to join on phone or tablet
+  </div>
+
+</div>
+    <div class="info" style="margin-top: 18px;">
+
+  <div class="status">
+    <div class="dot"></div>
+    <div>LIVE REMOTE FEED</div>
+  </div>
+
+  <div style="border-radius: 12px; overflow: hidden; border: 1px solid rgba(201,164,76,0.18);">
+    <iframe
+      src="https://vdo.ninja/?scene&room=whatsthe411&roomkey=DfmbmuvdavLBPykP&sas&sl"
+      width="100%"
+      height="300"
+      style="border:0; background:black;"
+      allow="camera; microphone; autoplay; fullscreen"
+    ></iframe>
+  </div>
+
+</div>
     .status {
       display: flex;
       gap: 10px;
