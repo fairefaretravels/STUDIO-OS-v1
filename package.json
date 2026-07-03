@@ -1,0 +1,12 @@
+{
+  "name": "stv-onair-cloudinary-sync",
+  "version": "1.0.0",
+  "description": "Uploads clips to Cloudinary and rebuilds playlist.json from the stv-onair tag",
+  "main": "cloudinary-to-playlist.js",
+  "scripts": {
+    "sync": "node cloudinary-to-playlist.js"
+  },
+  "dependencies": {
+    "cloudinary": "^2.5.1"
+  }
+}
