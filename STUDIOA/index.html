@@ -1,0 +1,3118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STV Master Control</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+
+<style>
+:root{
+  --ink:#0A0C0F;
+  --panel:#14171D;
+  --panel-2:#1B1F26;
+  --panel-3:#22262E;
+  --hairline:#2B303A;
+  --gold:#C8963E;
+  --gold-soft:#E4C77E;
+  --text:#EDE7DA;
+  --text-dim:#8B8F98;
+  --text-faint:#5B6069;
+  --green:#4C9A63;
+  --green-glow:#4C9A6355;
+  --red:#C24B4B;
+  --red-glow:#C24B4B55;
+  --radius:10px;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:'Barlow', Arial, sans-serif;
+  background:
+    radial-gradient(ellipse at top, #14171D 0%, var(--ink) 55%);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ---------- HEADER / TALLY STRIP ---------- */
+
+header{
+  background:linear-gradient(180deg,#15181E 0%,#0E1014 100%);
+  border-bottom:1px solid var(--hairline);
+  padding:22px 28px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:14px;
+  position:sticky;
+  top:0;
+  z-index:50;
+  box-shadow:0 6px 24px #00000066;
+}
+
+.brand{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+}
+
+header h1{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:34px;
+  letter-spacing:2px;
+  margin:0;
+  color:var(--gold-soft);
+  text-shadow:0 0 18px #C8963E33;
+}
+
+.brand p{
+  margin:0;
+  font-family:'Barlow Condensed', sans-serif;
+  font-size:13px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--text-dim);
+}
+
+.tally{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'Barlow Condensed', sans-serif;
+  letter-spacing:2px;
+  font-weight:600;
+  font-size:14px;
+  padding:9px 18px;
+  border-radius:999px;
+  border:1px solid var(--hairline);
+}
+
+.tally-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+
+.live{
+  background:#1C2A20;
+  color:#8FE3A8;
+  border-color:#2E6B44;
+}
+.live .tally-dot{
+  background:var(--green);
+  box-shadow:0 0 0 4px var(--green-glow);
+  animation:pulse 1.4s infinite;
+}
+
+.offline{
+  background:#2A1D1D;
+  color:#F0A8A8;
+  border-color:#6B2E2E;
+}
+.offline .tally-dot{
+  background:var(--red);
+  box-shadow:0 0 0 4px var(--red-glow);
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.45;}
+}
+
+/* ---------- LAYOUT ---------- */
+
+.dashboard{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:18px;
+  padding:22px;
+  max-width:1600px;
+  margin:0 auto;
+}
+
+.card, .box{
+  background:linear-gradient(180deg, var(--panel) 0%, #101318 100%);
+  border:1px solid var(--hairline);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:0 10px 24px #00000055, inset 0 1px 0 #ffffff08;
+}
+
+h2, .header{
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:1.5px;
+  font-size:22px;
+  color:var(--gold-soft);
+  border-bottom:1px solid var(--hairline);
+  padding-bottom:10px;
+  margin:0 0 14px;
+}
+
+.box .header{
+  margin:-20px -20px 16px;
+  padding:16px 20px 12px;
+  border-bottom:1px solid var(--hairline);
+}
+
+.box .body{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+h3{
+  font-family:'Barlow Condensed', sans-serif;
+  color:var(--text-dim);
+  font-weight:600;
+  letter-spacing:.5px;
+  margin:14px 0 6px;
+  font-size:15px;
+}
+
+/* ---------- FORM ELEMENTS ---------- */
+
+input, select, textarea{
+  width:100%;
+  padding:10px 12px;
+  background:var(--panel-2);
+  border:1px solid var(--hairline);
+  border-radius:8px;
+  color:var(--text);
+  font-family:'Barlow', sans-serif;
+  font-size:14px;
+  margin:6px 0;
+  transition:border-color .15s, box-shadow .15s;
+}
+
+input::placeholder, textarea::placeholder{
+  color:var(--text-faint);
+}
+
+input:focus, select:focus, textarea:focus{
+  outline:none;
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px #C8963E2A;
+}
+
+textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+label{
+  font-size:14px;
+  color:var(--text-dim);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+input[type="checkbox"]{
+  width:auto;
+  accent-color:var(--gold);
+}
+
+button, .btn{
+  background:linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 100%);
+  color:#241A08;
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  font-family:'Barlow Condensed', sans-serif;
+  font-weight:700;
+  letter-spacing:.5px;
+  font-size:14px;
+  cursor:pointer;
+  margin:5px 5px 5px 0;
+  transition:transform .12s, box-shadow .12s, filter .12s;
+}
+
+button:hover, .btn:hover{
+  filter:brightness(1.08);
+  box-shadow:0 4px 14px #C8963E44;
+}
+button:active, .btn:active{
+  transform:scale(0.98);
+}
+
+.btn.live{
+  background:linear-gradient(180deg,#63C67F,#3C8A54);
+  color:#0A160D;
+}
+
+/* ---------- NESTED CARDS / ITEMS ---------- */
+
+.episode, .contentCard, .asset, .sheet, .scheduleItem,
+.talentCard, .dealCard, .analyticsCard, .taskCard,
+.releaseCard, .workflowCard, .calendarCard, .searchResult,
+.queueItem, .scheduleRow{
+  background:var(--panel-2);
+  padding:12px 14px;
+  margin-top:10px;
+  border-radius:8px;
+  border-left:3px solid var(--gold);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.dealCard{ border-left-color:var(--green); }
+.releaseCard{ border-left-color:var(--green); }
+.workflowCard{ border-left-color:var(--gold-soft); }
+.analyticsCard{ border-left-color:var(--gold-soft); }
+
+.sheet h3{ color:var(--gold-soft); margin:0 0 6px; }
+
+strong, b{ color:var(--gold-soft); }
+
+.priority{
+  font-weight:700;
+  color:var(--gold-soft);
+}
+
+a{
+  color:var(--gold-soft);
+  text-decoration:none;
+  border-bottom:1px dotted var(--gold);
+}
+a:hover{ color:var(--gold); }
+
+/* ---------- PIPELINE BOARD ---------- */
+
+#pipelineBoard{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding-bottom:6px;
+}
+
+.stage{
+  min-width:170px;
+  background:var(--panel-2);
+  padding:14px;
+  border-radius:8px;
+  border:1px solid var(--hairline);
+  flex:1;
+}
+
+.stage h3{
+  margin-top:0;
+  color:var(--gold-soft);
+  font-size:14px;
+}
+
+.stage .contentCard{
+  border-left-color:var(--gold-soft);
+}
+
+/* ---------- SCOREBOARD / MISC ---------- */
+
+#status{
+  font-family:'Barlow Condensed', sans-serif;
+}
+
+#count, #totalRevenue, #totalViews, #totalListeners{
+  color:var(--gold-soft);
+  font-family:'JetBrains Mono', monospace;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+ul li{
+  background:var(--panel-2);
+  padding:9px 12px;
+  border-radius:6px;
+  border:1px solid var(--hairline);
+  font-size:14px;
+}
+
+/* ---------- PROGRAM CLOCK (signature) ---------- */
+
+#currentProgram{
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:2px;
+  color:var(--text-dim);
+  font-size:20px;
+  margin:0 0 4px;
+  border:none;
+  padding:0;
+}
+
+.box .body p{
+  margin:2px 0;
+  font-size:13px;
+  color:var(--text-dim);
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+
+.box .body p span{
+  color:var(--gold-soft);
+  text-transform:none;
+  font-family:'Barlow Condensed', sans-serif;
+  font-weight:600;
+}
+
+#clock{
+  font-family:'JetBrains Mono', monospace;
+  font-size:44px;
+  font-weight:600;
+  color:var(--gold-soft);
+  text-align:center;
+  letter-spacing:2px;
+  margin:10px 0 4px;
+  text-shadow:0 0 20px #C8963E40;
+  background:#000000AA;
+  border:1px solid var(--hairline);
+  border-radius:8px;
+  padding:10px 0;
+}
+
+#currentPlay{
+  color:var(--green);
+  font-weight:700;
+  background:var(--panel-2);
+  padding:10px 12px;
+  border-radius:8px;
+  border-left:3px solid var(--green);
+}
+
+/* ---------- SCROLLBAR ---------- */
+
+::-webkit-scrollbar{ height:8px; width:8px; }
+::-webkit-scrollbar-track{ background:var(--panel-2); }
+::-webkit-scrollbar-thumb{ background:var(--hairline); border-radius:4px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--gold); }
+
+#page-radio *, #page-radio *::before, #page-radio *::after{box-sizing:border-box;margin:0;padding:0}
+#page-radio{
+      --bg:var(--panel);--bg2:var(--panel-2);--bg3:var(--panel-3);
+      --muted:var(--text-dim);
+      --border:var(--hairline);--border2:#3A3F4A;
+      --green:#4C9A63;--gdark:#3C7E50;--glight:#1C2A20;
+      --red:#C24B4B;--rdark:#9A3A3A;--rlight:#2A1D1D;
+      --blue:var(--gold);--blight:#2A2410;--bdark:var(--gold-soft);
+      --amber:var(--gold);--alight:#2A2410;
+      --r:8px;--rl:12px;
+      background:var(--bg3);color:var(--text);
+    }
+#page-radio{min-height:100%;background:var(--bg3);color:var(--text)}
+#page-radio .shell{max-width:720px;margin:0 auto;padding:1rem 1rem 5rem}
+#page-radio .header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;
+      padding:.85rem 1.25rem;background:var(--bg);border-radius:var(--rl);border:.5px solid var(--border)}
+#page-radio .logo{width:40px;height:40px;border-radius:50%;background:var(--green);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#page-radio .logo i{color:#fff;font-size:20px}
+#page-radio .header-info h1{font-size:17px;font-weight:600;color:var(--text)}
+#page-radio .header-info p{font-size:11px;color:var(--muted)}
+#page-radio #live-clock{margin-left:auto;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
+#page-radio .tabs{display:flex;gap:3px;background:var(--bg);border:.5px solid var(--border);
+      border-radius:var(--rl);padding:4px;margin-bottom:1rem}
+#page-radio .tab{flex:1;padding:7px 6px;border:none;background:transparent;cursor:pointer;
+      border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);
+      display:flex;align-items:center;justify-content:center;gap:4px;transition:all .15s}
+#page-radio .tab.active{background:var(--bg2);color:var(--text);border:.5px solid var(--border)}
+#page-radio .tab i{font-size:15px}
+#page-radio .section{display:none}
+#page-radio .section.active{display:block}
+#page-radio .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+#page-radio .stat-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);
+      padding:.85rem;text-align:center}
+#page-radio .stat-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+#page-radio .stat-val{font-size:22px;font-weight:600;color:var(--text)}
+#page-radio .card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);
+      padding:1rem 1.25rem;margin-bottom:.75rem}
+#page-radio .card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:.75rem;
+      display:flex;align-items:center;gap:6px}
+#page-radio .emp-grid{display:grid;gap:8px;margin-bottom:.75rem}
+#page-radio .emp-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);
+      padding:.85rem 1.1rem;display:flex;align-items:center;gap:12px;transition:all .2s}
+#page-radio .emp-card.clocked-in{border-color:var(--green);background:var(--glight)}
+#page-radio .emp-card.clocked-in .sdot{background:var(--green)}
+#page-radio .avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+#page-radio .emp-info{flex:1;min-width:0}
+#page-radio .emp-name{font-size:14px;font-weight:500;color:var(--text)}
+#page-radio .emp-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:2px}
+#page-radio .sdot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+#page-radio .emp-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+#page-radio .ptt-btn{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      position:relative;transition:transform .1s,background .15s}
+#page-radio .ptt-btn:active{transform:scale(.92)}
+#page-radio .ptt-btn.in{background:var(--green)}
+#page-radio .ptt-btn.in:hover{background:var(--gdark)}
+#page-radio .ptt-btn.out{background:var(--red)}
+#page-radio .ptt-btn.out:hover{background:var(--rdark)}
+#page-radio .ptt-btn i{color:#fff;font-size:20px}
+#page-radio .ptt-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--green);
+      opacity:0;pointer-events:none}
+#page-radio .emp-card.clocked-in .ptt-ring{animation:trpulse 2s ease-in-out infinite}
+@keyframes trpulse{0%,100%{opacity:0;transform:scale(1)}50%{opacity:.4;transform:scale(1.1)}}
+#page-radio .loc-badge{font-size:10px;padding:2px 7px;border-radius:4px;
+      background:var(--blight);color:var(--bdark);display:inline-flex;align-items:center;gap:3px}
+#page-radio .add-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:.75rem}
+#page-radio input[type=text], #page-radio input[type=email], #page-radio input[type=search], #page-radio select{
+      padding:8px 11px;border:.5px solid var(--border2);border-radius:var(--r);font-size:13px;
+      background:var(--bg2);color:var(--text);outline:none;transition:border-color .15s}
+#page-radio input:focus, #page-radio select:focus{border-color:var(--green)}
+#page-radio input::placeholder{color:var(--muted)}
+#page-radio .btn{padding:8px 12px;border:.5px solid var(--border2);border-radius:var(--r);cursor:pointer;
+      font-size:12px;font-weight:500;background:transparent;color:var(--text);
+      display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
+#page-radio .btn:hover{background:var(--bg2)}
+#page-radio .btn i{font-size:14px}
+#page-radio .btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+#page-radio .btn.primary:hover{background:var(--gdark)}
+#page-radio .btn.danger{color:var(--red);border-color:var(--red)}
+#page-radio .btn.danger:hover{background:var(--rlight)}
+#page-radio .btn.amber{background:var(--amber);color:#fff;border-color:var(--amber)}
+#page-radio .btn.small{padding:5px 9px;font-size:11px}
+#page-radio .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;
+      border-radius:4px;font-size:11px;font-weight:500}
+#page-radio .badge.green{background:var(--glight);color:var(--gdark)}
+#page-radio .badge.red{background:var(--rlight);color:var(--rdark)}
+#page-radio .badge.blue{background:var(--blight);color:var(--bdark)}
+#page-radio .badge.amber{background:var(--alight);color:var(--amber)}
+#page-radio .no-data{text-align:center;padding:2rem;color:var(--muted);font-size:13px}
+#page-radio .no-data i{font-size:32px;display:block;margin-bottom:.5rem;opacity:.4}
+#page-radio .radio-setup{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem}
+#page-radio .radio-setup select, #page-radio .radio-setup input{width:100%}
+#page-radio .ptt-main-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem;
+      padding:1.5rem 1rem;background:var(--bg);border:.5px solid var(--border);
+      border-radius:var(--rl);margin-bottom:.75rem}
+#page-radio .ptt-main{width:110px;height:110px;border-radius:50%;border:none;cursor:pointer;
+      background:var(--green);display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:4px;user-select:none;position:relative;
+      box-shadow:0 0 0 8px var(--glight);transition:all .1s;touch-action:none}
+#page-radio .ptt-main:active, #page-radio .ptt-main.active{background:var(--gdark);transform:scale(.96);
+      box-shadow:0 0 0 12px var(--glight)}
+#page-radio .ptt-main.disabled{background:var(--muted);box-shadow:0 0 0 8px var(--bg2);cursor:not-allowed}
+#page-radio .ptt-main i{color:#fff;font-size:32px}
+#page-radio .ptt-main span{color:#fff;font-size:11px;font-weight:600;letter-spacing:.5px}
+#page-radio .peers-row{display:flex;gap:8px;flex-wrap:wrap}
+#page-radio .peer-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+      border-radius:20px;font-size:12px;border:.5px solid var(--border);background:var(--bg2)}
+#page-radio .peer-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+#page-radio .radio-log{max-height:180px;overflow-y:auto;background:var(--bg2);
+      border:.5px solid var(--border);border-radius:var(--r);padding:.5rem}
+#page-radio .log-entry{display:flex;align-items:center;gap:8px;padding:5px 4px;
+      border-bottom:.5px solid var(--border);font-size:12px}
+#page-radio .log-entry:last-child{border-bottom:none}
+#page-radio .log-time{color:var(--muted);font-size:10px;white-space:nowrap}
+#page-radio .tx-wave{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+#page-radio .tx-wave span{width:3px;border-radius:1px;background:var(--green);animation:trwave .6s ease-in-out infinite alternate}
+#page-radio .tx-wave span:nth-child(2){animation-delay:.15s}
+#page-radio .tx-wave span:nth-child(3){animation-delay:.3s}
+@keyframes trwave{from{height:3px}to{height:12px}}
+#page-radio #map-container{height:380px;border-radius:var(--rl);overflow:hidden;
+      border:.5px solid var(--border);margin-bottom:.75rem}
+#page-radio .map-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem}
+#page-radio .waypoint-list{display:grid;gap:4px}
+#page-radio .waypoint-row{display:flex;align-items:center;gap:6px;font-size:12px;
+      padding:5px 8px;background:var(--bg2);border-radius:var(--r)}
+#page-radio .wp-num{width:20px;height:20px;border-radius:50%;background:var(--blue);
+      color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#page-radio .tbl-wrap{overflow-x:auto;border:.5px solid var(--border);border-radius:var(--rl);
+      margin-bottom:.75rem;background:var(--bg)}
+#page-radio table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+#page-radio th{padding:8px 10px;text-align:left;color:var(--muted);font-weight:500;
+      border-bottom:.5px solid var(--border);background:var(--bg2);font-size:11px}
+#page-radio td{padding:8px 10px;border-bottom:.5px solid var(--border);color:var(--text);vertical-align:middle}
+#page-radio tr:last-child td{border-bottom:none}
+#page-radio .session-chip{display:inline-flex;align-items:center;gap:3px;background:var(--bg2);
+      border-radius:3px;padding:2px 6px;font-size:10px;margin:1px;white-space:nowrap}
+#page-radio .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+      z-index:999;align-items:center;justify-content:center;padding:1rem}
+#page-radio .modal-overlay.open{display:flex}
+#page-radio .modal{background:var(--bg);border-radius:var(--rl);border:.5px solid var(--border2);
+      padding:1.5rem;width:420px;max-width:100%}
+#page-radio .modal h2{font-size:16px;font-weight:600;margin-bottom:.5rem}
+#page-radio .modal p{font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.6}
+#page-radio .modal input{width:100%;margin-bottom:.75rem}
+#page-radio .modal-btns{display:flex;gap:8px;justify-content:flex-end}
+#page-radio .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);
+      background:var(--text);color:var(--bg);padding:9px 16px;border-radius:var(--rl);
+      font-size:12px;font-weight:500;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap}
+#page-radio .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#page-radio .driver-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;
+      border-radius:4px;background:var(--alight);color:var(--amber);font-size:10px;font-weight:600}
+@media(max-width:480px){
+#page-radio .radio-setup{grid-template-columns:1fr}
+#page-radio .map-controls{grid-template-columns:1fr}
+#page-radio .stats-row{grid-template-columns:repeat(2,1fr)}
+
+    
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <h1>STV MASTER CONTROL</h1>
+    <p>Broadcast · Create · Document · Build</p>
+  </div>
+  <select id="pageSwitcher" onchange="showPage(this.value)" style="width:auto;margin:0;background:var(--panel-2);border-color:var(--hairline);color:var(--gold-soft);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px;padding:9px 14px;">
+    <option value="page-master">Master Control</option>
+    <option value="page-radio">Time &amp; Radio Ops</option>
+  </select>
+  <div id="status" class="tally offline">
+    <span class="tally-dot"></span> STANDBY
+  </div>
+</header>
+
+
+<div id="page-master">
+<div class="dashboard">
+
+
+<div class="card">
+<h2>Control Room</h2>
+<p>Channel</p>
+<input id="channel" value="STV Channel 1">
+<p>Current Show</p>
+<input id="show" placeholder="Example: Cruise Muse">
+<button onclick="goLive()">GO LIVE</button>
+<button onclick="standby()">STANDBY</button>
+</div>
+
+
+<div class="card">
+<h2>Newsroom Pipeline</h2>
+<p>Create Content Card</p>
+<input id="contentName" placeholder="Content title">
+<select id="contentStage">
+<option>IDEA</option>
+<option>SCRIPT</option>
+<option>SHOOT</option>
+<option>EDIT</option>
+<option>THUMBNAIL</option>
+<option>SCHEDULE</option>
+<option>PUBLISHED</option>
+</select>
+<button onclick="addContent()">+ ADD TO PIPELINE</button>
+
+<div id="pipelineBoard">
+<div class="stage"><h3>IDEA</h3><div id="idea"></div></div>
+<div class="stage"><h3>SCRIPT</h3><div id="script"></div></div>
+<div class="stage"><h3>SHOOT</h3><div id="shoot"></div></div>
+<div class="stage"><h3>EDIT</h3><div id="edit"></div></div>
+<div class="stage"><h3>THUMBNAIL</h3><div id="thumbnail"></div></div>
+<div class="stage"><h3>SCHEDULE</h3><div id="schedule"></div></div>
+<div class="stage"><h3>PUBLISHED</h3><div id="published"></div></div>
+</div>
+</div>
+
+
+<div class="card">
+<h2>Episode Builder</h2>
+<input id="episodeTitle" placeholder="Episode title">
+<textarea id="episodeDesc" placeholder="Episode description"></textarea>
+<button onclick="createEpisode()">+ CREATE EPISODE</button>
+<div id="episodes"></div>
+</div>
+
+
+<div class="card">
+<h2>Founder's Log</h2>
+<textarea id="log" placeholder="What happened today?"></textarea>
+<button onclick="saveLog()">SAVE ENTRY</button>
+<p id="saved"></p>
+</div>
+
+
+<div class="card">
+<h2>Creator Scoreboard</h2>
+<h3>Episodes Created: <span id="count">0</span></h3>
+<h3>System: ONLINE</h3>
+</div>
+
+
+<div class="card">
+<h2>STV Universe</h2>
+<ul>
+<li>STV Travel</li>
+<li>STV Food</li>
+<li>Interviews</li>
+<li>Radiomeltdown</li>
+<li>STV Gaming</li>
+<li>Real Life</li>
+<li>SENSTACK</li>
+</ul>
+</div>
+
+
+<div class="card">
+<h2>STV Media Vault</h2>
+<p>Asset Name</p>
+<input id="assetName" placeholder="Example: Cruise Muse Episode 01">
+<p>Asset Type</p>
+<select id="assetType">
+<option>Video</option>
+<option>Photo</option>
+<option>Music</option>
+<option>Document</option>
+<option>Graphic</option>
+</select>
+<p>Link / Location</p>
+<input id="assetLink" placeholder="Cloudinary, Drive, GitHub, Folder Link">
+<button onclick="addAsset()">+ ADD ASSET</button>
+<div id="vault"></div>
+</div>
+
+
+<div class="card">
+<h2>Showrunner Episode Sheet</h2>
+<input id="season" placeholder="Season (Example: Season 1)">
+<input id="episodeNumber" placeholder="Episode Number">
+<input id="host" placeholder="Host">
+<input id="guest" placeholder="Guest / Featured Person">
+<input id="storyArc" placeholder="Story Arc">
+<textarea id="shotList" placeholder="Shot List:
+1.
+2.
+3."></textarea>
+<textarea id="productionNotes" placeholder="Production Notes"></textarea>
+
+<h3>Production Checklist</h3>
+<label><input type="checkbox" id="scriptCheck"> Script Complete</label><br>
+<label><input type="checkbox" id="shootCheck"> Shoot Complete</label><br>
+<label><input type="checkbox" id="editCheck"> Edit Complete</label><br>
+<label><input type="checkbox" id="publishCheck"> Published</label><br><br>
+
+<button onclick="saveEpisodeSheet()">SAVE EPISODE SHEET</button>
+<div id="episodeSheets"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Network Scheduler</h2>
+<input id="scheduleTitle" placeholder="Program Name">
+<input id="scheduleTime" placeholder="Time Slot (Example: 7:00 PM)">
+<select id="scheduleChannel">
+<option>STV Channel 1</option>
+<option>STV Radiomeltdown</option>
+<option>STV Live Events</option>
+<option>STV On Demand</option>
+</select>
+<select id="scheduleType">
+<option>Premiere</option>
+<option>Live</option>
+<option>Replay</option>
+<option>Simulcast</option>
+</select>
+<button onclick="addSchedule()">+ ADD PROGRAM</button>
+<div id="scheduleList"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Talent Center</h2>
+<input id="talentName" placeholder="Name">
+<input id="talentRole" placeholder="Role (Artist, Guest, Host, Expert)">
+<input id="talentShow" placeholder="Associated Show">
+<select id="talentStatus">
+<option>Potential</option>
+<option>Contacted</option>
+<option>Confirmed</option>
+<option>Recorded</option>
+<option>Published</option>
+</select>
+<textarea id="talentNotes" placeholder="Notes, bio, talking points..."></textarea>
+<button onclick="addTalent()">+ ADD TALENT</button>
+<div id="talentList"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Revenue Command Center</h2>
+<input id="clientName" placeholder="Sponsor / Client Name">
+<input id="dealName" placeholder="Campaign or Package">
+<input id="dealAmount" placeholder="Amount ($)">
+<select id="dealStatus">
+<option>Lead</option>
+<option>Proposal Sent</option>
+<option>Negotiating</option>
+<option>Signed</option>
+<option>Paid</option>
+</select>
+<input id="dealDate" type="date">
+<textarea id="dealNotes" placeholder="Notes, deliverables, payment terms..."></textarea>
+<button onclick="addDeal()">+ ADD DEAL</button>
+<div id="dealList"></div>
+<h3>Total Revenue: $<span id="totalRevenue">0</span></h3>
+</div>
+
+
+<div class="card">
+<h2>STV Analytics Command Center</h2>
+<input id="analyticsShow" placeholder="Show Name">
+<input id="views" placeholder="Views">
+<input id="listeners" placeholder="Listeners">
+<input id="watchTime" placeholder="Watch Time (minutes)">
+<input id="socialReach" placeholder="Social Reach">
+<button onclick="addAnalytics()">+ ADD REPORT</button>
+<div id="analyticsList"></div>
+<h3>Total Views: <span id="totalViews">0</span></h3>
+<h3>Total Listeners: <span id="totalListeners">0</span></h3>
+</div>
+
+
+<div class="card">
+<h2>STV Team Operations</h2>
+<input id="teamMember" placeholder="Team Member Name">
+<input id="teamRole" placeholder="Role (Producer, Editor, Host...)">
+<input id="taskName" placeholder="Assigned Task">
+<select id="taskStatus">
+<option>Assigned</option>
+<option>In Progress</option>
+<option>Review</option>
+<option>Complete</option>
+</select>
+<select id="priority">
+<option>Normal</option>
+<option>Important</option>
+<option>Urgent</option>
+</select>
+<button onclick="addTask()">+ ASSIGN TASK</button>
+<div id="teamTasks"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Digital Distribution Hub</h2>
+<input id="contentTitle" placeholder="Content Title">
+<select id="platform">
+<option>YouTube</option>
+<option>TikTok</option>
+<option>Instagram</option>
+<option>Facebook</option>
+<option>Podcast</option>
+<option>Website</option>
+<option>Newsletter</option>
+</select>
+<input id="publishLink" placeholder="Published Link">
+<select id="publishStatus">
+<option>Draft</option>
+<option>Scheduled</option>
+<option>Published</option>
+</select>
+<input id="publishDate" type="date">
+<textarea id="publishNotes" placeholder="Caption, description, hashtags, press notes..."></textarea>
+<button onclick="addDistribution()">+ ADD RELEASE</button>
+<div id="distributionList"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Automation Center</h2>
+<input id="projectName" placeholder="Project / Episode Name">
+<select id="templateType">
+<option>TV Episode</option>
+<option>Interview</option>
+<option>Live Show</option>
+<option>Short Clip</option>
+<option>Podcast</option>
+</select>
+<button onclick="createWorkflow()">+ CREATE WORKFLOW</button>
+<div id="workflowList"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Master Calendar</h2>
+<input id="calendarTitle" placeholder="Event / Production Name">
+<input id="calendarDate" type="date">
+<select id="calendarType">
+<option>Shoot Day</option>
+<option>Live Broadcast</option>
+<option>Interview</option>
+<option>Episode Release</option>
+<option>Sponsor Deadline</option>
+<option>Social Campaign</option>
+</select>
+<input id="calendarOwner" placeholder="Assigned To">
+<button onclick="addCalendarEvent()">+ ADD EVENT</button>
+<div id="calendarList"></div>
+</div>
+
+
+<div class="card">
+<h2>STV Intelligence Search</h2>
+<input id="searchBox" placeholder="Search episodes, guests, assets, deals..." onkeyup="searchSTV()">
+<div id="searchResults"></div>
+</div>
+
+
+<div class="box">
+<div class="header">PROGRAM CLOCK</div>
+<div class="body">
+<h2 id="currentProgram" style="border:none;padding:0;margin:0;">STV CHANNEL</h2>
+<p>NOW PLAYING: <span id="nowPlaying">Standby</span></p>
+<p>NEXT: <span id="nextProgram">No Program Scheduled</span></p>
+<h1 id="clock">00:00:00</h1>
+</div>
+</div>
+
+
+<div class="box">
+<div class="header">OPERATOR NOTES</div>
+<div class="body">
+<textarea id="operatorNotes" placeholder="Production notes, cues, reminders..."></textarea>
+<button class="btn" onclick="saveNotes()">SAVE NOTES</button>
+</div>
+</div>
+
+
+<div class="box">
+<div class="header">PLAYOUT CONTROL</div>
+<div class="body">
+<input id="playlistItem" placeholder="Add program or segment">
+<button class="btn" onclick="addToQueue()">+ ADD TO QUEUE</button>
+<button class="btn live" onclick="takeLive()">TAKE LIVE</button>
+<button class="btn" onclick="playNext()">PLAY NEXT</button>
+<button class="btn" onclick="clearQueue()">CLEAR QUEUE</button>
+<h3>CURRENT:</h3>
+<div id="currentPlay">Standby</div>
+<h3>QUEUE:</h3>
+<div id="playQueue"></div>
+</div>
+</div>
+
+
+<div class="box">
+<div class="header">NETWORK SCHEDULE</div>
+<div class="body">
+<input id="showName" placeholder="Program Name">
+<input id="showTime" placeholder="Time (Example 7:00 PM)">
+<input id="showDuration" placeholder="Duration">
+<select id="showChannel">
+<option>STV Channel</option>
+<option>Radiomeltdown</option>
+<option>Live Events</option>
+</select>
+<button class="btn" onclick="addScheduleItem()">+ ADD PROGRAM</button>
+<div id="networkSchedule"></div>
+</div>
+</div>
+
+
+</div>
+</div>
+
+<div id="page-radio" style="display:none">
+<div class="shell">
+  <header class="header">
+    <div class="logo"><i class="ti ti-radio"></i></div>
+    <div class="header-info">
+      <h1>STV Time &amp; Radio Ops</h1>
+      <p id="date-disp"></p>
+    </div>
+    <div id="live-clock"></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab" onclick="switchTab('radio')"><i class="ti ti-radio"></i> Radio</button>
+    <button class="tab active" onclick="switchTab('clock')"><i class="ti ti-clock"></i> Clock</button>
+    <button class="tab" onclick="switchTab('map')"><i class="ti ti-map-2"></i> Map</button>
+    <button class="tab" onclick="switchTab('report')"><i class="ti ti-report"></i> Report</button>
+  </nav>
+
+  <!-- RADIO TAB -->
+  <div id="tab-radio" class="section">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-antenna"></i> Channel setup</div>
+      <div class="radio-setup">
+        <select id="my-emp-sel"><option value="">— Select your name —</option></select>
+        <input type="text" id="channel-input" placeholder="Channel code (e.g. dispatch)" maxlength="20">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn primary" onclick="joinChannel()"><i class="ti ti-plug"></i> Join channel</button>
+        <button class="btn danger" onclick="leaveChannel()"><i class="ti ti-plug-x"></i> Leave</button>
+        <span id="channel-badge" class="badge blue" style="display:none"><i class="ti ti-broadcast"></i> <span id="channel-name-disp"></span></span>
+      </div>
+    </div>
+
+    <div id="peers-card" class="card" style="display:none">
+      <div class="card-title"><i class="ti ti-users"></i> On this channel</div>
+      <div id="peers-row" class="peers-row"></div>
+    </div>
+
+    <div class="ptt-main-wrap">
+      <div id="radio-status" style="font-size:12px;color:var(--muted)">Join a channel to start</div>
+      <button id="ptt-main" class="ptt-main disabled" disabled>
+        <i class="ti ti-microphone"></i>
+        <span>HOLD TO TALK</span>
+      </button>
+      <div id="tx-indicator" style="display:none">
+        <div class="tx-wave"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-messages"></i> Transmission log</div>
+      <div id="radio-log" class="radio-log">
+        <div class="no-data" style="padding:.75rem"><i class="ti ti-microphone-off" style="font-size:20px"></i>No transmissions yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOCK TAB -->
+  <div id="tab-clock" class="section active">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Clocked in</div><div class="stat-val" id="s-in">0</div></div>
+      <div class="stat-card"><div class="stat-label">Hours today</div><div class="stat-val" id="s-hrs">0h</div></div>
+      <div class="stat-card"><div class="stat-label">Miles today</div><div class="stat-val" id="s-mi">0</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-user-plus"></i> Add employee</div>
+      <div class="add-row">
+        <input type="text" id="new-name" placeholder="Full name" style="flex:1;min-width:120px">
+        <input type="text" id="new-role" placeholder="Role" style="width:140px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="new-driver"> Driver
+        </label>
+        <button class="btn primary" onclick="addEmployee()"><i class="ti ti-plus"></i> Add</button>
+      </div>
+    </div>
+    <div id="clock-list" class="emp-grid"></div>
+    <div id="no-emp" style="display:none" class="no-data"><i class="ti ti-user-plus"></i>Add employees above</div>
+  </div>
+
+  <!-- MAP TAB -->
+  <div id="tab-map" class="section">
+    <div id="map-container"></div>
+    <div class="map-controls">
+      <div class="card" style="margin:0">
+        <div class="card-title"><i class="ti ti-car"></i> Driver tracking</div>
+        <select id="driver-sel" style="width:100%;margin-bottom:8px"><option value="">Select driver</option></select>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn primary small" onclick="startTracking()"><i class="ti ti-player-play"></i> Start</button>
+          <button class="btn danger small" onclick="stopTracking()"><i class="ti ti-player-stop"></i> Stop</button>
+          <button class="btn small" onclick="centerOnDriver()"><i class="ti ti-current-location"></i> Center</button>
+        </div>
+        <div id="tracking-status" style="margin-top:8px;font-size:11px;color:var(--muted)">No driver selected</div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title"><i class="ti ti-route"></i> Route optimizer</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="wp-input" placeholder="Address or landmark" style="flex:1;font-size:12px">
+          <button class="btn small" onclick="geocodeWaypoint()"><i class="ti ti-search"></i></button>
+        </div>
+        <button class="btn small" onclick="addCurrentLocWP()" style="margin-bottom:8px;width:100%">
+          <i class="ti ti-current-location"></i> Add my location
+        </button>
+        <div id="waypoint-list" class="waypoint-list"></div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn primary small" onclick="optimizeRoute()"><i class="ti ti-route"></i> Optimize</button>
+          <button class="btn danger small" onclick="clearWaypoints()"><i class="ti ti-trash"></i> Clear</button>
+        </div>
+        <div id="route-info" style="margin-top:6px;font-size:11px;color:var(--muted)"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-pin"></i> Employee locations</div>
+      <div id="loc-list">
+        <div class="no-data" style="padding:.5rem"><i class="ti ti-map-pin-off" style="font-size:20px"></i>No GPS data yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT TAB -->
+  <div id="tab-report" class="section">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total hours</div><div class="stat-val" id="r-hrs">0h</div></div>
+      <div class="stat-card"><div class="stat-label">Total miles</div><div class="stat-val" id="r-mi">0</div></div>
+      <div class="stat-card"><div class="stat-label">Sessions</div><div class="stat-val" id="r-sess">0</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Employee</th><th>Role</th><th>Sessions</th><th>Hours</th><th>Miles</th><th>Status</th></tr></thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="downloadCSV()"><i class="ti ti-download"></i> Download CSV</button>
+      <button class="btn" onclick="openEmailModal()"><i class="ti ti-mail"></i> Email report</button>
+      <button class="btn danger" onclick="clearToday()" style="margin-left:auto"><i class="ti ti-trash"></i> Clear today</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email modal -->
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <h2><i class="ti ti-mail" style="vertical-align:-2px;margin-right:6px"></i>Email daily report</h2>
+    <p>The full timesheet and mileage report will open pre-filled in your default mail app.</p>
+    <input type="email" id="email-to" placeholder="recipient@company.com">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn primary" onclick="sendEmail()"><i class="ti ti-send"></i> Open in mail</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+
+let episodes =
+JSON.parse(localStorage.getItem("stvEpisodes")) || [];
+
+
+function updateEpisodes(){
+
+let box=document.getElementById("episodes");
+
+box.innerHTML="";
+
+episodes.forEach(ep=>{
+
+box.innerHTML += `
+<div class="episode">
+<b>${ep.title}</b>
+<br>
+${ep.desc}
+</div>
+`;
+
+});
+
+document.getElementById("count").innerHTML=
+episodes.length;
+
+}
+
+
+function createEpisode(){
+
+let title=
+document.getElementById("episodeTitle").value;
+
+let desc=
+document.getElementById("episodeDesc").value;
+
+
+episodes.push({
+title:title,
+desc:desc
+});
+
+
+localStorage.setItem(
+"stvEpisodes",
+JSON.stringify(episodes)
+);
+
+
+updateEpisodes();
+
+}
+
+
+function goLive(){
+
+let s=document.getElementById("status");
+
+s.className="tally live";
+s.innerHTML='<span class="tally-dot"></span> LIVE';
+
+}
+
+
+function standby(){
+
+let s=document.getElementById("status");
+
+s.className="tally offline";
+s.innerHTML='<span class="tally-dot"></span> STANDBY';
+
+}
+
+
+function saveLog(){
+
+let text=
+document.getElementById("log").value;
+
+
+localStorage.setItem(
+"founderLog",
+text
+);
+
+
+document.getElementById("saved").innerHTML=
+"Saved to STV Archive";
+
+}
+
+
+updateEpisodes();
+
+let content =
+JSON.parse(localStorage.getItem("stvPipeline")) || [];
+
+
+function addContent(){
+
+let name =
+document.getElementById("contentName").value;
+
+let stage =
+document.getElementById("contentStage").value;
+
+
+content.push({
+name:name,
+stage:stage
+});
+
+
+localStorage.setItem(
+"stvPipeline",
+JSON.stringify(content)
+);
+
+
+renderPipeline();
+
+}
+
+
+function renderPipeline(){
+
+let areas=[
+"idea",
+"script",
+"shoot",
+"edit",
+"thumbnail",
+"schedule",
+"published"
+];
+
+
+areas.forEach(a=>{
+document.getElementById(a).innerHTML="";
+});
+
+
+content.forEach(item=>{
+
+let id=item.stage.toLowerCase();
+
+if(document.getElementById(id)){
+
+document.getElementById(id).innerHTML +=
+`
+<div class="contentCard">
+<b>${item.name}</b>
+</div>
+`;
+
+}
+
+});
+
+}
+
+
+renderPipeline();
+let assets =
+JSON.parse(localStorage.getItem("stvVault")) || [];
+
+
+function addAsset(){
+
+let name =
+document.getElementById("assetName").value;
+
+
+let type =
+document.getElementById("assetType").value;
+
+
+let link =
+document.getElementById("assetLink").value;
+
+
+assets.push({
+name:name,
+type:type,
+link:link
+});
+
+
+localStorage.setItem(
+"stvVault",
+JSON.stringify(assets)
+);
+
+
+renderVault();
+
+}
+
+
+
+function renderVault(){
+
+let box =
+document.getElementById("vault");
+
+
+box.innerHTML="";
+
+
+assets.forEach(asset=>{
+
+box.innerHTML +=
+
+`
+<div class="asset">
+
+<b>${asset.type}</b>
+<br>
+
+${asset.name}
+
+<br>
+
+<a href="${asset.link}" target="_blank">
+Open Asset
+</a>
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderVault();
+
+let sheets =
+JSON.parse(localStorage.getItem("stvSheets")) || [];
+
+
+function saveEpisodeSheet(){
+
+let sheet={
+
+season:
+document.getElementById("season").value,
+
+episode:
+document.getElementById("episodeNumber").value,
+
+host:
+document.getElementById("host").value,
+
+guest:
+document.getElementById("guest").value,
+
+story:
+document.getElementById("storyArc").value,
+
+shots:
+document.getElementById("shotList").value,
+
+notes:
+document.getElementById("productionNotes").value,
+
+status:{
+script:
+document.getElementById("scriptCheck").checked,
+
+shoot:
+document.getElementById("shootCheck").checked,
+
+edit:
+document.getElementById("editCheck").checked,
+
+publish:
+document.getElementById("publishCheck").checked
+
+}
+
+};
+
+
+sheets.push(sheet);
+
+
+localStorage.setItem(
+"stvSheets",
+JSON.stringify(sheets)
+);
+
+
+renderSheets();
+
+}
+
+
+
+function renderSheets(){
+
+let box=
+document.getElementById("episodeSheets");
+
+box.innerHTML="";
+
+
+sheets.forEach(s=>{
+
+
+box.innerHTML +=`
+
+<div class="sheet">
+
+<h3>
+${s.season} - Episode ${s.episode}
+</h3>
+
+<p>
+Host: ${s.host}
+</p>
+
+<p>
+Guest: ${s.guest}
+</p>
+
+<p>
+Story: ${s.story}
+</p>
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderSheets();
+let schedule =
+JSON.parse(localStorage.getItem("stvSchedule")) || [];
+
+
+
+function addSchedule(){
+
+let program = {
+
+title:
+document.getElementById("scheduleTitle").value,
+
+time:
+document.getElementById("scheduleTime").value,
+
+channel:
+document.getElementById("scheduleChannel").value,
+
+type:
+document.getElementById("scheduleType").value
+
+};
+
+
+schedule.push(program);
+
+
+localStorage.setItem(
+"stvSchedule",
+JSON.stringify(schedule)
+);
+
+
+renderSchedule();
+
+}
+
+
+
+function renderSchedule(){
+
+let box =
+document.getElementById("scheduleList");
+
+
+box.innerHTML="";
+
+
+schedule.forEach(show=>{
+
+
+box.innerHTML +=`
+
+<div class="scheduleItem">
+
+<strong>
+${show.time}
+</strong>
+
+<br>
+
+${show.title}
+
+<br>
+
+${show.channel}
+
+<br>
+
+${show.type}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderSchedule();
+
+let talent =
+JSON.parse(localStorage.getItem("stvTalent")) || [];
+
+
+
+function addTalent(){
+
+let person = {
+
+name:
+document.getElementById("talentName").value,
+
+role:
+document.getElementById("talentRole").value,
+
+show:
+document.getElementById("talentShow").value,
+
+status:
+document.getElementById("talentStatus").value,
+
+notes:
+document.getElementById("talentNotes").value
+
+};
+
+
+talent.push(person);
+
+
+localStorage.setItem(
+"stvTalent",
+JSON.stringify(talent)
+);
+
+
+renderTalent();
+
+}
+
+
+
+function renderTalent(){
+
+let box =
+document.getElementById("talentList");
+
+
+box.innerHTML="";
+
+
+talent.forEach(person=>{
+
+
+box.innerHTML +=`
+
+<div class="talentCard">
+
+<strong>
+${person.name}
+</strong>
+
+<br>
+
+${person.role}
+
+<br>
+
+${person.show}
+
+<br>
+
+Status:
+${person.status}
+
+<br>
+
+${person.notes}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderTalent();  
+
+let deals =
+JSON.parse(localStorage.getItem("stvDeals")) || [];
+
+
+
+function addDeal(){
+
+let deal={
+
+client:
+document.getElementById("clientName").value,
+
+campaign:
+document.getElementById("dealName").value,
+
+amount:
+Number(document.getElementById("dealAmount").value),
+
+status:
+document.getElementById("dealStatus").value,
+
+date:
+document.getElementById("dealDate").value,
+
+notes:
+document.getElementById("dealNotes").value
+
+};
+
+
+deals.push(deal);
+
+
+localStorage.setItem(
+"stvDeals",
+JSON.stringify(deals)
+);
+
+
+renderDeals();
+
+}
+
+
+
+function renderDeals(){
+
+let box =
+document.getElementById("dealList");
+
+box.innerHTML="";
+
+let total=0;
+
+
+deals.forEach(deal=>{
+
+
+if(deal.status==="Paid"){
+
+total += deal.amount;
+
+}
+
+
+box.innerHTML +=`
+
+<div class="dealCard">
+
+<strong>
+${deal.client}
+</strong>
+
+<br>
+
+${deal.campaign}
+
+<br>
+
+$${deal.amount}
+
+<br>
+
+Status:
+${deal.status}
+
+<br>
+
+${deal.date}
+
+</div>
+
+`;
+
+});
+
+
+document.getElementById("totalRevenue")
+.innerHTML=total;
+
+}
+
+
+renderDeals();
+
+let analytics =
+JSON.parse(localStorage.getItem("stvAnalytics")) || [];
+
+
+
+function addAnalytics(){
+
+let report={
+
+show:
+document.getElementById("analyticsShow").value,
+
+views:
+Number(document.getElementById("views").value),
+
+listeners:
+Number(document.getElementById("listeners").value),
+
+watch:
+Number(document.getElementById("watchTime").value),
+
+reach:
+Number(document.getElementById("socialReach").value)
+
+};
+
+
+analytics.push(report);
+
+
+localStorage.setItem(
+"stvAnalytics",
+JSON.stringify(analytics)
+);
+
+
+renderAnalytics();
+
+}
+
+
+
+function renderAnalytics(){
+
+let box =
+document.getElementById("analyticsList");
+
+
+box.innerHTML="";
+
+
+let views=0;
+let listeners=0;
+
+
+analytics.forEach(item=>{
+
+
+views += item.views;
+listeners += item.listeners;
+
+
+box.innerHTML +=`
+
+<div class="analyticsCard">
+
+<b>${item.show}</b>
+
+<br>
+
+Views:
+${item.views}
+
+<br>
+
+Listeners:
+${item.listeners}
+
+<br>
+
+Watch:
+${item.watch} minutes
+
+<br>
+
+Reach:
+${item.reach}
+
+</div>
+
+`;
+
+});
+
+
+document.getElementById("totalViews")
+.innerHTML=views;
+
+
+document.getElementById("totalListeners")
+.innerHTML=listeners;
+
+
+}
+
+
+renderAnalytics();
+
+let tasks =
+JSON.parse(localStorage.getItem("stvTasks")) || [];
+
+
+
+function addTask(){
+
+let task={
+
+member:
+document.getElementById("teamMember").value,
+
+role:
+document.getElementById("teamRole").value,
+
+task:
+document.getElementById("taskName").value,
+
+status:
+document.getElementById("taskStatus").value,
+
+priority:
+document.getElementById("priority").value
+
+};
+
+
+tasks.push(task);
+
+
+localStorage.setItem(
+"stvTasks",
+JSON.stringify(tasks)
+);
+
+
+renderTasks();
+
+}
+
+
+
+function renderTasks(){
+
+let box =
+document.getElementById("teamTasks");
+
+
+box.innerHTML="";
+
+
+tasks.forEach(item=>{
+
+
+box.innerHTML +=`
+
+<div class="taskCard">
+
+<strong>
+${item.member}
+</strong>
+
+<br>
+
+${item.role}
+
+<br>
+
+${item.task}
+
+<br>
+
+Status:
+${item.status}
+
+<br>
+
+<span class="priority">
+Priority:
+${item.priority}
+</span>
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderTasks();
+
+let releases =
+JSON.parse(localStorage.getItem("stvReleases")) || [];
+
+
+
+function addDistribution(){
+
+let release={
+
+title:
+document.getElementById("contentTitle").value,
+
+platform:
+document.getElementById("platform").value,
+
+link:
+document.getElementById("publishLink").value,
+
+status:
+document.getElementById("publishStatus").value,
+
+date:
+document.getElementById("publishDate").value,
+
+notes:
+document.getElementById("publishNotes").value
+
+};
+
+
+releases.push(release);
+
+
+localStorage.setItem(
+"stvReleases",
+JSON.stringify(releases)
+);
+
+
+renderReleases();
+
+}
+
+
+
+function renderReleases(){
+
+let box =
+document.getElementById("distributionList");
+
+
+box.innerHTML="";
+
+
+releases.forEach(item=>{
+
+
+box.innerHTML +=`
+
+<div class="releaseCard">
+
+<strong>
+${item.title}
+</strong>
+
+<br>
+
+${item.platform}
+
+<br>
+
+${item.date}
+
+<br>
+
+Status:
+${item.status}
+
+<br>
+
+<a href="${item.link}" target="_blank">
+View Release
+</a>
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderReleases();
+
+let workflows =
+JSON.parse(localStorage.getItem("stvWorkflows")) || [];
+
+
+
+function createWorkflow(){
+
+let workflow={
+
+name:
+document.getElementById("projectName").value,
+
+type:
+document.getElementById("templateType").value,
+
+steps:[
+
+"Script Complete",
+
+"Recording Complete",
+
+"Audio Checked",
+
+"Editing Complete",
+
+"Thumbnail Created",
+
+"Uploaded",
+
+"Promotion Posted"
+
+]
+
+};
+
+
+workflows.push(workflow);
+
+
+localStorage.setItem(
+"stvWorkflows",
+JSON.stringify(workflows)
+);
+
+
+renderWorkflows();
+
+}
+
+
+
+function renderWorkflows(){
+
+let box =
+document.getElementById("workflowList");
+
+
+box.innerHTML="";
+
+
+workflows.forEach((item,index)=>{
+
+
+box.innerHTML +=`
+
+<div class="workflowCard">
+
+<strong>
+${item.type}
+</strong>
+
+<br>
+
+${item.name}
+
+
+<div class="checklist">
+
+${item.steps.map(step=>`
+
+<label>
+<input type="checkbox">
+${step}
+</label>
+<br>
+
+`).join("")}
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderWorkflows();
+
+let calendarEvents =
+JSON.parse(localStorage.getItem("stvCalendar")) || [];
+
+
+
+function addCalendarEvent(){
+
+let event={
+
+title:
+document.getElementById("calendarTitle").value,
+
+date:
+document.getElementById("calendarDate").value,
+
+type:
+document.getElementById("calendarType").value,
+
+owner:
+document.getElementById("calendarOwner").value
+
+};
+
+
+calendarEvents.push(event);
+
+
+localStorage.setItem(
+"stvCalendar",
+JSON.stringify(calendarEvents)
+);
+
+
+renderCalendar();
+
+}
+
+
+
+function renderCalendar(){
+
+let box =
+document.getElementById("calendarList");
+
+
+box.innerHTML="";
+
+
+calendarEvents.sort(
+(a,b)=>new Date(a.date)-new Date(b.date)
+);
+
+
+calendarEvents.forEach(event=>{
+
+
+box.innerHTML +=`
+
+<div class="calendarCard">
+
+<strong>
+${event.title}
+</strong>
+
+<br>
+
+${event.date}
+
+<br>
+
+${event.type}
+
+<br>
+
+${event.owner}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderCalendar();
+
+function searchSTV(){
+
+let query =
+document.getElementById("searchBox")
+.value
+.toLowerCase();
+
+
+let results=[];
+
+
+
+let allData=[
+
+...episodes.map(item=>({
+type:"Episode",
+name:item.title,
+info:item.desc
+})),
+
+...talent.map(item=>({
+type:"Talent",
+name:item.name,
+info:item.role
+})),
+
+...assets.map(item=>({
+type:"Asset",
+name:item.name,
+info:item.type
+})),
+
+...deals.map(item=>({
+type:"Revenue",
+name:item.client,
+info:item.campaign
+})),
+
+...calendarEvents.map(item=>({
+type:"Calendar",
+name:item.title,
+info:item.type
+}))
+
+];
+
+
+
+results =
+allData.filter(item=>
+
+item.name
+.toLowerCase()
+.includes(query)
+
+);
+
+
+
+let box =
+document.getElementById("searchResults");
+
+
+box.innerHTML="";
+
+
+
+results.forEach(item=>{
+
+
+box.innerHTML +=`
+
+<div class="searchResult">
+
+<strong>
+${item.type}
+</strong>
+
+<br>
+
+${item.name}
+
+<br>
+
+${item.info}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+function updateClock(){
+
+const now = new Date();
+
+document.getElementById("clock")
+.innerHTML =
+now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+function saveNotes(){
+
+localStorage.setItem(
+"stvOperatorNotes",
+document.getElementById("operatorNotes").value
+);
+
+alert("Notes Saved");
+
+}
+
+
+document.getElementById("operatorNotes").value =
+localStorage.getItem("stvOperatorNotes") || ""; 
+
+let playQueue =
+JSON.parse(localStorage.getItem("stvQueue")) || [];
+
+
+let currentPlay =
+localStorage.getItem("stvCurrent") || "Standby";
+
+
+
+function addToQueue(){
+
+let item =
+document.getElementById("playlistItem").value;
+
+
+if(!item)return;
+
+
+playQueue.push(item);
+
+
+localStorage.setItem(
+"stvQueue",
+JSON.stringify(playQueue)
+);
+
+
+renderQueue();
+
+}
+
+
+
+function playNext(){
+
+if(playQueue.length === 0){
+
+currentPlay="Standby";
+
+}else{
+
+currentPlay =
+playQueue.shift();
+
+}
+
+
+localStorage.setItem(
+"stvCurrent",
+currentPlay
+);
+
+
+localStorage.setItem(
+"stvQueue",
+JSON.stringify(playQueue)
+);
+
+
+document.getElementById("currentPlay")
+.innerHTML=currentPlay;
+
+
+renderQueue();
+
+}
+
+
+
+function renderQueue(){
+
+let box =
+document.getElementById("playQueue");
+
+
+box.innerHTML="";
+
+
+playQueue.forEach((item,index)=>{
+
+
+box.innerHTML +=`
+
+<div class="queueItem">
+
+${index+1}. ${item}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+function clearQueue(){
+
+playQueue=[];
+
+localStorage.setItem(
+"stvQueue",
+JSON.stringify(playQueue)
+);
+
+renderQueue();
+
+}
+
+
+
+function takeLive(){
+
+currentPlay="LIVE EVENT";
+
+localStorage.setItem(
+"stvCurrent",
+currentPlay
+);
+
+
+document.getElementById("currentPlay")
+.innerHTML=currentPlay;
+
+}
+
+
+
+document.getElementById("currentPlay")
+.innerHTML=currentPlay;
+
+
+renderQueue();
+
+let networkSchedule =
+JSON.parse(localStorage.getItem("stvNetworkSchedule")) || [];
+
+
+
+function addScheduleItem(){
+
+let item={
+
+name:
+document.getElementById("showName").value,
+
+time:
+document.getElementById("showTime").value,
+
+duration:
+document.getElementById("showDuration").value,
+
+channel:
+document.getElementById("showChannel").value
+
+};
+
+
+networkSchedule.push(item);
+
+
+localStorage.setItem(
+"stvNetworkSchedule",
+JSON.stringify(networkSchedule)
+);
+
+
+renderNetworkSchedule();
+
+}
+
+
+
+function renderNetworkSchedule(){
+
+let box =
+document.getElementById("networkSchedule");
+
+
+box.innerHTML="";
+
+
+networkSchedule.forEach(show=>{
+
+
+box.innerHTML +=`
+
+<div class="scheduleRow">
+
+<b>
+${show.time}
+</b>
+
+<br>
+
+${show.name}
+
+<br>
+
+${show.channel}
+
+<br>
+
+${show.duration}
+
+</div>
+
+`;
+
+});
+
+
+}
+
+
+renderNetworkSchedule();
+
+
+/* ---- Page switcher ---- */
+function showPage(id){
+  document.getElementById('page-master').style.display = (id==='page-master') ? '' : 'none';
+  document.getElementById('page-radio').style.display = (id==='page-radio') ? '' : 'none';
+  if(id==='page-radio'){
+    tickClock();
+    render();
+    updateEmpSelects();
+  }
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+/* ─── State ─── */
+const COLORS=[{bg:'#dbeafe',t:'#1e40af'},{bg:'#dcfce7',t:'#166534'},{bg:'#fce7f3',t:'#9d174d'},
+  {bg:'#fef3c7',t:'#92400e'},{bg:'#ede9fe',t:'#5b21b6'},{bg:'#ffedd5',t:'#9a3412'},
+  {bg:'#f0fdf4',t:'#15803d'},{bg:'#fdf2f8',t:'#a21caf'}];
+const MAP_COLORS=['#378ADD','#E24B4A','#1D9E75','#BA7517','#9333ea','#dc2626'];
+
+let employees=ls('tr_emp',[]);
+let sessions=ls('tr_sess',[]);
+let active=ls('tr_active',{});      // empId->{start,lat,lng}
+let routes=ls('tr_routes',{});       // empId->[{lat,lng,ts}]
+let waypoints=[];                    // [{lat,lng,label}]
+let activeDriverId=null;
+let driverWatchId=null;
+
+// Runtime (not persisted)
+let map=null, mapMarkers={}, mapPolylines={}, routeLayer=null, wpMarkers=[];
+let peer=null, peerConns={}, myEmpId=null, myChannel='';
+let mediaRecorder=null, audioChunks=[], isRecording=false;
+
+function ls(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}}
+function save(){
+  localStorage.setItem('tr_emp',JSON.stringify(employees));
+  localStorage.setItem('tr_sess',JSON.stringify(sessions));
+  localStorage.setItem('tr_active',JSON.stringify(active));
+  localStorage.setItem('tr_routes',JSON.stringify(routes));
+}
+
+/* ─── Helpers ─── */
+function today(){return new Date().toISOString().slice(0,10)}
+function ft(ts){return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function initials(n){return n.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function col(i){return COLORS[i%COLORS.length]}
+function fmtMins(m){m=Math.floor(m);const h=Math.floor(m/60),mn=m%60;return h?(mn?`${h}h ${mn}m`:`${h}h`):`${mn}m`}
+function fmtMiles(m){return m.toFixed(1)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function haversine(la1,lo1,la2,lo2){
+  const R=3958.8,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function routeMiles(empId){
+  const pts=routes[empId]||[];let m=0;
+  for(let i=1;i<pts.length;i++)m+=haversine(pts[i-1].lat,pts[i-1].lng,pts[i].lat,pts[i].lng);
+  return m;
+}
+function sessionMins(empId){
+  let m=0;
+  sessions.filter(s=>s.empId===empId&&s.date===today()).forEach(s=>m+=(s.end-s.start)/60000);
+  if(active[empId])m+=(Date.now()-active[empId].start)/60000;
+  return m;
+}
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+/* ─── Clock ─── */
+function clockIn(empId){
+  if(active[empId])return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    active[empId]={start:Date.now(),lat:pos.coords.latitude,lng:pos.coords.longitude};
+    save();render();toast('Clocked in with GPS ✓');updateMapMarkers();
+  },()=>{
+    active[empId]={start:Date.now(),lat:null,lng:null};
+    save();render();toast('Clocked in (no GPS)');
+  },{timeout:8000,maximumAge:30000});
+}
+function clockOut(empId){
+  const a=active[empId];if(!a)return;
+  sessions.push({empId,date:today(),start:a.start,end:Date.now(),lat:a.lat,lng:a.lng});
+  delete active[empId];
+  if(activeDriverId===empId)stopTracking();
+  save();render();toast('Clocked out');
+}
+function addEmployee(){
+  const n=document.getElementById('new-name').value.trim();
+  if(!n)return;
+  const r=document.getElementById('new-role').value.trim()||'Team member';
+  const isDriver=document.getElementById('new-driver').checked;
+  employees.push({id:Date.now()+'',name:n,role:r,driver:isDriver});
+  document.getElementById('new-name').value='';
+  document.getElementById('new-role').value='';
+  document.getElementById('new-driver').checked=false;
+  save();render();updateEmpSelects();toast('Employee added');
+}
+function removeEmployee(id){
+  if(!confirm('Remove employee and their data?'))return;
+  employees=employees.filter(e=>e.id!==id);
+  sessions=sessions.filter(s=>s.empId!==id);
+  delete active[id];delete routes[id];
+  save();render();updateEmpSelects();
+}
+
+/* ─── Driver tracking ─── */
+function startTracking(){
+  const sel=document.getElementById('driver-sel').value;
+  if(!sel){toast('Select a driver first');return}
+  const emp=employees.find(e=>e.id===sel);
+  if(!emp){return}
+  if(!active[sel]){toast('Driver must be clocked in first');return}
+  if(driverWatchId!==null)navigator.geolocation.clearWatch(driverWatchId);
+  activeDriverId=sel;
+  routes[sel]=routes[sel]||[];
+  document.getElementById('tracking-status').textContent=`Tracking ${emp.name}...`;
+  driverWatchId=navigator.geolocation.watchPosition(pos=>{
+    const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()};
+    routes[sel].push(pt);save();
+    updateDriverPolyline(sel);
+    const mi=routeMiles(sel);
+    document.getElementById('tracking-status').textContent=
+      `${emp.name} — ${fmtMiles(mi)} mi tracked`;
+    document.getElementById('s-mi').textContent=fmtMiles(mi);
+    if(map)map.setView([pt.lat,pt.lng],15);
+  },err=>{
+    document.getElementById('tracking-status').textContent='GPS error: '+err.message;
+  },{enableHighAccuracy:true,maximumAge:15000,timeout:20000});
+  toast('Driver tracking started');
+}
+function stopTracking(){
+  if(driverWatchId!==null){navigator.geolocation.clearWatch(driverWatchId);driverWatchId=null}
+  const emp=employees.find(e=>e.id===activeDriverId);
+  if(emp)document.getElementById('tracking-status').textContent=
+    `${emp.name} — ${fmtMiles(routeMiles(activeDriverId))} mi logged`;
+  activeDriverId=null;toast('Tracking stopped');
+}
+function centerOnDriver(){
+  const sel=document.getElementById('driver-sel').value;
+  const pts=routes[sel]||[];
+  if(!pts.length){toast('No route data yet');return}
+  const last=pts[pts.length-1];
+  if(map)map.setView([last.lat,last.lng],15);
+}
+
+/* ─── Route optimizer ─── */
+async function geocodeWaypoint(){
+  const q=document.getElementById('wp-input').value.trim();
+  if(!q)return;
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
+      {headers:{'Accept-Language':'en'}});
+    const data=await res.json();
+    if(!data.length){toast('Address not found');return}
+    const {lat,lon,display_name}=data[0];
+    addWaypoint(+lat,+lon,display_name.split(',')[0]);
+    document.getElementById('wp-input').value='';
+  }catch(e){toast('Geocoding failed');}
+}
+function addCurrentLocWP(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    addWaypoint(pos.coords.latitude,pos.coords.longitude,'My location');
+  },()=>toast('GPS unavailable'));
+}
+function addWaypoint(lat,lng,label){
+  waypoints.push({lat,lng,label});
+  renderWaypoints();
+  if(map){
+    const m=L.circleMarker([lat,lng],{radius:8,color:'#1D9E75',fillColor:'#1D9E75',fillOpacity:.8})
+      .bindPopup(label).addTo(map);
+    wpMarkers.push(m);
+    map.setView([lat,lng],13);
+  }
+}
+function removeWaypoint(i){
+  waypoints.splice(i,1);
+  if(wpMarkers[i]&&map)map.removeLayer(wpMarkers[i]);
+  wpMarkers.splice(i,1);
+  renderWaypoints();
+}
+function clearWaypoints(){
+  waypoints=[];
+  wpMarkers.forEach(m=>{if(map)map.removeLayer(m)});wpMarkers=[];
+  if(routeLayer&&map){map.removeLayer(routeLayer);routeLayer=null}
+  renderWaypoints();
+  document.getElementById('route-info').textContent='';
+}
+function renderWaypoints(){
+  const el=document.getElementById('waypoint-list');
+  if(!waypoints.length){el.innerHTML='';return}
+  el.innerHTML=waypoints.map((w,i)=>`
+    <div class="waypoint-row">
+      <span class="wp-num">${i+1}</span>
+      <span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(w.label)}</span>
+      <button class="btn small danger" onclick="removeWaypoint(${i})" style="padding:2px 6px"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+async function optimizeRoute(){
+  if(waypoints.length<2){toast('Add at least 2 waypoints');return}
+  document.getElementById('route-info').textContent='Optimizing...';
+  const coords=waypoints.map(w=>`${w.lng},${w.lat}`).join(';');
+  try{
+    const url=`https://router.project-osrm.org/trip/v1/driving/${coords}?overview=full&geometries=geojson&source=first`;
+    const res=await fetch(url);const data=await res.json();
+    if(data.code!=='Ok')throw new Error(data.message||'Route error');
+    const trip=data.trips[0];
+    const distMi=(trip.distance/1609.34).toFixed(1);
+    const durMin=Math.round(trip.duration/60);
+    document.getElementById('route-info').textContent=
+      `Optimized: ${distMi} mi · ~${durMin} min`;
+    if(routeLayer&&map)map.removeLayer(routeLayer);
+    routeLayer=L.geoJSON(trip.geometry,{style:{color:'#E24B4A',weight:4,opacity:.8}}).addTo(map);
+    map.fitBounds(routeLayer.getBounds(),{padding:[20,20]});
+    const order=data.waypoints.sort((a,b)=>a.waypoint_index-b.waypoint_index);
+    toast(`Route: ${distMi} mi, ~${durMin} min`);
+  }catch(e){
+    document.getElementById('route-info').textContent='Route failed: '+e.message;
+    toast('Could not optimize route');
+  }
+}
+
+/* ─── Map ─── */
+function initMap(){
+  if(map)return;
+  map=L.map('map-container').setView([39.5,-98.35],4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19
+  }).addTo(map);
+  map.on('click',e=>{
+    if(document.getElementById('tab-map').classList.contains('active')&&
+       document.activeElement===document.getElementById('wp-input')){
+      addWaypoint(e.latlng.lat,e.latlng.lng,'Map pin');
+    }
+  });
+  updateMapMarkers();
+  employees.forEach(e=>updateDriverPolyline(e.id));
+}
+function updateMapMarkers(){
+  if(!map)return;
+  employees.forEach((e,i)=>{
+    const a=active[e.id];if(!a||!a.lat)return;
+    const c=col(i);
+    const icon=L.divIcon({
+      className:'',html:`<div style="width:32px;height:32px;border-radius:50%;background:${c.bg};
+        border:2px solid ${c.t};display:flex;align-items:center;justify-content:center;
+        font-size:11px;font-weight:600;color:${c.t}">${initials(e.name)}</div>`,
+      iconSize:[32,32],iconAnchor:[16,16]
+    });
+    if(mapMarkers[e.id])map.removeLayer(mapMarkers[e.id]);
+    mapMarkers[e.id]=L.marker([a.lat,a.lng],{icon})
+      .bindPopup(`<strong>${e.name}</strong><br>${e.role}<br>Clocked in ${ft(a.start)}`)
+      .addTo(map);
+  });
+  renderLocList();
+}
+function updateDriverPolyline(empId){
+  if(!map)return;
+  const pts=routes[empId]||[];if(pts.length<2)return;
+  const lls=pts.map(p=>[p.lat,p.lng]);
+  const i=employees.findIndex(e=>e.id===empId);
+  const color=MAP_COLORS[i%MAP_COLORS.length];
+  if(mapPolylines[empId])map.removeLayer(mapPolylines[empId]);
+  mapPolylines[empId]=L.polyline(lls,{color,weight:3,opacity:.7}).addTo(map);
+}
+function renderLocList(){
+  const el=document.getElementById('loc-list');
+  const hasLoc=employees.some(e=>active[e.id]&&active[e.id].lat);
+  if(!hasLoc){el.innerHTML=`<div class="no-data" style="padding:.5rem"><i class="ti ti-map-pin-off" style="font-size:20px"></i>No GPS data yet</div>`;return}
+  el.innerHTML=employees.filter(e=>active[e.id]&&active[e.id].lat).map((e,i)=>{
+    const a=active[e.id];const mi=routeMiles(e.id);
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border)">
+      <div class="avatar" style="background:${col(i).bg};color:${col(i).t};width:30px;height:30px;font-size:11px">${initials(e.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${esc(e.name)}</div>
+        <div style="font-size:10px;color:var(--muted)">${a.lat.toFixed(4)}, ${a.lng.toFixed(4)} · ${ft(a.start)}</div>
+      </div>
+      ${mi>0?`<span class="driver-badge"><i class="ti ti-car" style="font-size:10px"></i> ${fmtMiles(mi)} mi</span>`:''}
+      <button class="btn small" onclick="if(map)map.setView([${a.lat},${a.lng}],15)"><i class="ti ti-eye"></i></button>
+    </div>`}).join('');
+}
+
+/* ─── Walkie-talkie / PeerJS ─── */
+function makePeerId(channel,name){
+  const c=channel.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,12);
+  const n=name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,12);
+  return `tr${c}${n}`;
+}
+function joinChannel(){
+  const empSel=document.getElementById('my-emp-sel').value;
+  const ch=document.getElementById('channel-input').value.trim();
+  if(!empSel){toast('Select your name first');return}
+  if(!ch){toast('Enter a channel code');return}
+  const emp=employees.find(e=>e.id===empSel);
+  if(!emp)return;
+  if(peer){peer.destroy();peer=null;peerConns={}}
+  myEmpId=empSel;myChannel=ch;
+  const pid=makePeerId(ch,emp.name);
+  peer=new Peer(pid);
+  peer.on('open',()=>{
+    document.getElementById('channel-badge').style.display='inline-flex';
+    document.getElementById('channel-name-disp').textContent=ch;
+    document.getElementById('radio-status').textContent=`On "${ch}" as ${emp.name}`;
+    const pttBtn=document.getElementById('ptt-main');
+    pttBtn.disabled=false;pttBtn.classList.remove('disabled');
+    employees.forEach(e=>{
+      if(e.id!==empSel){
+        const theirId=makePeerId(ch,e.name);
+        tryConnect(theirId,e.name);
+      }
+    });
+    toast(`Joined channel: ${ch}`);
+    updatePeersUI();
+  });
+  peer.on('connection',conn=>{setupConn(conn)});
+  peer.on('error',err=>{
+    if(err.type==='unavailable-id'){
+      document.getElementById('radio-status').textContent='Name already taken on this channel';
+    }
+  });
+}
+function tryConnect(peerId,empName){
+  try{
+    const conn=peer.connect(peerId,{reliable:true});
+    conn._empName=empName;
+    setupConn(conn);
+  }catch(e){}
+}
+function setupConn(conn){
+  conn.on('open',()=>{
+    peerConns[conn.peer]=conn;
+    updatePeersUI();
+  });
+  conn.on('data',pkt=>{
+    if(pkt.type==='audio'){
+      try{
+        const bytes=Uint8Array.from(atob(pkt.b64),(c)=>c.charCodeAt(0));
+        const blob=new Blob([bytes],{type:pkt.mime||'audio/webm'});
+        const url=URL.createObjectURL(blob);
+        const audio=new Audio(url);audio.play().catch(()=>{});
+        setTimeout(()=>URL.revokeObjectURL(url),15000);
+        addRadioLog(pkt.from,'received');
+      }catch(e){}
+    }
+  });
+  conn.on('close',()=>{delete peerConns[conn.peer];updatePeersUI()});
+  conn.on('error',()=>{delete peerConns[conn.peer];updatePeersUI()});
+}
+function leaveChannel(){
+  if(peer){peer.destroy();peer=null;peerConns={};myEmpId=null;myChannel=''}
+  document.getElementById('channel-badge').style.display='none';
+  document.getElementById('radio-status').textContent='Join a channel to start';
+  const pttBtn=document.getElementById('ptt-main');
+  pttBtn.disabled=true;pttBtn.classList.add('disabled');
+  updatePeersUI();toast('Left channel');
+}
+function updatePeersUI(){
+  const names=Object.values(peerConns).map(c=>c._empName||c.peer);
+  const card=document.getElementById('peers-card');
+  const row=document.getElementById('peers-row');
+  if(!names.length){card.style.display='none';return}
+  card.style.display='block';
+  row.innerHTML=names.map(n=>`<span class="peer-pill"><span class="peer-dot"></span>${esc(n)}</span>`).join('');
+}
+function addRadioLog(from,type){
+  const el=document.getElementById('radio-log');
+  const first=el.querySelector('.no-data');if(first)first.remove();
+  const entry=document.createElement('div');entry.className='log-entry';
+  entry.innerHTML=`<i class="ti ti-microphone" style="color:var(--green);font-size:13px"></i>
+    <span style="font-weight:500;font-size:12px">${esc(from)}</span>
+    <span style="color:var(--muted);font-size:11px">${type==='sent'?'transmitted':'received audio'}</span>
+    <span class="log-time">${ft(Date.now())}</span>`;
+  el.insertBefore(entry,el.firstChild);
+  if(el.children.length>30)el.removeChild(el.lastChild);
+}
+
+/* PTT logic */
+function startPTT(){
+  if(!peer||isRecording)return;
+  navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})
+    .then(stream=>{
+      audioChunks=[];
+      const opts=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ?{mimeType:'audio/webm;codecs=opus'}:{};
+      mediaRecorder=new MediaRecorder(stream,opts);
+      mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
+      mediaRecorder.onstop=()=>{
+        stream.getTracks().forEach(t=>t.stop());
+        const mime=mediaRecorder.mimeType||'audio/webm';
+        const blob=new Blob(audioChunks,{type:mime});
+        const reader=new FileReader();
+        reader.onloadend=()=>{
+          const b64=reader.result.split(',')[1];
+          const myEmp=employees.find(e=>e.id===myEmpId);
+          const pkt={type:'audio',from:myEmp?myEmp.name:'Unknown',mime,b64};
+          Object.values(peerConns).forEach(conn=>{
+            if(conn.open)try{conn.send(pkt)}catch(e){}
+          });
+          addRadioLog(myEmp?myEmp.name:'Me','sent');
+        };
+        reader.readAsDataURL(blob);
+        isRecording=false;
+        document.getElementById('ptt-main').classList.remove('active');
+        document.getElementById('tx-indicator').style.display='none';
+      };
+      mediaRecorder.start(100);isRecording=true;
+      document.getElementById('ptt-main').classList.add('active');
+      document.getElementById('tx-indicator').style.display='block';
+    }).catch(()=>toast('Microphone permission denied'));
+}
+function stopPTT(){
+  if(mediaRecorder&&isRecording)mediaRecorder.stop();
+}
+
+/* ─── Main render ─── */
+function render(){
+  const t=today();
+  let totalMins=0,totalMiles=0,inCount=0;
+  employees.forEach(e=>{
+    totalMins+=sessionMins(e.id);
+    totalMiles+=routeMiles(e.id);
+    if(active[e.id])inCount++;
+  });
+  document.getElementById('s-in').textContent=inCount;
+  document.getElementById('s-hrs').textContent=totalMins>0?fmtMins(totalMins):'0h';
+  document.getElementById('s-mi').textContent=fmtMiles(totalMiles);
+
+  const cl=document.getElementById('clock-list');
+  const noEmp=document.getElementById('no-emp');
+  if(!employees.length){cl.innerHTML='';noEmp.style.display='block';return}
+  noEmp.style.display='none';
+  cl.innerHTML=employees.map((e,i)=>{
+    const isIn=!!active[e.id];const mins=sessionMins(e.id);const mi=routeMiles(e.id);
+    const c=col(i);
+    const since=isIn?`Since ${ft(active[e.id].start)}`:(mins>0?fmtMins(mins)+' today':'Not clocked in');
+    const hasLoc=isIn&&active[e.id].lat;
+    return `<div class="emp-card${isIn?' clocked-in':''}">
+      <div class="avatar" style="background:${c.bg};color:${c.t}">${initials(e.name)}</div>
+      <div class="emp-info">
+        <div class="emp-name">${esc(e.name)}
+          ${e.driver?`<span class="driver-badge" style="margin-left:5px"><i class="ti ti-car" style="font-size:9px"></i> Driver</span>`:''}
+        </div>
+        <div class="emp-sub">
+          <span class="sdot"></span>${esc(since)}
+          ${hasLoc?`<span class="loc-badge"><i class="ti ti-map-pin" style="font-size:10px"></i>GPS</span>`:''}
+          ${mi>0?`<span class="driver-badge">${fmtMiles(mi)} mi</span>`:''}
+        </div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn small danger" onclick="removeEmployee('${e.id}')" title="Remove"><i class="ti ti-trash"></i></button>
+        <button class="ptt-btn ${isIn?'out':'in'}"
+          onclick="${isIn?'clockOut':'clockIn'}('${e.id}')"
+          title="${isIn?'Clock out':'Clock in'}">
+          <div class="ptt-ring"></div>
+          <i class="ti ti-${isIn?'player-stop':'radio'}"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  let rHrs=0,rMi=0,rSess=0;
+  const tbody=document.getElementById('report-body');
+  tbody.innerHTML=employees.map((e,i)=>{
+    const empSess=sessions.filter(s=>s.empId===e.id&&s.date===t);
+    const isIn=!!active[e.id];const mins=sessionMins(e.id);const mi=routeMiles(e.id);
+    rHrs+=mins;rMi+=mi;rSess+=empSess.length;
+    const c=col(i);
+    const chips=empSess.map(s=>`<span class="session-chip"><i class="ti ti-clock" style="font-size:9px"></i>${ft(s.start)}–${ft(s.end)}</span>`).join('');
+    return `<tr>
+      <td><span style="display:inline-flex;align-items:center;gap:7px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${c.t}"></span>
+        <strong style="font-weight:500">${esc(e.name)}</strong></span></td>
+      <td style="color:var(--muted)">${esc(e.role)}</td>
+      <td>${chips||'<span style="color:var(--muted);font-size:10px">None</span>'}</td>
+      <td style="font-weight:600">${mins>0?fmtMins(mins):'—'}</td>
+      <td style="font-weight:600">${mi>0?fmtMiles(mi)+' mi':'—'}</td>
+      <td><span class="badge ${isIn?'green':'red'}">${isIn?'In':'Out'}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('r-hrs').textContent=rHrs>0?fmtMins(rHrs):'0h';
+  document.getElementById('r-mi').textContent=fmtMiles(rMi);
+  document.getElementById('r-sess').textContent=rSess;
+}
+
+function updateEmpSelects(){
+  const opts=employees.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');
+  document.getElementById('my-emp-sel').innerHTML='<option value="">— Select your name —</option>'+opts;
+  const driverOpts=employees.filter(e=>e.driver).map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');
+  document.getElementById('driver-sel').innerHTML='<option value="">Select driver</option>'+driverOpts;
+}
+
+/* ─── CSV / Email ─── */
+function downloadCSV(){
+  const t=today();
+  const rows=[['Date','Employee','Role','Driver','Clock In','Clock Out','Duration(min)','Miles','Location']];
+  employees.forEach(e=>{
+    const empSess=sessions.filter(s=>s.empId===e.id&&s.date===t);
+    const mi=routeMiles(e.id);
+    if(!empSess.length){rows.push([t,e.name,e.role,e.driver?'Yes':'No','','','',fmtMiles(mi),'']);return}
+    empSess.forEach(s=>{
+      const loc=s.lat?`${s.lat.toFixed(4)},${s.lng.toFixed(4)}`:'';
+      rows.push([t,e.name,e.role,e.driver?'Yes':'No',ft(s.start),ft(s.end),
+        Math.round((s.end-s.start)/60000),e.driver?fmtMiles(mi):'',loc]);
+    });
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`timesheet-${t}.csv`;a.click();toast('CSV downloaded');
+}
+function buildReportText(){
+  const t=today();
+  const d=new Date().toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  let lines=[`STV TIME & RADIO OPS — DAILY REPORT`,`Date: ${d}`,`Generated: ${new Date().toLocaleTimeString()}`,``,`EMPLOYEE TIMESHEET`,`${'─'.repeat(44)}`];
+  employees.forEach(e=>{
+    const empSess=sessions.filter(s=>s.empId===e.id&&s.date===t);
+    const mins=Math.floor(sessionMins(e.id));const mi=routeMiles(e.id);
+    lines.push(`${e.name} (${e.role})${e.driver?' [DRIVER]':''}${active[e.id]?' [CLOCKED IN]':''}`);
+    lines.push(`  Hours: ${fmtMins(mins)}  |  Sessions: ${empSess.length}${e.driver?`  |  Miles: ${fmtMiles(mi)}`:''}`) ;
+    empSess.forEach((s,i)=>{
+      const loc=s.lat?` @ ${s.lat.toFixed(4)},${s.lng.toFixed(4)}`:'';
+      lines.push(`  ${i+1}. ${ft(s.start)} → ${ft(s.end)}${loc}`);
+    });
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+function openEmailModal(){document.getElementById('email-modal').classList.add('open')}
+function closeEmailModal(){document.getElementById('email-modal').classList.remove('open')}
+function sendEmail(){
+  const to=document.getElementById('email-to').value.trim();
+  const t=today();
+  window.location.href=`mailto:${to}?subject=${encodeURIComponent('Timesheet Report — '+t)}&body=${encodeURIComponent(buildReportText())}`;
+  closeEmailModal();
+}
+function clearToday(){
+  if(!confirm('Clear ALL sessions for today? This cannot be undone.'))return;
+  sessions=sessions.filter(s=>s.date!==today());active={};
+  employees.forEach(e=>{routes[e.id]=[]});save();render();toast('Cleared');
+}
+
+/* ─── Tab switching (internal to this page) ─── */
+function switchTab(t){
+  const tabs=['radio','clock','map','report'];
+  document.querySelectorAll('#page-radio .tab').forEach((el,i)=>{
+    el.classList.toggle('active',tabs[i]===t);
+  });
+  document.querySelectorAll('#page-radio .section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='map')setTimeout(()=>{initMap();map&&map.invalidateSize();updateMapMarkers()},80);
+  if(t==='report')render();
+}
+
+/* ─── Clock display ─── */
+function tickClock(){
+  const now=new Date();
+  document.getElementById('live-clock').textContent=
+    now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('date-disp').textContent=
+    now.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+
+/* ─── PTT button events ─── */
+const pttBtn=document.getElementById('ptt-main');
+pttBtn.addEventListener('mousedown',startPTT);
+pttBtn.addEventListener('mouseup',stopPTT);
+pttBtn.addEventListener('mouseleave',stopPTT);
+pttBtn.addEventListener('touchstart',e=>{e.preventDefault();startPTT()},{passive:false});
+pttBtn.addEventListener('touchend',e=>{e.preventDefault();stopPTT()},{passive:false});
+
+/* ─── Keyboard ─── */
+document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('new-role').focus()});
+document.getElementById('new-role').addEventListener('keydown',e=>{if(e.key==='Enter')addEmployee()});
+document.getElementById('wp-input').addEventListener('keydown',e=>{if(e.key==='Enter')geocodeWaypoint()});
+document.getElementById('email-modal').addEventListener('click',e=>{if(e.target===document.getElementById('email-modal'))closeEmailModal()});
+
+/* ─── Init ─── */
+tickClock();
+setInterval(()=>{tickClock();render()},10000);
+updateEmpSelects();
+render();
+
+</script>
+
+</body>
+</html>
