@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>TimeRadio Elite</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#fff;--bg2:#f5f5f4;--bg3:#eeede9;--text:#1a1a18;--muted:#6b6b67;
+      --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+      --green:#1D9E75;--gdark:#0F6E56;--glight:#E1F5EE;
+      --red:#E24B4A;--rdark:#A32D2D;--rlight:#FCEBEB;
+      --blue:#378ADD;--blight:#E6F1FB;--bdark:#185FA5;
+      --amber:#BA7517;--alight:#FAEEDA;
+      --r:8px;--rl:12px;
+    }
+    @media(prefers-color-scheme:dark){
+      :root{--bg:#1c1c1a;--bg2:#252522;--bg3:#2e2e2b;--text:#f0ede8;--muted:#9e9b95;
+        --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
+        --glight:#0a2e22;--rlight:#2e1212;--blight:#0d1e30;--alight:#2e1e06;}
+    }
+    html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      background:var(--bg3);color:var(--text)}
+    .shell{max-width:720px;margin:0 auto;padding:1rem 1rem 5rem}
+    .header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;
+      padding:.85rem 1.25rem;background:var(--bg);border-radius:var(--rl);border:.5px solid var(--border)}
+    .logo{width:40px;height:40px;border-radius:50%;background:var(--green);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .logo i{color:#fff;font-size:20px}
+    .header-info h1{font-size:17px;font-weight:600;color:var(--text)}
+    .header-info p{font-size:11px;color:var(--muted)}
+    #live-clock{margin-left:auto;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
+    .tabs{display:flex;gap:3px;background:var(--bg);border:.5px solid var(--border);
+      border-radius:var(--rl);padding:4px;margin-bottom:1rem}
+    .tab{flex:1;padding:7px 6px;border:none;background:transparent;cursor:pointer;
+      border-radius:var(--r);font-size:12px;font-weight:500;color:var(--muted);
+      display:flex;align-items:center;justify-content:center;gap:4px;transition:all .15s}
+    .tab.active{background:var(--bg2);color:var(--text);border:.5px solid var(--border)}
+    .tab i{font-size:15px}
+    .section{display:none}.section.active{display:block}
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+    .stat-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);
+      padding:.85rem;text-align:center}
+    .stat-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+    .stat-val{font-size:22px;font-weight:600;color:var(--text)}
+    .card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);
+      padding:1rem 1.25rem;margin-bottom:.75rem}
+    .card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:.75rem;
+      display:flex;align-items:center;gap:6px}
+    .emp-grid{display:grid;gap:8px;margin-bottom:.75rem}
+    .emp-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rl);
+      padding:.85rem 1.1rem;display:flex;align-items:center;gap:12px;transition:all .2s}
+    .emp-card.clocked-in{border-color:var(--green);background:var(--glight)}
+    .emp-card.clocked-in .sdot{background:var(--green)}
+    .avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+    .emp-info{flex:1;min-width:0}
+    .emp-name{font-size:14px;font-weight:500;color:var(--text)}
+    .emp-sub{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:2px}
+    .sdot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+    .emp-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+    .ptt-btn{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      position:relative;transition:transform .1s,background .15s}
+    .ptt-btn:active{transform:scale(.92)}
+    .ptt-btn.in{background:var(--green)}.ptt-btn.in:hover{background:var(--gdark)}
+    .ptt-btn.out{background:var(--red)}.ptt-btn.out:hover{background:var(--rdark)}
+    .ptt-btn i{color:#fff;font-size:20px}
+    .ptt-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--green);
+      opacity:0;pointer-events:none}
+    .emp-card.clocked-in .ptt-ring{animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:0;transform:scale(1)}50%{opacity:.4;transform:scale(1.1)}}
+    .loc-badge{font-size:10px;padding:2px 7px;border-radius:4px;
+      background:var(--blight);color:var(--bdark);display:inline-flex;align-items:center;gap:3px}
+    .add-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:.75rem}
+    input[type=text],input[type=email],input[type=search],select{
+      padding:8px 11px;border:.5px solid var(--border2);border-radius:var(--r);font-size:13px;
+      background:var(--bg2);color:var(--text);outline:none;transition:border-color .15s}
+    input:focus,select:focus{border-color:var(--green)}
+    input::placeholder{color:var(--muted)}
+    .btn{padding:8px 12px;border:.5px solid var(--border2);border-radius:var(--r);cursor:pointer;
+      font-size:12px;font-weight:500;background:transparent;color:var(--text);
+      display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
+    .btn:hover{background:var(--bg2)}.btn i{font-size:14px}
+    .btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+    .btn.primary:hover{background:var(--gdark)}
+    .btn.danger{color:var(--red);border-color:var(--red)}
+    .btn.danger:hover{background:var(--rlight)}
+    .btn.amber{background:var(--amber);color:#fff;border-color:var(--amber)}
+    .btn.small{padding:5px 9px;font-size:11px}
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;
+      border-radius:4px;font-size:11px;font-weight:500}
+    .badge.green{background:var(--glight);color:var(--gdark)}
+    .badge.red{background:var(--rlight);color:var(--rdark)}
+    .badge.blue{background:var(--blight);color:var(--bdark)}
+    .badge.amber{background:var(--alight);color:var(--amber)}
+    .no-data{text-align:center;padding:2rem;color:var(--muted);font-size:13px}
+    .no-data i{font-size:32px;display:block;margin-bottom:.5rem;opacity:.4}
+    /* Radio Tab */
+    .radio-setup{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem}
+    .radio-setup select,.radio-setup input{width:100%}
+    .ptt-main-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem;
+      padding:1.5rem 1rem;background:var(--bg);border:.5px solid var(--border);
+      border-radius:var(--rl);margin-bottom:.75rem}
+    .ptt-main{width:110px;height:110px;border-radius:50%;border:none;cursor:pointer;
+      background:var(--green);display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:4px;user-select:none;position:relative;
+      box-shadow:0 0 0 8px var(--glight);transition:all .1s;touch-action:none}
+    .ptt-main:active,.ptt-main.active{background:var(--gdark);transform:scale(.96);
+      box-shadow:0 0 0 12px var(--glight)}
+    .ptt-main.disabled{background:var(--muted);box-shadow:0 0 0 8px var(--bg2);cursor:not-allowed}
+    .ptt-main i{color:#fff;font-size:32px}
+    .ptt-main span{color:#fff;font-size:11px;font-weight:600;letter-spacing:.5px}
+    .peers-row{display:flex;gap:8px;flex-wrap:wrap}
+    .peer-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+      border-radius:20px;font-size:12px;border:.5px solid var(--border);background:var(--bg2)}
+    .peer-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+    .radio-log{max-height:180px;overflow-y:auto;background:var(--bg2);
+      border:.5px solid var(--border);border-radius:var(--r);padding:.5rem}
+    .log-entry{display:flex;align-items:center;gap:8px;padding:5px 4px;
+      border-bottom:.5px solid var(--border);font-size:12px}
+    .log-entry:last-child{border-bottom:none}
+    .log-time{color:var(--muted);font-size:10px;white-space:nowrap}
+    .tx-wave{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+    .tx-wave span{width:3px;border-radius:1px;background:var(--green);animation:wave .6s ease-in-out infinite alternate}
+    .tx-wave span:nth-child(2){animation-delay:.15s}.tx-wave span:nth-child(3){animation-delay:.3s}
+    @keyframes wave{from{height:3px}to{height:12px}}
+    /* Map */
+    #map-container{height:380px;border-radius:var(--rl);overflow:hidden;
+      border:.5px solid var(--border);margin-bottom:.75rem}
+    .map-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem}
+    .waypoint-list{display:grid;gap:4px}
+    .waypoint-row{display:flex;align-items:center;gap:6px;font-size:12px;
+      padding:5px 8px;background:var(--bg2);border-radius:var(--r)}
+    .wp-num{width:20px;height:20px;border-radius:50%;background:var(--blue);
+      color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    /* Report table */
+    .tbl-wrap{overflow-x:auto;border:.5px solid var(--border);border-radius:var(--rl);
+      margin-bottom:.75rem;background:var(--bg)}
+    table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+    th{padding:8px 10px;text-align:left;color:var(--muted);font-weight:500;
+      border-bottom:.5px solid var(--border);background:var(--bg2);font-size:11px}
+    td{padding:8px 10px;border-bottom:.5px solid var(--border);color:var(--text);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    .session-chip{display:inline-flex;align-items:center;gap:3px;background:var(--bg2);
+      border-radius:3px;padding:2px 6px;font-size:10px;margin:1px;white-space:nowrap}
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+      z-index:999;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--bg);border-radius:var(--rl);border:.5px solid var(--border2);
+      padding:1.5rem;width:420px;max-width:100%}
+    .modal h2{font-size:16px;font-weight:600;margin-bottom:.5rem}
+    .modal p{font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.6}
+    .modal input{width:100%;margin-bottom:.75rem}
+    .modal-btns{display:flex;gap:8px;justify-content:flex-end}
+    /* Toast */
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);
+      background:var(--text);color:var(--bg);padding:9px 16px;border-radius:var(--rl);
+      font-size:12px;font-weight:500;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .driver-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;
+      border-radius:4px;background:var(--alight);color:var(--amber);font-size:10px;font-weight:600}
+    @media(max-width:480px){
+      .radio-setup{grid-template-columns:1fr}
+      .map-controls{grid-template-columns:1fr}
+      .stats-row{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="header">
+    <div class="logo"><i class="ti ti-radio"></i></div>
+    <div class="header-info">
+      <h1>TimeRadio Pro</h1>
+      <p id="date-disp"></p>
+    </div>
+    <div id="live-clock"></div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab" onclick="switchTab('radio')"><i class="ti ti-radio"></i> Radio</button>
+    <button class="tab active" onclick="switchTab('clock')"><i class="ti ti-clock"></i> Clock</button>
+    <button class="tab" onclick="switchTab('map')"><i class="ti ti-map-2"></i> Map</button>
+    <button class="tab" onclick="switchTab('report')"><i class="ti ti-report"></i> Report</button>
+  </nav>
+
+  <!-- RADIO TAB -->
+  <div id="tab-radio" class="section">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-antenna"></i> Channel setup</div>
+      <div class="radio-setup">
+        <select id="my-emp-sel"><option value="">— Select your name —</option></select>
+        <input type="text" id="channel-input" placeholder="Channel code (e.g. dispatch)" maxlength="20">
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn primary" onclick="joinChannel()"><i class="ti ti-plug"></i> Join channel</button>
+        <button class="btn danger" onclick="leaveChannel()"><i class="ti ti-plug-x"></i> Leave</button>
+        <span id="channel-badge" class="badge blue" style="display:none"><i class="ti ti-broadcast"></i> <span id="channel-name-disp"></span></span>
+      </div>
+    </div>
+
+    <div id="peers-card" class="card" style="display:none">
+      <div class="card-title"><i class="ti ti-users"></i> On this channel</div>
+      <div id="peers-row" class="peers-row"></div>
+    </div>
+
+    <div class="ptt-main-wrap">
+      <div id="radio-status" style="font-size:12px;color:var(--muted)">Join a channel to start</div>
+      <button id="ptt-main" class="ptt-main disabled" disabled>
+        <i class="ti ti-microphone"></i>
+        <span>HOLD TO TALK</span>
+      </button>
+      <div id="tx-indicator" style="display:none">
+        <div class="tx-wave"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-messages"></i> Transmission log</div>
+      <div id="radio-log" class="radio-log">
+        <div class="no-data" style="padding:.75rem"><i class="ti ti-microphone-off" style="font-size:20px"></i>No transmissions yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOCK TAB -->
+  <div id="tab-clock" class="section active">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Clocked in</div><div class="stat-val" id="s-in">0</div></div>
+      <div class="stat-card"><div class="stat-label">Hours today</div><div class="stat-val" id="s-hrs">0h</div></div>
+      <div class="stat-card"><div class="stat-label">Miles today</div><div class="stat-val" id="s-mi">0</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-user-plus"></i> Add employee</div>
+      <div class="add-row">
+        <input type="text" id="new-name" placeholder="Full name" style="flex:1;min-width:120px">
+        <input type="text" id="new-role" placeholder="Role" style="width:140px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="new-driver"> Driver
+        </label>
+        <button class="btn primary" onclick="addEmployee()"><i class="ti ti-plus"></i> Add</button>
+      </div>
+    </div>
+    <div id="clock-list" class="emp-grid"></div>
+    <div id="no-emp" style="display:none" class="no-data"><i class="ti ti-user-plus"></i>Add employees above</div>
+  </div>
+
+  <!-- MAP TAB -->
+  <div id="tab-map" class="section">
+    <div id="map-container"></div>
+    <div class="map-controls">
+      <div class="card" style="margin:0">
+        <div class="card-title"><i class="ti ti-car"></i> Driver tracking</div>
+        <select id="driver-sel" style="width:100%;margin-bottom:8px"><option value="">Select driver</option></select>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn primary small" onclick="startTracking()"><i class="ti ti-player-play"></i> Start</button>
+          <button class="btn danger small" onclick="stopTracking()"><i class="ti ti-player-stop"></i> Stop</button>
+          <button class="btn small" onclick="centerOnDriver()"><i class="ti ti-current-location"></i> Center</button>
+        </div>
+        <div id="tracking-status" style="margin-top:8px;font-size:11px;color:var(--muted)">No driver selected</div>
+      </div>
+      <div class="card" style="margin:0">
+        <div class="card-title"><i class="ti ti-route"></i> Route optimizer</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="wp-input" placeholder="Address or landmark" style="flex:1;font-size:12px">
+          <button class="btn small" onclick="geocodeWaypoint()"><i class="ti ti-search"></i></button>
+        </div>
+        <button class="btn small" onclick="addCurrentLocWP()" style="margin-bottom:8px;width:100%">
+          <i class="ti ti-current-location"></i> Add my location
+        </button>
+        <div id="waypoint-list" class="waypoint-list"></div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn primary small" onclick="optimizeRoute()"><i class="ti ti-route"></i> Optimize</button>
+          <button class="btn danger small" onclick="clearWaypoints()"><i class="ti ti-trash"></i> Clear</button>
+        </div>
+        <div id="route-info" style="margin-top:6px;font-size:11px;color:var(--muted)"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-pin"></i> Employee locations</div>
+      <div id="loc-list">
+        <div class="no-data" style="padding:.5rem"><i class="ti ti-map-pin-off" style="font-size:20px"></i>No GPS data yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT TAB -->
+  <div id="tab-report" class="section">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total hours</div><div class="stat-val" id="r-hrs">0h</div></div>
+      <div class="stat-card"><div class="stat-label">Total miles</div><div class="stat-val" id="r-mi">0</div></div>
+      <div class="stat-card"><div class="stat-label">Sessions</div><div class="stat-val" id="r-sess">0</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Employee</th><th>Role</th><th>Sessions</th><th>Hours</th><th>Miles</th><th>Status</th></tr></thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="downloadCSV()"><i class="ti ti-download"></i> Download CSV</button>
+      <button class="btn" onclick="openEmailModal()"><i class="ti ti-mail"></i> Email report</button>
+      <button class="btn danger" onclick="clearToday()" style="margin-left:auto"><i class="ti ti-trash"></i> Clear today</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email modal -->
+<div class="modal-overlay" id="email-modal">
+  <div class="modal">
+    <h2><i class="ti ti-mail" style="vertical-align:-2px;margin-right:6px"></i>Email daily report</h2>
+    <p>The full timesheet and mileage report will open pre-filled in your default mail app.</p>
+    <input type="email" id="email-to" placeholder="recipient@company.com">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeEmailModal()">Cancel</button>
+      <button class="btn primary" onclick="sendEmail()"><i class="ti ti-send"></i> Open in mail</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+/* ─── State ─── */
+const COLORS=[{bg:'#dbeafe',t:'#1e40af'},{bg:'#dcfce7',t:'#166534'},{bg:'#fce7f3',t:'#9d174d'},
+  {bg:'#fef3c7',t:'#92400e'},{bg:'#ede9fe',t:'#5b21b6'},{bg:'#ffedd5',t:'#9a3412'},
+  {bg:'#f0fdf4',t:'#15803d'},{bg:'#fdf2f8',t:'#a21caf'}];
+const MAP_COLORS=['#378ADD','#E24B4A','#1D9E75','#BA7517','#9333ea','#dc2626'];
+
+let employees=ls('tr_emp',[]);
+let sessions=ls('tr_sess',[]);
+let active=ls('tr_active',{});      // empId->{start,lat,lng}
+let routes=ls('tr_routes',{});       // empId->[{lat,lng,ts}]
+let waypoints=[];                    // [{lat,lng,label}]
+let activeDriverId=null;
+let driverWatchId=null;
+
+// Runtime (not persisted)
+let map=null, mapMarkers={}, mapPolylines={}, routeLayer=null, wpMarkers=[];
+let peer=null, peerConns={}, myEmpId=null, myChannel='';
+let mediaRecorder=null, audioChunks=[], isRecording=false;
+
+function ls(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}}
+function save(){
+  localStorage.setItem('tr_emp',JSON.stringify(employees));
+  localStorage.setItem('tr_sess',JSON.stringify(sessions));
+  localStorage.setItem('tr_active',JSON.stringify(active));
+  localStorage.setItem('tr_routes',JSON.stringify(routes));
+}
+
+/* ─── Helpers ─── */
+function today(){return new Date().toISOString().slice(0,10)}
+function ft(ts){return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function initials(n){return n.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function col(i){return COLORS[i%COLORS.length]}
+function fmtMins(m){m=Math.floor(m);const h=Math.floor(m/60),mn=m%60;return h?(mn?`${h}h ${mn}m`:`${h}h`):`${mn}m`}
+function fmtMiles(m){return m.toFixed(1)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function haversine(la1,lo1,la2,lo2){
+  const R=3958.8,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function routeMiles(empId){
+  const pts=routes[empId]||[];let m=0;
+  for(let i=1;i<pts.length;i++)m+=haversine(pts[i-1].lat,pts[i-1].lng,pts[i].lat,pts[i].lng);
+  return m;
+}
+function sessionMins(empId){
+  let m=0;
+  sessions.filter(s=>s.empId===empId&&s.date===today()).forEach(s=>m+=(s.end-s.start)/60000);
+  if(active[empId])m+=(Date.now()-active[empId].start)/60000;
+  return m;
+}
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+/* ─── Clock ─── */
+function clockIn(empId){
+  if(active[empId])return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    active[empId]={start:Date.now(),lat:pos.coords.latitude,lng:pos.coords.longitude};
+    save();render();toast('Clocked in with GPS ✓');updateMapMarkers();
+  },()=>{
+    active[empId]={start:Date.now(),lat:null,lng:null};
+    save();render();toast('Clocked in (no GPS)');
+  },{timeout:8000,maximumAge:30000});
+}
+function clockOut(empId){
+  const a=active[empId];if(!a)return;
+  sessions.push({empId,date:today(),start:a.start,end:Date.now(),lat:a.lat,lng:a.lng});
+  delete active[empId];
+  if(activeDriverId===empId)stopTracking();
+  save();render();toast('Clocked out');
+}
+function addEmployee(){
+  const n=document.getElementById('new-name').value.trim();
+  if(!n)return;
+  const r=document.getElementById('new-role').value.trim()||'Team member';
+  const isDriver=document.getElementById('new-driver').checked;
+  employees.push({id:Date.now()+'',name:n,role:r,driver:isDriver});
+  document.getElementById('new-name').value='';
+  document.getElementById('new-role').value='';
+  document.getElementById('new-driver').checked=false;
+  save();render();updateEmpSelects();toast('Employee added');
+}
+function removeEmployee(id){
+  if(!confirm('Remove employee and their data?'))return;
+  employees=employees.filter(e=>e.id!==id);
+  sessions=sessions.filter(s=>s.empId!==id);
+  delete active[id];delete routes[id];
+  save();render();updateEmpSelects();
+}
+
+/* ─── Driver tracking ─── */
+function startTracking(){
+  const sel=document.getElementById('driver-sel').value;
+  if(!sel){toast('Select a driver first');return}
+  const emp=employees.find(e=>e.id===sel);
+  if(!emp){return}
+  if(!active[sel]){toast('Driver must be clocked in first');return}
+  if(driverWatchId!==null)navigator.geolocation.clearWatch(driverWatchId);
+  activeDriverId=sel;
+  routes[sel]=routes[sel]||[];
+  document.getElementById('tracking-status').textContent=`Tracking ${emp.name}...`;
+  driverWatchId=navigator.geolocation.watchPosition(pos=>{
+    const pt={lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()};
+    routes[sel].push(pt);save();
+    updateDriverPolyline(sel);
+    const mi=routeMiles(sel);
+    document.getElementById('tracking-status').textContent=
+      `${emp.name} — ${fmtMiles(mi)} mi tracked`;
+    document.getElementById('s-mi').textContent=fmtMiles(mi);
+    if(map)map.setView([pt.lat,pt.lng],15);
+  },err=>{
+    document.getElementById('tracking-status').textContent='GPS error: '+err.message;
+  },{enableHighAccuracy:true,maximumAge:15000,timeout:20000});
+  toast('Driver tracking started');
+}
+function stopTracking(){
+  if(driverWatchId!==null){navigator.geolocation.clearWatch(driverWatchId);driverWatchId=null}
+  const emp=employees.find(e=>e.id===activeDriverId);
+  if(emp)document.getElementById('tracking-status').textContent=
+    `${emp.name} — ${fmtMiles(routeMiles(activeDriverId))} mi logged`;
+  activeDriverId=null;toast('Tracking stopped');
+}
+function centerOnDriver(){
+  const sel=document.getElementById('driver-sel').value;
+  const pts=routes[sel]||[];
+  if(!pts.length){toast('No route data yet');return}
+  const last=pts[pts.length-1];
+  if(map)map.setView([last.lat,last.lng],15);
+}
+
+/* ─── Route optimizer ─── */
+async function geocodeWaypoint(){
+  const q=document.getElementById('wp-input').value.trim();
+  if(!q)return;
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
+      {headers:{'Accept-Language':'en'}});
+    const data=await res.json();
+    if(!data.length){toast('Address not found');return}
+    const {lat,lon,display_name}=data[0];
+    addWaypoint(+lat,+lon,display_name.split(',')[0]);
+    document.getElementById('wp-input').value='';
+  }catch(e){toast('Geocoding failed');}
+}
+function addCurrentLocWP(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    addWaypoint(pos.coords.latitude,pos.coords.longitude,'My location');
+  },()=>toast('GPS unavailable'));
+}
+function addWaypoint(lat,lng,label){
+  waypoints.push({lat,lng,label});
+  renderWaypoints();
+  if(map){
+    const m=L.circleMarker([lat,lng],{radius:8,color:'#1D9E75',fillColor:'#1D9E75',fillOpacity:.8})
+      .bindPopup(label).addTo(map);
+    wpMarkers.push(m);
+    map.setView([lat,lng],13);
+  }
+}
+function removeWaypoint(i){
+  waypoints.splice(i,1);
+  if(wpMarkers[i]&&map)map.removeLayer(wpMarkers[i]);
+  wpMarkers.splice(i,1);
+  renderWaypoints();
+}
+function clearWaypoints(){
+  waypoints=[];
+  wpMarkers.forEach(m=>{if(map)map.removeLayer(m)});wpMarkers=[];
+  if(routeLayer&&map){map.removeLayer(routeLayer);routeLayer=null}
+  renderWaypoints();
+  document.getElementById('route-info').textContent='';
+}
+function renderWaypoints(){
+  const el=document.getElementById('waypoint-list');
+  if(!waypoints.length){el.innerHTML='';return}
+  el.innerHTML=waypoints.map((w,i)=>`
+    <div class="waypoint-row">
+      <span class="wp-num">${i+1}</span>
+      <span style="flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(w.label)}</span>
+      <button class="btn small danger" onclick="removeWaypoint(${i})" style="padding:2px 6px"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+async function optimizeRoute(){
+  if(waypoints.length<2){toast('Add at least 2 waypoints');return}
+  document.getElementById('route-info').textContent='Optimizing...';
+  const coords=waypoints.map(w=>`${w.lng},${w.lat}`).join(';');
+  try{
+    const url=`https://router.project-osrm.org/trip/v1/driving/${coords}?overview=full&geometries=geojson&source=first`;
+    const res=await fetch(url);const data=await res.json();
+    if(data.code!=='Ok')throw new Error(data.message||'Route error');
+    const trip=data.trips[0];
+    const distMi=(trip.distance/1609.34).toFixed(1);
+    const durMin=Math.round(trip.duration/60);
+    document.getElementById('route-info').textContent=
+      `Optimized: ${distMi} mi · ~${durMin} min`;
+    if(routeLayer&&map)map.removeLayer(routeLayer);
+    routeLayer=L.geoJSON(trip.geometry,{style:{color:'#E24B4A',weight:4,opacity:.8}}).addTo(map);
+    map.fitBounds(routeLayer.getBounds(),{padding:[20,20]});
+    // Reorder waypoints display
+    const order=data.waypoints.sort((a,b)=>a.waypoint_index-b.waypoint_index);
+    toast(`Route: ${distMi} mi, ~${durMin} min`);
+  }catch(e){
+    document.getElementById('route-info').textContent='Route failed: '+e.message;
+    toast('Could not optimize route');
+  }
+}
+
+/* ─── Map ─── */
+function initMap(){
+  if(map)return;
+  map=L.map('map-container').setView([39.5,-98.35],4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19
+  }).addTo(map);
+  map.on('click',e=>{
+    // click to add waypoint if on route tab
+    if(document.getElementById('tab-map').classList.contains('active')&&
+       document.activeElement===document.getElementById('wp-input')){
+      addWaypoint(e.latlng.lat,e.latlng.lng,'Map pin');
+    }
+  });
+  updateMapMarkers();
+  employees.forEach(e=>updateDriverPolyline(e.id));
+}
+function updateMapMarkers(){
+  if(!map)return;
+  employees.forEach((e,i)=>{
+    const a=active[e.id];if(!a||!a.lat)return;
+    const c=col(i);
+    const icon=L.divIcon({
+      className:'',html:`<div style="width:32px;height:32px;border-radius:50%;background:${c.bg};
+        border:2px solid ${c.t};display:flex;align-items:center;justify-content:center;
+        font-size:11px;font-weight:600;color:${c.t}">${initials(e.name)}</div>`,
+      iconSize:[32,32],iconAnchor:[16,16]
+    });
+    if(mapMarkers[e.id])map.removeLayer(mapMarkers[e.id]);
+    mapMarkers[e.id]=L.marker([a.lat,a.lng],{icon})
+      .bindPopup(`<strong>${e.name}</strong><br>${e.role}<br>Clocked in ${ft(a.start)}`)
+      .addTo(map);
+  });
+  renderLocList();
+}
+function updateDriverPolyline(empId){
+  if(!map)return;
+  const pts=routes[empId]||[];if(pts.length<2)return;
+  const lls=pts.map(p=>[p.lat,p.lng]);
+  const i=employees.findIndex(e=>e.id===empId);
+  const color=MAP_COLORS[i%MAP_COLORS.length];
+  if(mapPolylines[empId])map.removeLayer(mapPolylines[empId]);
+  mapPolylines[empId]=L.polyline(lls,{color,weight:3,opacity:.7}).addTo(map);
+}
+function renderLocList(){
+  const el=document.getElementById('loc-list');
+  const hasLoc=employees.some(e=>active[e.id]&&active[e.id].lat);
+  if(!hasLoc){el.innerHTML=`<div class="no-data" style="padding:.5rem"><i class="ti ti-map-pin-off" style="font-size:20px"></i>No GPS data yet</div>`;return}
+  el.innerHTML=employees.filter(e=>active[e.id]&&active[e.id].lat).map((e,i)=>{
+    const a=active[e.id];const mi=routeMiles(e.id);
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border)">
+      <div class="avatar" style="background:${col(i).bg};color:${col(i).t};width:30px;height:30px;font-size:11px">${initials(e.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${esc(e.name)}</div>
+        <div style="font-size:10px;color:var(--muted)">${a.lat.toFixed(4)}, ${a.lng.toFixed(4)} · ${ft(a.start)}</div>
+      </div>
+      ${mi>0?`<span class="driver-badge"><i class="ti ti-car" style="font-size:10px"></i> ${fmtMiles(mi)} mi</span>`:''}
+      <button class="btn small" onclick="if(map)map.setView([${a.lat},${a.lng}],15)"><i class="ti ti-eye"></i></button>
+    </div>`}).join('');
+}
+
+/* ─── Walkie-talkie / PeerJS ─── */
+function makePeerId(channel,name){
+  const c=channel.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,12);
+  const n=name.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,12);
+  return `tr${c}${n}`;
+}
+function joinChannel(){
+  const empSel=document.getElementById('my-emp-sel').value;
+  const ch=document.getElementById('channel-input').value.trim();
+  if(!empSel){toast('Select your name first');return}
+  if(!ch){toast('Enter a channel code');return}
+  const emp=employees.find(e=>e.id===empSel);
+  if(!emp)return;
+  if(peer){peer.destroy();peer=null;peerConns={}}
+  myEmpId=empSel;myChannel=ch;
+  const pid=makePeerId(ch,emp.name);
+  peer=new Peer(pid);
+  peer.on('open',()=>{
+    document.getElementById('channel-badge').style.display='inline-flex';
+    document.getElementById('channel-name-disp').textContent=ch;
+    document.getElementById('radio-status').textContent=`On "${ch}" as ${emp.name}`;
+    const pttBtn=document.getElementById('ptt-main');
+    pttBtn.disabled=false;pttBtn.classList.remove('disabled');
+    // Connect to all other employees
+    employees.forEach(e=>{
+      if(e.id!==empSel){
+        const theirId=makePeerId(ch,e.name);
+        tryConnect(theirId,e.name);
+      }
+    });
+    toast(`Joined channel: ${ch}`);
+    updatePeersUI();
+  });
+  peer.on('connection',conn=>{setupConn(conn)});
+  peer.on('error',err=>{
+    if(err.type==='unavailable-id'){
+      document.getElementById('radio-status').textContent='Name already taken on this channel';
+    }
+  });
+}
+function tryConnect(peerId,empName){
+  try{
+    const conn=peer.connect(peerId,{reliable:true});
+    conn._empName=empName;
+    setupConn(conn);
+  }catch(e){}
+}
+function setupConn(conn){
+  conn.on('open',()=>{
+    peerConns[conn.peer]=conn;
+    updatePeersUI();
+  });
+  conn.on('data',pkt=>{
+    if(pkt.type==='audio'){
+      try{
+        const bytes=Uint8Array.from(atob(pkt.b64),(c)=>c.charCodeAt(0));
+        const blob=new Blob([bytes],{type:pkt.mime||'audio/webm'});
+        const url=URL.createObjectURL(blob);
+        const audio=new Audio(url);audio.play().catch(()=>{});
+        setTimeout(()=>URL.revokeObjectURL(url),15000);
+        addRadioLog(pkt.from,'received');
+      }catch(e){}
+    }
+  });
+  conn.on('close',()=>{delete peerConns[conn.peer];updatePeersUI()});
+  conn.on('error',()=>{delete peerConns[conn.peer];updatePeersUI()});
+}
+function leaveChannel(){
+  if(peer){peer.destroy();peer=null;peerConns={};myEmpId=null;myChannel=''}
+  document.getElementById('channel-badge').style.display='none';
+  document.getElementById('radio-status').textContent='Join a channel to start';
+  const pttBtn=document.getElementById('ptt-main');
+  pttBtn.disabled=true;pttBtn.classList.add('disabled');
+  updatePeersUI();toast('Left channel');
+}
+function updatePeersUI(){
+  const names=Object.values(peerConns).map(c=>c._empName||c.peer);
+  const card=document.getElementById('peers-card');
+  const row=document.getElementById('peers-row');
+  if(!names.length){card.style.display='none';return}
+  card.style.display='block';
+  row.innerHTML=names.map(n=>`<span class="peer-pill"><span class="peer-dot"></span>${esc(n)}</span>`).join('');
+}
+function addRadioLog(from,type){
+  const el=document.getElementById('radio-log');
+  const first=el.querySelector('.no-data');if(first)first.remove();
+  const entry=document.createElement('div');entry.className='log-entry';
+  entry.innerHTML=`<i class="ti ti-microphone" style="color:var(--green);font-size:13px"></i>
+    <span style="font-weight:500;font-size:12px">${esc(from)}</span>
+    <span style="color:var(--muted);font-size:11px">${type==='sent'?'transmitted':'received audio'}</span>
+    <span class="log-time">${ft(Date.now())}</span>`;
+  el.insertBefore(entry,el.firstChild);
+  if(el.children.length>30)el.removeChild(el.lastChild);
+}
+
+/* PTT logic */
+function startPTT(){
+  if(!peer||isRecording)return;
+  navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})
+    .then(stream=>{
+      audioChunks=[];
+      const opts=MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ?{mimeType:'audio/webm;codecs=opus'}:{};
+      mediaRecorder=new MediaRecorder(stream,opts);
+      mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
+      mediaRecorder.onstop=()=>{
+        stream.getTracks().forEach(t=>t.stop());
+        const mime=mediaRecorder.mimeType||'audio/webm';
+        const blob=new Blob(audioChunks,{type:mime});
+        const reader=new FileReader();
+        reader.onloadend=()=>{
+          const b64=reader.result.split(',')[1];
+          const myEmp=employees.find(e=>e.id===myEmpId);
+          const pkt={type:'audio',from:myEmp?myEmp.name:'Unknown',mime,b64};
+          Object.values(peerConns).forEach(conn=>{
+            if(conn.open)try{conn.send(pkt)}catch(e){}
+          });
+          addRadioLog(myEmp?myEmp.name:'Me','sent');
+        };
+        reader.readAsDataURL(blob);
+        isRecording=false;
+        document.getElementById('ptt-main').classList.remove('active');
+        document.getElementById('tx-indicator').style.display='none';
+      };
+      mediaRecorder.start(100);isRecording=true;
+      document.getElementById('ptt-main').classList.add('active');
+      document.getElementById('tx-indicator').style.display='block';
+    }).catch(()=>toast('Microphone permission denied'));
+}
+function stopPTT(){
+  if(mediaRecorder&&isRecording)mediaRecorder.stop();
+}
+
+/* ─── Main render ─── */
+function render(){
+  const t=today();
+  let totalMins=0,totalMiles=0,inCount=0;
+  employees.forEach(e=>{
+    totalMins+=sessionMins(e.id);
+    totalMiles+=routeMiles(e.id);
+    if(active[e.id])inCount++;
+  });
+  document.getElementById('s-in').textContent=inCount;
+  document.getElementById('s-hrs').textContent=totalMins>0?fmtMins(totalMins):'0h';
+  document.getElementById('s-mi').textContent=fmtMiles(totalMiles);
+
+  /* Clock list */
+  const cl=document.getElementById('clock-list');
+  const noEmp=document.getElementById('no-emp');
+  if(!employees.length){cl.innerHTML='';noEmp.style.display='block';return}
+  noEmp.style.display='none';
+  cl.innerHTML=employees.map((e,i)=>{
+    const isIn=!!active[e.id];const mins=sessionMins(e.id);const mi=routeMiles(e.id);
+    const c=col(i);
+    const since=isIn?`Since ${ft(active[e.id].start)}`:(mins>0?fmtMins(mins)+' today':'Not clocked in');
+    const hasLoc=isIn&&active[e.id].lat;
+    return `<div class="emp-card${isIn?' clocked-in':''}">
+      <div class="avatar" style="background:${c.bg};color:${c.t}">${initials(e.name)}</div>
+      <div class="emp-info">
+        <div class="emp-name">${esc(e.name)}
+          ${e.driver?`<span class="driver-badge" style="margin-left:5px"><i class="ti ti-car" style="font-size:9px"></i> Driver</span>`:''}
+        </div>
+        <div class="emp-sub">
+          <span class="sdot"></span>${esc(since)}
+          ${hasLoc?`<span class="loc-badge"><i class="ti ti-map-pin" style="font-size:10px"></i>GPS</span>`:''}
+          ${mi>0?`<span class="driver-badge">${fmtMiles(mi)} mi</span>`:''}
+        </div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn small danger" onclick="removeEmployee('${e.id}')" title="Remove"><i class="ti ti-trash"></i></button>
+        <button class="ptt-btn ${isIn?'out':'in'}"
+          onclick="${isIn?'clockOut':'clockIn'}('${e.id}')"
+          title="${isIn?'Clock out':'Clock in'}">
+          <div class="ptt-ring"></div>
+          <i class="ti ti-${isIn?'player-stop':'radio'}"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* Report */
+  let rHrs=0,rMi=0,rSess=0;
+  const tbody=document.getElementById('report-body');
+  tbody.innerHTML=employees.map((e,i)=>{
+    const empSess=sessions.filter(s=>s.empId===e.id&&s.date===t);
+    const isIn=!!active[e.id];const mins=sessionMins(e.id);const mi=routeMiles(e.id);
+    rHrs+=mins;rMi+=mi;rSess+=empSess.length;
+    const c=col(i);
+    const chips=empSess.map(s=>`<span class="session-chip"><i class="ti ti-clock" style="font-size:9px"></i>${ft(s.start)}–${ft(s.end)}</span>`).join('');
+    return `<tr>
+      <td><span style="display:inline-flex;align-items:center;gap:7px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${c.t}"></span>
+        <strong style="font-weight:500">${esc(e.name)}</strong></span></td>
+      <td style="color:var(--muted)">${esc(e.role)}</td>
+      <td>${chips||'<span style="color:var(--muted);font-size:10px">None</span>'}</td>
+      <td style="font-weight:600">${mins>0?fmtMins(mins):'—'}</td>
+      <td style="font-weight:600">${mi>0?fmtMiles(mi)+' mi':'—'}</td>
+      <td><span class="badge ${isIn?'green':'red'}">${isIn?'In':'Out'}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('r-hrs').textContent=rHrs>0?fmtMins(rHrs):'0h';
+  document.getElementById('r-mi').textContent=fmtMiles(rMi);
+  document.getElementById('r-sess').textContent=rSess;
+}
+
+function updateEmpSelects(){
+  const opts=employees.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');
+  document.getElementById('my-emp-sel').innerHTML='<option value="">— Select your name —</option>'+opts;
+  const driverOpts=employees.filter(e=>e.driver).map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');
+  document.getElementById('driver-sel').innerHTML='<option value="">Select driver</option>'+driverOpts;
+}
+
+/* ─── CSV / Email ─── */
+function downloadCSV(){
+  const t=today();
+  const rows=[['Date','Employee','Role','Driver','Clock In','Clock Out','Duration(min)','Miles','Location']];
+  employees.forEach(e=>{
+    const empSess=sessions.filter(s=>s.empId===e.id&&s.date===t);
+    const mi=routeMiles(e.id);
+    if(!empSess.length){rows.push([t,e.name,e.role,e.driver?'Yes':'No','','','',fmtMiles(mi),'']);return}
+    empSess.forEach(s=>{
+      const loc=s.lat?`${s.lat.toFixed(4)},${s.lng.toFixed(4)}`:'';
+      rows.push([t,e.name,e.role,e.driver?'Yes':'No',ft(s.start),ft(s.end),
+        Math.round((s.end-s.start)/60000),e.driver?fmtMiles(mi):'',loc]);
+    });
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`timesheet-${t}.csv`;a.click();toast('CSV downloaded');
+}
+function buildReportText(){
+  const t=today();
+  const d=new Date().toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  let lines=[`TIMERADIO PRO — DAILY REPORT`,`Date: ${d}`,`Generated: ${new Date().toLocaleTimeString()}`,``,`EMPLOYEE TIMESHEET`,`${'─'.repeat(44)}`];
+  employees.forEach(e=>{
+    const empSess=sessions.filter(s=>s.empId===e.id&&s.date===t);
+    const mins=Math.floor(sessionMins(e.id));const mi=routeMiles(e.id);
+    lines.push(`${e.name} (${e.role})${e.driver?' [DRIVER]':''}${active[e.id]?' [CLOCKED IN]':''}`);
+    lines.push(`  Hours: ${fmtMins(mins)}  |  Sessions: ${empSess.length}${e.driver?`  |  Miles: ${fmtMiles(mi)}`:''}`) ;
+    empSess.forEach((s,i)=>{
+      const loc=s.lat?` @ ${s.lat.toFixed(4)},${s.lng.toFixed(4)}`:'';
+      lines.push(`  ${i+1}. ${ft(s.start)} → ${ft(s.end)}${loc}`);
+    });
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+function openEmailModal(){document.getElementById('email-modal').classList.add('open')}
+function closeEmailModal(){document.getElementById('email-modal').classList.remove('open')}
+function sendEmail(){
+  const to=document.getElementById('email-to').value.trim();
+  const t=today();
+  window.location.href=`mailto:${to}?subject=${encodeURIComponent('Timesheet Report — '+t)}&body=${encodeURIComponent(buildReportText())}`;
+  closeEmailModal();
+}
+function clearToday(){
+  if(!confirm('Clear ALL sessions for today? This cannot be undone.'))return;
+  sessions=sessions.filter(s=>s.date!==today());active={};
+  employees.forEach(e=>{routes[e.id]=[]});save();render();toast('Cleared');
+}
+
+/* ─── Tab switching ─── */
+function switchTab(t){
+  const tabs=['radio','clock','map','report'];
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('active',tabs[i]===t);
+  });
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='map')setTimeout(()=>{initMap();map&&map.invalidateSize();updateMapMarkers()},80);
+  if(t==='report')render();
+}
+
+/* ─── Clock display ─── */
+function tickClock(){
+  const now=new Date();
+  document.getElementById('live-clock').textContent=
+    now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('date-disp').textContent=
+    now.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+
+/* ─── PTT button events ─── */
+const pttBtn=document.getElementById('ptt-main');
+pttBtn.addEventListener('mousedown',startPTT);
+pttBtn.addEventListener('mouseup',stopPTT);
+pttBtn.addEventListener('mouseleave',stopPTT);
+pttBtn.addEventListener('touchstart',e=>{e.preventDefault();startPTT()},{passive:false});
+pttBtn.addEventListener('touchend',e=>{e.preventDefault();stopPTT()},{passive:false});
+
+/* ─── Keyboard ─── */
+document.getElementById('new-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('new-role').focus()});
+document.getElementById('new-role').addEventListener('keydown',e=>{if(e.key==='Enter')addEmployee()});
+document.getElementById('wp-input').addEventListener('keydown',e=>{if(e.key==='Enter')geocodeWaypoint()});
+document.getElementById('email-modal').addEventListener('click',e=>{if(e.target===document.getElementById('email-modal'))closeEmailModal()});
+
+/* ─── Init ─── */
+tickClock();
+setInterval(()=>{tickClock();render()},10000);
+updateEmpSelects();
+render();
+</script>
+</body>
+</html>
