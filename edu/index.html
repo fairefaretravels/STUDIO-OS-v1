@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SanecaTV — Learning Resources Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0c0f14;
+    --panel: #12161d;
+    --panel-2: #171c25;
+    --line: #232a36;
+    --amber: #ffb100;
+    --amber-dim: #7a5b12;
+    --teal: #2dd4bf;
+    --red: #ff4d4f;
+    --text: #e8eaed;
+    --muted: #8a93a6;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Oswald', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+  }
+
+  body{
+    background-image:
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+  }
+
+  .wrap{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ---------- MASTHEAD ---------- */
+  header.masthead{
+    padding: 36px 0 28px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 28px;
+  }
+
+  .channel-strip{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 22px;
+  }
+
+  .logo-block{
+    display:flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .logo-block .saneca{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 42px;
+    letter-spacing: 1px;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .logo-block .tv{
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 42px;
+    color: var(--bg);
+    background: var(--amber);
+    padding: 0 10px;
+    letter-spacing: 1px;
+  }
+
+  .on-air{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .dot{
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 8px 1px rgba(255,77,79,0.7);
+    animation: blink 2.4s infinite ease-in-out;
+  }
+  @keyframes blink{
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+
+  .tagline{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--teal);
+    letter-spacing: 0.5px;
+  }
+  .tagline span.sep{ color: var(--muted); margin: 0 8px; }
+
+  .guide-meta{
+    display:flex;
+    gap: 26px;
+    margin-top: 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .guide-meta b{ color: var(--text); }
+
+  /* ---------- SEARCH / TUNER ---------- */
+  .tuner{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    margin: 26px 0 6px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 10px 14px;
+    border-radius: 2px;
+  }
+  .tuner label{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tuner input{
+    flex:1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 6px 4px;
+  }
+  .tuner input::placeholder{ color: #4c5566; }
+  .tuner .count{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- CHANNEL SECTIONS ---------- */
+  .channel{
+    margin-top: 34px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+  }
+
+  .channel-head{
+    display:flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, var(--panel-2), var(--panel));
+  }
+
+  .ch-number{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--bg);
+    background: var(--amber);
+    padding: 4px 9px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    min-width: 46px;
+    text-align: center;
+  }
+
+  .ch-name{
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .ch-count{
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th{
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  thead th.slot{ width: 70px; }
+  thead th.platform{ width: 220px; }
+
+  tbody tr{
+    border-bottom: 1px solid var(--line);
+    transition: background 0.12s ease;
+  }
+  tbody tr:last-child{ border-bottom: none; }
+  tbody tr:hover{ background: rgba(255,177,0,0.05); }
+
+  tbody td{
+    padding: 12px 20px;
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  td.slot{
+    font-family: var(--mono);
+    color: var(--teal);
+    font-size: 12.5px;
+    letter-spacing: 0.5px;
+  }
+
+  td.platform{
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  td.desc{
+    color: var(--muted);
+  }
+
+  .hidden-row{ display: none; }
+
+  .empty-state{
+    display:none;
+    padding: 40px 20px;
+    text-align:center;
+    font-family: var(--mono);
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    border: 1px dashed var(--line);
+    margin-top: 34px;
+  }
+
+  footer{
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 640px){
+    .logo-block .saneca, .logo-block .tv{ font-size: 28px; }
+    thead th.platform{ width: 130px; }
+    td, th{ padding: 10px 12px !important; }
+    .ch-name{ font-size: 18px; }
+    .guide-meta{ gap: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="channel-strip">
+      <div class="logo-block">
+        <span class="saneca">Saneca</span><span class="tv">TV</span>
+      </div>
+      <div class="on-air"><span class="dot"></span> Now Broadcasting</div>
+    </div>
+    <div class="tagline">Learning Resources Guide <span class="sep">/</span> Tune in. Level up.</div>
+    <div class="guide-meta">
+      <span><b>10</b> Channels</span>
+      <span><b id="totalPrograms">0</b> Programs Listed</span>
+      <span>Guide updated for this week</span>
+    </div>
+  </header>
+
+  <div class="tuner">
+    <label for="search">Tune ▸</label>
+    <input id="search" type="text" placeholder="Search a platform or topic (e.g. “Python”, “design”, “flashcards”)…">
+    <span class="count" id="resultCount"></span>
+  </div>
+
+  <div id="channels"></div>
+  <div class="empty-state" id="emptyState">— NO SIGNAL — try a different search term —</div>
+
+  <footer>
+    <span>SanecaTV Learning Guide</span>
+    <span>Channel listings subject to change without notice</span>
+  </footer>
+</div>
+
+<script>
+const DATA = [
+  { channel: "General Learning", items: [
+    ["Blinkist", "Book Summaries"],
+    ["Alison", "Free Online Courses"],
+    ["Coursera", "University & Professional Courses"],
+    ["edX", "University-Level Courses"],
+    ["FutureLearn", "Diverse Learning Topics"],
+    ["OpenLearning", "Social Online Learning"],
+    ["Class Central", "MOOC Aggregator"],
+    ["Academic Earth", "Free College Courses"],
+    ["Saylor Academy", "Free College Courses"],
+    ["Canvas Network", "Open Online Courses"],
+    ["Open Yale Courses", "Ivy League Lectures"],
+    ["MIT OpenCourseWare", "Free MIT Courses"],
+    ["Harvard Online", "Harvard University Courses"],
+    ["Stanford Online", "Stanford University Courses"],
+    ["BBC Learning", "Educational Resources"],
+    ["Open Culture", "Cultural & Educational Media"],
+  ]},
+  { channel: "Coding & Programming", items: [
+    ["Codecademy", "Interactive Coding Lessons"],
+    ["Code.org", "Early Coding Education"],
+    ["CodeHS", "High School Coding"],
+    ["Code School", "Interactive Coding Challenges"],
+    ["QuickCode", "Free Coding Courses"],
+    ["The Odin Project", "Open Source Coding"],
+    ["Treehouse", "Design & Coding"],
+    ["Thinkful", "Coding Bootcamp"],
+    ["Flatiron School", "Coding Bootcamp"],
+    ["General Assembly", "Tech Skills Bootcamp"],
+    ["Laracasts", "Laravel Tutorials"],
+    ["RubyMonk", "Ruby Programming"],
+    ["SQLZoo", "Interactive SQL Tutorials"],
+    ["Apple Developer", "Developer Resources"],
+    ["W3Schools", "Web Development Tutorials"],
+    ["HackerRank", "Coding Challenges"],
+    ["Egghead", "Short Programming Lessons"],
+    ["SoloLearn", "Programming Languages"],
+  ]},
+  { channel: "Data Science", items: [
+    ["DataCamp", "Data Science Learning"],
+    ["DataQuest", "Project-Based Learning"],
+    ["AWS Training", "Cloud Skills"],
+    ["Linux Academy", "Linux & Cloud"],
+    ["ITProTV", "IT Skills Development"],
+    ["Microsoft Learn", "Microsoft Technologies"],
+    ["Blockchain Council", "Blockchain Certification"],
+    ["Cryptopals", "Cryptography Challenges"],
+  ]},
+  { channel: "Creative Skills", items: [
+    ["Skillshare", "Creative Workshops"],
+    ["CreativeLive", "Creative Classes"],
+    ["MasterClass", "Celebrity-Led Classes"],
+    ["Envato Tuts+", "Creative Tutorials"],
+    ["Smashing Magazine", "Web Design"],
+    ["Vimeo Video School", "Video Production"],
+    ["Pianu", "Piano Lessons"],
+  ]},
+  { channel: "Languages", items: [
+    ["Duolingo", "Language Learning"],
+    ["Babbel", "Practical Language Lessons"],
+    ["Busuu", "Social Language Learning"],
+    ["HelloTalk", "Language Exchange"],
+    ["Memrise", "Language Games"],
+    ["Rocket Languages", "Language Software"],
+    ["Rosetta Stone", "Immersive Language Learning"],
+  ]},
+  { channel: "Study Tools", items: [
+    ["Quizlet", "Flashcards & Quizzes"],
+    ["Anki", "Flashcard Learning"],
+    ["Mathway", "Math Solver"],
+    ["TypingClub", "Touch Typing"],
+    ["Google Scholar", "Academic Research"],
+    ["JSTOR", "Digital Library"],
+    ["Scribd", "Digital Library"],
+    ["Investopedia", "Financial Education"],
+  ]},
+  { channel: "K-12 Education", items: [
+    ["Khan Academy", "Free Academic Tutorials"],
+    ["Brightstorm", "High School Subjects"],
+    ["IXL", "K-12 Curriculum"],
+    ["LearnZillion", "Instructional Content"],
+    ["CK-12 Foundation", "STEM Learning"],
+    ["CrashCourse", "Educational Videos"],
+    ["TED-Ed", "Educational Videos"],
+    ["PBS LearningMedia", "Teacher Resources"],
+    ["National Geographic Kids", "Educational Games"],
+  ]},
+  { channel: "Career Development", items: [
+    ["Udemy", "Professional Skills"],
+    ["Udacity", "Tech Certifications"],
+    ["Pluralsight", "Technology Skills"],
+    ["Simplilearn", "Certification Training"],
+    ["LinkedIn Learning", "Professional Development"],
+    ["FlexJobs", "Remote Work Skills"],
+    ["Teachable", "Create Online Courses"],
+    ["Skillcrush", "Tech Skills"],
+    ["Springboard", "Career-Focused Courses"],
+  ]},
+  { channel: "Communities", items: [
+    ["SuperProf", "Tutor Directory"],
+    ["InterNations", "Global Expat Network"],
+    ["Moodle", "Learning Management"],
+    ["Schoology", "Learning Management"],
+    ["No Excuse List", "Learning Resources Directory"],
+    ["Khan Lab School", "Independent School Model"],
+  ]},
+  { channel: "Other", items: [
+    ["O'Reilly", "Technology & Business Library"],
+    ["GeekBrains", "Russian Tech Courses"],
+    ["Oxford Home Study", "Free Online Courses"],
+    ["The Great Courses", "University Lectures"],
+    ["Academic Torrents", "Research Data Sharing"],
+    ["iTunesU", "Educational Multimedia"],
+    ["DraftKings", "Fantasy Sports Learning"],
+  ]},
+];
+
+const container = document.getElementById('channels');
+let totalPrograms = 0;
+
+DATA.forEach((group, i) => {
+  const chNum = String(i + 1).padStart(2, '0');
+  totalPrograms += group.items.length;
+
+  const section = document.createElement('div');
+  section.className = 'channel';
+  section.dataset.channel = group.channel;
+
+  const head = document.createElement('div');
+  head.className = 'channel-head';
+  head.innerHTML = `
+    <span class="ch-number">CH ${chNum}</span>
+    <span class="ch-name">${group.channel}</span>
+    <span class="ch-count">${group.items.length} programs</span>
+  `;
+  section.appendChild(head);
+
+  const table = document.createElement('table');
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th class="slot">No.</th>
+        <th class="platform">Platform</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+  const tbody = table.querySelector('tbody');
+
+  group.items.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    tr.dataset.search = (item[0] + ' ' + item[1] + ' ' + group.channel).toLowerCase();
+    tr.innerHTML = `
+      <td class="slot">${String(idx + 1).padStart(2, '0')}</td>
+      <td class="platform">${item[0]}</td>
+      <td class="desc">${item[1]}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  section.appendChild(table);
+  container.appendChild(section);
+});
+
+document.getElementById('totalPrograms').textContent = totalPrograms;
+document.getElementById('resultCount').textContent = totalPrograms + ' shown';
+
+const searchInput = document.getElementById('search');
+const emptyState = document.getElementById('emptyState');
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+
+  document.querySelectorAll('.channel').forEach(section => {
+    let sectionVisible = 0;
+    section.querySelectorAll('tbody tr').forEach(row => {
+      const match = row.dataset.search.includes(q);
+      row.classList.toggle('hidden-row', !match);
+      if (match) { sectionVisible++; visibleCount++; }
+    });
+    section.style.display = sectionVisible === 0 ? 'none' : '';
+    const countEl = section.querySelector('.ch-count');
+    countEl.textContent = sectionVisible + ' programs';
+  });
+
+  document.getElementById('resultCount').textContent = visibleCount + ' shown';
+  emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+});
+</script>
+
+</body>
+</html>
