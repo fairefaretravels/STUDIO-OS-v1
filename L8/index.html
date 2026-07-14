@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>L8@NITE — Love Lines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#d8b25a; --gold2:#f3d889;
+    --bg:#0a060d; --bg2:#150c1a; --card:#1c1120;
+    --text:#f5f0ee; --muted:#a99aa8; --border:rgba(255,255,255,.08);
+    --radius:24px;
+    --pop-rose:#ff9ab0; --pop-lilac:#c9a4ff; --pop-amber:#ffcf7a;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
+    overflow-x:hidden; min-height:100vh;
+  }
+  body::before{
+    content:""; position:fixed; inset:0;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(216,178,90,.09), transparent 45%),
+      radial-gradient(circle at 88% 82%, rgba(255,154,176,.09), transparent 42%),
+      radial-gradient(circle at 50% 100%, rgba(201,164,255,.06), transparent 50%);
+    z-index:-2;
+  }
+
+  /* ---------- Header ---------- */
+  .header{
+    position:sticky; top:0; height:72px; display:flex; justify-content:space-between; align-items:center;
+    padding:0 34px; background:rgba(10,6,13,.72); backdrop-filter:blur(22px);
+    border-bottom:1px solid var(--border); z-index:1000;
+  }
+  .logo{ display:flex; align-items:center; gap:14px; font-weight:800; font-size:20px; letter-spacing:2px; }
+  .logo .mark{
+    width:38px; height:38px; border-radius:50%;
+    background:conic-gradient(from 90deg, var(--gold), var(--pop-rose), var(--gold));
+    display:flex; align-items:center; justify-content:center; color:#0a060d; font-family:'Bebas Neue'; font-size:16px;
+  }
+  nav{ display:flex; gap:10px; }
+  nav a{ text-decoration:none; color:#998; padding:10px 18px; border-radius:100px; transition:.25s; font-weight:700; font-size:14px; }
+  nav a:hover{ background:rgba(255,255,255,.06); color:white; }
+  nav .active{ background:linear-gradient(90deg,var(--gold),#a77d2d); color:black; }
+  .header-right{ display:flex; align-items:center; gap:16px; }
+  .live{ display:flex; align-items:center; gap:9px; font-weight:800; letter-spacing:2px; color:var(--pop-rose); font-size:13px; }
+  .live-dot{ width:9px; height:9px; border-radius:50%; background:var(--pop-rose); box-shadow:0 0 16px var(--pop-rose); animation:pulse 1.5s infinite; }
+  @keyframes pulse{ 50%{ opacity:.3; transform:scale(.75); } }
+  #audioBtn{
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.04);
+    color:var(--text); cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:.2s;
+  }
+  #audioBtn:hover{ background:rgba(255,255,255,.1); }
+  #audioBtn.on{ border-color:var(--pop-rose); color:var(--pop-rose); }
+
+  /* ---------- Eyebrow / title block ---------- */
+  .intro{ padding:56px 6vw 30px; max-width:1180px; margin:0 auto; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:12px;
+    letter-spacing:3px; color:var(--pop-rose); border:1px solid rgba(255,154,176,.4);
+    padding:6px 14px; border-radius:100px; background:rgba(255,154,176,.06); margin-bottom:20px;
+  }
+  .eyebrow::before{ content:"●"; font-size:8px; }
+  .intro h1{ font-family:'Bebas Neue'; font-size:clamp(40px,6vw,74px); line-height:.95; letter-spacing:1px; }
+  .intro h1 span{ display:block; color:var(--gold); }
+  .intro p{ color:var(--muted); font-size:17px; max-width:580px; margin-top:16px; line-height:1.65; }
+
+  /* ---------- Stage / player ---------- */
+  .stage-wrap{ padding:20px 6vw 10px; max-width:1180px; margin:0 auto; }
+  .stage{
+    position:relative; border-radius:var(--radius); border:1px solid var(--border);
+    background:linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+    overflow:hidden; min-height:560px; display:flex; flex-direction:column;
+  }
+  .stage-top{ position:relative; flex:1; display:flex; align-items:center; justify-content:center; padding:50px 30px 20px; min-height:420px; }
+
+  /* Spinning art piece = the moon dial bubbles attach to */
+  #artZone{ position:relative; width:340px; height:340px; }
+  .art-disc{
+    position:absolute; inset:0; border-radius:50%;
+    background:
+      repeating-conic-gradient(from 0deg, rgba(255,255,255,.04) 0deg 6deg, transparent 6deg 12deg),
+      radial-gradient(circle at 32% 28%, #2a1930, #0a060d 72%);
+    border:2px solid rgba(216,178,90,.35);
+    box-shadow:0 0 70px rgba(216,178,90,.16), inset 0 0 40px rgba(0,0,0,.6);
+    animation:spin 14s linear infinite paused;
+  }
+  .art-disc.playing{ animation-play-state:running; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .art-core{
+    position:absolute; inset:38%; border-radius:50%;
+    background:radial-gradient(circle, var(--gold2), var(--gold) 55%, #8a692a 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue'; font-size:13px; color:#0a060d; letter-spacing:1px; text-align:center;
+    box-shadow:0 0 20px rgba(216,178,90,.5);
+  }
+  .hotspot{
+    position:absolute; width:14px; height:14px; border-radius:50%;
+    background:var(--pop-rose); box-shadow:0 0 0 rgba(255,154,176,.6);
+    transform:translate(-50%,-50%); opacity:0; pointer-events:none;
+  }
+  .hotspot.pinging{ opacity:1; animation:ping 1.8s ease-out infinite; }
+  @keyframes ping{
+    0%{ box-shadow:0 0 0 0 rgba(255,154,176,.55); }
+    70%{ box-shadow:0 0 0 16px rgba(255,154,176,0); }
+    100%{ box-shadow:0 0 0 0 rgba(255,154,176,0); }
+  }
+
+  /* Bubble callouts */
+  .bubble{
+    position:absolute; max-width:250px; font-family:'Space Mono',monospace; font-size:12.5px; line-height:1.5;
+    padding:12px 14px; border-radius:14px; color:#0a060d; background:var(--pop-rose);
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+    transform:scale(.4); opacity:0; z-index:5;
+    transform-origin:var(--origin-x,0%) var(--origin-y,100%);
+  }
+  .bubble.show{ animation:popIn .5s cubic-bezier(.26,1.6,.4,1) forwards; }
+  .bubble.hide{ animation:popOut .35s ease-in forwards; }
+  @keyframes popIn{ 0%{ transform:scale(.3) rotate(-4deg); opacity:0; } 60%{ transform:scale(1.08) rotate(1deg); opacity:1; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  @keyframes popOut{ to{ transform:scale(.3); opacity:0; } }
+  .bubble .tag{
+    display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:1.5px;
+    padding:2px 7px; border-radius:100px; background:rgba(10,6,13,.75); color:var(--pop-rose); margin-bottom:6px;
+  }
+  .bubble .src{ display:block; margin-top:6px; font-size:9.5px; opacity:.65; }
+  .bubble.lilac{ background:var(--pop-lilac); }
+  .bubble.lilac .tag{ color:var(--pop-lilac); }
+  .bubble.amber{ background:var(--pop-amber); }
+  .bubble.amber .tag{ color:#5c4310; background:rgba(10,6,13,.18); }
+  .bubble::after{
+    content:""; position:absolute; width:12px; height:12px; background:inherit;
+    bottom:-4px; left:22px; transform:rotate(45deg); border-radius:2px;
+  }
+
+  /* Transport */
+  .transport{ padding:22px 34px 30px; border-top:1px solid var(--border); background:rgba(0,0,0,.18); }
+  .t-row{ display:flex; align-items:center; gap:18px; }
+  #playBtn{
+    width:52px; height:52px; border-radius:50%; border:none; cursor:pointer; flex:0 0 auto;
+    background:linear-gradient(135deg, var(--gold2), var(--gold)); color:#0a060d; font-size:18px;
+    display:flex; align-items:center; justify-content:center; transition:.25s;
+    box-shadow:0 0 22px rgba(216,178,90,.35);
+  }
+  #playBtn:hover{ transform:scale(1.06); }
+  .time{ font-family:'Space Mono',monospace; font-size:13px; color:var(--muted); min-width:92px; }
+  .scrubber{ position:relative; flex:1; height:34px; display:flex; align-items:center; cursor:pointer; }
+  .track{ position:relative; width:100%; height:6px; border-radius:100px; background:rgba(255,255,255,.08); overflow:visible; }
+  .fill{ position:absolute; inset:0; width:0%; border-radius:100px; background:linear-gradient(90deg,var(--gold),var(--pop-rose)); }
+  .marker{
+    position:absolute; top:50%; width:8px; height:8px; border-radius:50%; background:var(--pop-rose);
+    transform:translate(-50%,-50%); border:2px solid var(--bg); transition:.25s;
+  }
+  .marker.lilac{ background:var(--pop-lilac); }
+  .marker.amber{ background:var(--pop-amber); }
+  .marker.done{ opacity:.35; }
+  .track-meta{ margin-top:18px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
+  .track-meta .who h3{ font-family:'Bebas Neue'; font-size:26px; letter-spacing:1px; }
+  .track-meta .who p{ color:var(--gold2); font-weight:700; font-size:13px; letter-spacing:1px; margin-top:2px; }
+  .episode-badge{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1.5px; color:var(--muted);
+    border:1px solid var(--border); padding:6px 12px; border-radius:100px;
+  }
+
+  /* ---------- Love log ---------- */
+  .log-wrap{ padding:44px 6vw 90px; max-width:1180px; margin:0 auto; }
+  .log-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+  .log-head h2{ font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px; }
+  .log-head p{ color:var(--muted); font-size:13px; }
+  #resetBtn{
+    background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--text);
+    font-family:'Space Mono',monospace; font-size:12px; padding:9px 16px; border-radius:100px; cursor:pointer;
+    letter-spacing:1px;
+  }
+  #resetBtn:hover{ background:rgba(255,255,255,.12); }
+  .log-list{ display:flex; flex-direction:column; gap:10px; }
+  .log-empty{ color:var(--muted); font-family:'Space Mono',monospace; font-size:13px; padding:22px 0; }
+  .log-item{
+    display:flex; gap:14px; align-items:flex-start; padding:14px 16px; border-radius:14px;
+    background:rgba(255,255,255,.03); border:1px solid var(--border);
+    animation:slideIn .35s ease;
+  }
+  @keyframes slideIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+  .log-item .stamp{ font-family:'Space Mono',monospace; font-size:12px; color:var(--muted); min-width:48px; }
+  .log-item .body{ font-size:14px; line-height:1.5; }
+  .log-item .body .src{ display:block; margin-top:4px; font-size:11px; color:var(--muted); font-family:'Space Mono',monospace; }
+  .log-item .tag{
+    font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:1px;
+    padding:2px 8px; border-radius:100px; margin-right:8px; color:#0a060d; background:var(--pop-rose);
+  }
+  .log-item .tag.lilac{ background:var(--pop-lilac); }
+  .log-item .tag.amber{ background:var(--pop-amber); }
+
+  /* ---------- Footer note ---------- */
+  .foot-note{ max-width:1180px; margin:0 auto; padding:0 6vw 60px; color:var(--muted); font-size:12px; line-height:1.6; }
+
+  @media(prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+    .art-disc.playing{ animation:none; }
+  }
+
+  @media(max-width:720px){
+    .header{ padding:0 18px; }
+    nav{ display:none; }
+    .intro{ padding:40px 20px 20px; }
+    .stage-wrap{ padding:16px 16px 10px; }
+    .stage-top{ min-height:340px; padding:36px 16px 14px; }
+    #artZone{ width:230px; height:230px; }
+    .bubble{ max-width:190px; font-size:11.5px; }
+    .transport{ padding:18px 18px 22px; }
+    .track-meta .who h3{ font-size:22px; }
+    .log-wrap{ padding:34px 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<audio id="stvAudio" preload="none" muted loop>
+  <source src="https://listen.streamaudio.co/proxy/sanecatv/stream" type="audio/mpeg">
+</audio>
+
+<header class="header">
+  <div class="logo"><div class="mark">S</div>L8@NITE</div>
+  <nav>
+    <a href="/radio">Radio</a>
+    <a href="/watch">TV</a>
+    <a class="active" href="#">Talk</a>
+  </nav>
+  <div class="header-right">
+    <div class="live"><div class="live-dot"></div> LIVE</div>
+    <button id="audioBtn" aria-label="Toggle live audio" title="Toggle STV live audio">🔈</button>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="eyebrow">L8@NITE · LOVE LINES · POLL-BACKED PILLOW TALK</div>
+  <h1>Real talk.<span>Backed by real polling.</span></h1>
+  <p>Hit play and let the numbers do some of the talking — dating, marriage, and staying power, pulled from actual national surveys and dropped in as callouts, right where they land.</p>
+</section>
+
+<div class="stage-wrap">
+  <div class="stage">
+    <div class="stage-top">
+      <div id="artZone">
+        <div class="art-disc" id="artDisc">
+          <div class="art-core">LOVE<br>LINES</div>
+        </div>
+        <div class="hotspot" id="hotspot"></div>
+        <!-- bubbles injected here -->
+      </div>
+    </div>
+
+    <div class="transport">
+      <div class="t-row">
+        <button id="playBtn" aria-label="Play">▶</button>
+        <div class="time"><span id="curTime">0:00</span> / <span id="durTime">0:48</span></div>
+        <div class="scrubber" id="scrubber">
+          <div class="track" id="track">
+            <div class="fill" id="fill"></div>
+            <!-- markers injected here -->
+          </div>
+        </div>
+      </div>
+      <div class="track-meta">
+        <div class="who">
+          <h3>L8@NITE — "Love Lines"</h3>
+          <p>AFTER HOURS · EP. 01</p>
+        </div>
+        <div class="episode-badge">7 TIPS THIS SEGMENT</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="log-wrap">
+  <div class="log-head">
+    <div>
+      <h2>LOVE LOG</h2>
+      <p>Every tip that's popped up so far, in order, with where the number came from.</p>
+    </div>
+    <button id="resetBtn">↺ Restart segment</button>
+  </div>
+  <div class="log-list" id="logList">
+    <div class="log-empty" id="logEmpty">Nothing's popped yet — press play.</div>
+  </div>
+</div>
+
+<p class="foot-note">Stats referenced are drawn from Pew Research Center's surveys on marriage, dating, and relationships, plus Match's "Singles in America" survey. Figures are paraphrased for a broadcast read — check the original research for exact wording and methodology.</p>
+
+<script>
+  // duration in seconds (simulated timeline — swap for a real <video>'s timeupdate event later)
+  const DURATION = 48;
+
+  const events = [
+    { t: 3,  x: 78, y: 30, color:'rose',  tag:'TIP',       text:"Most people already have somebody — 69% of U.S. adults say they're married, living with a partner, or otherwise in a committed relationship. The odds are better than late-night texts make them feel.", src:'Pew Research Center' },
+    { t: 9,  x: 20, y: 65, color:'lilac', tag:'STAT',      text:"Only about 3 in 10 adults have ever used a dating app at all. If you're doing it the old-fashioned way, you're still in the majority.", src:'Pew Research Center' },
+    { t: 16, x: 85, y: 70, color:'amber', tag:'REAL TALK', text:"Make the first move. Most singles say everyone's gotten more passive about it lately — a plain text beats another maybe.", src:"Match, Singles in America" },
+    { t: 23, x: 15, y: 25, color:'rose',  tag:'TIP',       text:"Staying power is trending up — divorce is at a record low, with just 1.4% of marriages ending last year, down from 2% at the 2012 peak.", src:'Pew Research Center' },
+    { t: 30, x: 75, y: 20, color:'lilac', tag:'STAT',      text:"Only 1 in 10 partnered adults met their person through an app. The rest met somewhere ordinary — don't overthink the venue.", src:'Pew Research Center' },
+    { t: 37, x: 22, y: 78, color:'amber', tag:'REAL TALK', text:"More than half of single adults say they're not even looking right now, mostly because they like their own company. Not chasing isn't losing.", src:'Pew Research Center' },
+    { t: 43, x: 80, y: 50, color:'rose',  tag:'TIP',       text:"Say the thing. Over half of adults say they're comfortable talking about how they feel with a partner or close friend — comfort is more common than you'd think.", src:'Pew Research Center' },
+  ];
+
+  const playBtn   = document.getElementById('playBtn');
+  const artDisc   = document.getElementById('artDisc');
+  const artZone   = document.getElementById('artZone');
+  const hotspot   = document.getElementById('hotspot');
+  const fill      = document.getElementById('fill');
+  const track     = document.getElementById('track');
+  const scrubber  = document.getElementById('scrubber');
+  const curTimeEl = document.getElementById('curTime');
+  const durTimeEl = document.getElementById('durTime');
+  const logList   = document.getElementById('logList');
+  const logEmpty  = document.getElementById('logEmpty');
+  const resetBtn  = document.getElementById('resetBtn');
+  const audioEl   = document.getElementById('stvAudio');
+  const audioBtn  = document.getElementById('audioBtn');
+
+  durTimeEl.textContent = fmt(DURATION);
+
+  // build scrubber markers
+  events.forEach((ev, i) => {
+    const m = document.createElement('div');
+    m.className = 'marker ' + (ev.color === 'rose' ? '' : ev.color);
+    m.style.left = (ev.t / DURATION * 100) + '%';
+    m.dataset.index = i;
+    track.appendChild(m);
+  });
+  const markerEls = [...track.querySelectorAll('.marker')];
+
+  let playing = false;
+  let current = 0;
+  let firedIndex = -1;
+  let rafId = null;
+  let lastTs = null;
+  let activeBubble = null;
+  let audioOn = false;
+
+  function fmt(s){
+    s = Math.max(0, Math.floor(s));
+    return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+  }
+
+  function tick(ts){
+    if(!lastTs) lastTs = ts;
+    const dt = (ts - lastTs) / 1000;
+    lastTs = ts;
+    if(playing){
+      current += dt;
+      if(current >= DURATION){
+        current = DURATION;
+        stop();
+      }
+      updateUI();
+      checkEvents();
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function updateUI(){
+    curTimeEl.textContent = fmt(current);
+    fill.style.width = (current / DURATION * 100) + '%';
+    markerEls.forEach((m,i) => m.classList.toggle('done', events[i].t <= current));
+  }
+
+  function checkEvents(){
+    for(let i = firedIndex + 1; i < events.length; i++){
+      if(events[i].t <= current){
+        fireEvent(events[i]);
+        firedIndex = i;
+      } else break;
+    }
+  }
+
+  function fireEvent(ev){
+    spawnBubble(ev);
+    pingHotspot(ev);
+    addLogItem(ev);
+  }
+
+  function pingHotspot(ev){
+    hotspot.style.left = ev.x + '%';
+    hotspot.style.top = ev.y + '%';
+    hotspot.classList.remove('pinging');
+    void hotspot.offsetWidth;
+    hotspot.classList.add('pinging');
+    setTimeout(() => hotspot.classList.remove('pinging'), 4600);
+  }
+
+  function spawnBubble(ev){
+    if(activeBubble){
+      activeBubble.el.classList.add('hide');
+      const stale = activeBubble;
+      setTimeout(() => stale.el.remove(), 350);
+    }
+    const b = document.createElement('div');
+    b.className = 'bubble ' + (ev.color === 'rose' ? '' : ev.color);
+    const originX = ev.x < 50 ? '0%' : '100%';
+    const originY = ev.y < 50 ? '100%' : '0%';
+    b.style.setProperty('--origin-x', originX);
+    b.style.setProperty('--origin-y', originY);
+    let left = ev.x, top = ev.y;
+    if(ev.x < 50){ b.style.left = (left + 6) + '%'; } else { b.style.left = 'calc(' + (left - 6) + '% - 240px)'; }
+    if(ev.y < 50){ b.style.top = (top + 6) + '%'; } else { b.style.top = 'calc(' + (top - 6) + '% - 130px)'; }
+
+    b.innerHTML = '<span class="tag">' + ev.tag + '</span><div>' + ev.text + '</div><span class="src">— ' + ev.src + '</span>';
+    artZone.appendChild(b);
+    requestAnimationFrame(() => b.classList.add('show'));
+    activeBubble = { el: b };
+
+    setTimeout(() => {
+      if(activeBubble && activeBubble.el === b){
+        b.classList.add('hide');
+        setTimeout(() => b.remove(), 350);
+        activeBubble = null;
+      }
+    }, 5200);
+  }
+
+  function addLogItem(ev){
+    logEmpty.style.display = 'none';
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML =
+      '<div class="stamp">' + fmt(ev.t) + '</div>' +
+      '<div class="body"><span class="tag ' + (ev.color === 'rose' ? '' : ev.color) + '">' + ev.tag + '</span>' + ev.text +
+      '<span class="src">' + ev.src + '</span></div>';
+    logList.appendChild(item);
+    item.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  function play(){
+    playing = true;
+    lastTs = null;
+    artDisc.classList.add('playing');
+    playBtn.textContent = '❚❚';
+    playBtn.setAttribute('aria-label','Pause');
+    if(!rafId) rafId = requestAnimationFrame(tick);
+  }
+
+  function pause(){
+    playing = false;
+    artDisc.classList.remove('playing');
+    playBtn.textContent = '▶';
+    playBtn.setAttribute('aria-label','Play');
+  }
+
+  function stop(){
+    pause();
+    playBtn.textContent = '↺';
+  }
+
+  playBtn.addEventListener('click', () => {
+    if(current >= DURATION) resetEpisode();
+    playing ? pause() : play();
+  });
+
+  scrubber.addEventListener('click', (e) => {
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    current = ratio * DURATION;
+    firedIndex = -1;
+    for(let i = 0; i < events.length; i++){
+      if(events[i].t <= current) firedIndex = i; else break;
+    }
+    updateUI();
+  });
+
+  function resetEpisode(){
+    current = 0;
+    firedIndex = -1;
+    updateUI();
+    logList.innerHTML = '';
+    logList.appendChild(logEmpty);
+    logEmpty.style.display = 'block';
+    if(activeBubble){ activeBubble.el.remove(); activeBubble = null; }
+    hotspot.classList.remove('pinging');
+  }
+
+  resetBtn.addEventListener('click', () => { pause(); resetEpisode(); });
+
+  audioBtn.addEventListener('click', () => {
+    audioOn = !audioOn;
+    audioEl.muted = !audioOn;
+    audioBtn.classList.toggle('on', audioOn);
+    audioBtn.textContent = audioOn ? '🔊' : '🔈';
+    if(audioOn){
+      audioEl.play().catch(() => {
+        audioBtn.textContent = '🔈';
+        audioBtn.classList.remove('on');
+        audioOn = false;
+      });
+    } else {
+      audioEl.pause();
+    }
+  });
+
+  updateUI();
+  rafId = requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>
