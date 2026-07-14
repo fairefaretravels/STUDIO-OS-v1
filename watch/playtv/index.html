@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STV TRIVIA LIVE — Sports &amp; Wild Kingdom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#080d1c; --navy2:#101a35; --navy3:#16224a;
+    --gold:#d8b25a; --gold2:#f3d889; --gold-deep:#a77d2d;
+    --cream:#f5f1e6; --muted:#8b96b3; --border:rgba(216,178,90,.16);
+    --correct:#7bd88f; --wrong:#ff6b6b;
+    --radius:20px;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--cream);
+    min-height:100vh; overflow-x:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-2;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(216,178,90,.10), transparent 45%),
+      radial-gradient(circle at 90% 85%, rgba(216,178,90,.06), transparent 40%),
+      var(--navy);
+  }
+  /* faint scanline texture for broadcast feel */
+  body::after{
+    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.05;
+    background:repeating-linear-gradient(0deg, #fff 0px, #fff 1px, transparent 1px, transparent 3px);
+  }
+
+  /* ---------- Header ---------- */
+  .header{
+    position:sticky; top:0; z-index:1000; height:72px; display:flex; align-items:center; justify-content:space-between;
+    padding:0 5vw; background:rgba(6,10,20,.78); backdrop-filter:blur(20px); border-bottom:1px solid var(--border);
+  }
+  .logo{ display:flex; align-items:center; gap:12px; font-weight:800; font-size:19px; letter-spacing:2px; }
+  .logo .mark{
+    width:36px; height:36px; border-radius:50%;
+    background:conic-gradient(from 90deg, var(--gold), var(--gold2), var(--gold));
+    display:flex; align-items:center; justify-content:center; color:#080d1c; font-family:'Bebas Neue'; font-size:15px;
+  }
+  .header-mid{ display:flex; align-items:center; gap:10px; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:2px; color:var(--gold2); }
+  .header-mid .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold2); box-shadow:0 0 12px var(--gold2); animation:pulse 1.5s infinite; }
+  @keyframes pulse{ 50%{ opacity:.3; transform:scale(.7); } }
+  .header-right{ display:flex; align-items:center; gap:14px; }
+  .score-pill{
+    font-family:'Space Mono',monospace; font-weight:700; font-size:14px; color:#080d1c;
+    background:linear-gradient(90deg,var(--gold2),var(--gold)); padding:8px 16px; border-radius:100px;
+    min-width:92px; text-align:center;
+  }
+  #audioBtn{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.04);
+    color:var(--cream); cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;
+    transition:.2s;
+  }
+  #audioBtn:hover{ background:rgba(255,255,255,.1); }
+  #audioBtn.on{ border-color:var(--gold); color:var(--gold2); }
+
+  /* ---------- Intro ---------- */
+  .intro{ padding:44px 6vw 24px; max-width:1240px; margin:0 auto; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:12px;
+    letter-spacing:3px; color:var(--gold2); border:1px solid var(--border); padding:6px 14px; border-radius:100px;
+    background:rgba(216,178,90,.06); margin-bottom:18px;
+  }
+  .eyebrow::before{ content:"●"; font-size:8px; color:var(--gold); }
+  .intro h1{ font-family:'Bebas Neue'; font-size:clamp(36px,5.4vw,64px); line-height:.96; letter-spacing:1px; }
+  .intro h1 span{ display:block; color:var(--gold); }
+  .intro p{ color:var(--muted); font-size:16px; max-width:580px; margin-top:14px; line-height:1.6; }
+
+  /* ---------- Layout: board + ad rail ---------- */
+  .stage-wrap{
+    padding:10px 6vw 80px; max-width:1240px; margin:0 auto;
+    display:grid; grid-template-columns:1fr 320px; gap:26px; align-items:start;
+  }
+
+  /* ---------- Jeopardy board ---------- */
+  .board-card{
+    border-radius:var(--radius); border:1px solid var(--border);
+    background:linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    padding:22px; position:relative; overflow:hidden;
+  }
+  .board-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+  .board-head h2{ font-family:'Bebas Neue'; font-size:24px; letter-spacing:2px; }
+  #resetBtn{
+    background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--cream);
+    font-family:'Space Mono',monospace; font-size:11px; padding:8px 14px; border-radius:100px; cursor:pointer; letter-spacing:1px;
+  }
+  #resetBtn:hover{ background:rgba(255,255,255,.12); }
+
+  .board{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .cat-head{
+    font-family:'Bebas Neue'; letter-spacing:1.5px; font-size:20px; text-align:center; color:#080d1c;
+    background:linear-gradient(135deg,var(--gold2),var(--gold)); border-radius:12px; padding:14px 8px;
+  }
+  .tile{
+    position:relative; border-radius:12px; border:1px solid var(--border);
+    background:linear-gradient(180deg, var(--navy3), var(--navy2));
+    font-family:'Space Mono',monospace; font-weight:700; font-size:22px; color:var(--gold2);
+    display:flex; align-items:center; justify-content:center; height:76px; cursor:pointer;
+    transition:transform .18s, box-shadow .18s; overflow:hidden;
+  }
+  .tile:hover:not(.done){ transform:translateY(-2px); box-shadow:0 8px 22px rgba(216,178,90,.14); border-color:var(--gold); }
+  .tile.done{ cursor:default; color:var(--muted); opacity:.4; }
+  .tile.done.correct{ color:var(--correct); opacity:.55; }
+  .tile.done.wrong{ color:var(--wrong); opacity:.55; }
+  .tile .flip-glitch{
+    position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.5) 0 2px, transparent 2px 5px);
+    opacity:0; pointer-events:none;
+  }
+  .tile.flipping .flip-glitch{ animation:glitch .35s steps(2) 2; opacity:.5; }
+  @keyframes glitch{ 0%{opacity:.6;} 50%{opacity:0;} 100%{opacity:.6;} }
+
+  .progress-row{ margin-top:16px; display:flex; align-items:center; gap:10px; font-family:'Space Mono',monospace; font-size:12px; color:var(--muted); }
+  .progress-track{ flex:1; height:6px; border-radius:100px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--gold2)); transition:width .3s; }
+
+  /* ---------- Ad rail (video replacement: slideshow) ---------- */
+  .ad-rail{
+    border-radius:var(--radius); border:1px solid var(--border);
+    background:linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .ad-label{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--gold2);
+    padding:14px 16px 0; display:flex; align-items:center; gap:8px;
+  }
+  .ad-label .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold2); box-shadow:0 0 8px var(--gold2); }
+  .ad-viewport{ position:relative; height:260px; margin:12px 16px; border-radius:14px; overflow:hidden; border:1px solid var(--border); }
+  .ad-slide{
+    position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding:18px;
+    opacity:0; transform:scale(1.03); transition:opacity .6s ease, transform .6s ease; pointer-events:none;
+  }
+  .ad-slide.active{ opacity:1; transform:scale(1); pointer-events:auto; }
+  .ad-slide .tag{
+    align-self:flex-start; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:1.5px;
+    padding:3px 9px; border-radius:100px; background:rgba(4,7,13,.55); color:var(--gold2); margin-bottom:8px; border:1px solid var(--border);
+  }
+  .ad-slide h3{ font-family:'Bebas Neue'; font-size:23px; letter-spacing:.5px; line-height:1; }
+  .ad-slide p{ font-size:12.5px; color:var(--cream); opacity:.85; margin-top:6px; line-height:1.45; }
+  .ad-dots{ display:flex; gap:6px; padding:0 16px 16px; }
+  .ad-dot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); cursor:pointer; transition:.2s; }
+  .ad-dot.active{ background:var(--gold2); width:18px; border-radius:100px; }
+
+  /* ---------- Clue modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,7,13,.82); backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center; z-index:2000; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .clue-card{
+    width:100%; max-width:640px; border-radius:22px; border:1px solid var(--border);
+    background:linear-gradient(165deg, var(--navy3), var(--navy2)); padding:34px 30px 28px;
+    animation:cardIn .3s cubic-bezier(.26,1.4,.4,1);
+  }
+  @keyframes cardIn{ from{ opacity:0; transform:scale(.92) translateY(10px);} to{ opacity:1; transform:scale(1) translateY(0);} }
+  .clue-meta{ display:flex; justify-content:space-between; align-items:center; font-family:'Space Mono',monospace; font-size:12px; color:var(--gold2); letter-spacing:1.5px; margin-bottom:14px; }
+  .clue-text{ font-family:'Bebas Neue'; font-size:clamp(22px,3.4vw,30px); line-height:1.2; letter-spacing:.5px; margin-bottom:22px; }
+  .choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .choice-btn{
+    text-align:left; padding:13px 16px; border-radius:12px; border:1px solid var(--border);
+    background:rgba(255,255,255,.03); color:var(--cream); font-size:14px; cursor:pointer; transition:.18s;
+    font-family:'DM Sans',sans-serif;
+  }
+  .choice-btn:hover:not(:disabled){ background:rgba(216,178,90,.1); border-color:var(--gold); }
+  .choice-btn.correct{ background:rgba(123,216,143,.16); border-color:var(--correct); color:var(--correct); }
+  .choice-btn.wrong{ background:rgba(255,107,107,.14); border-color:var(--wrong); color:var(--wrong); }
+  .choice-btn:disabled{ cursor:default; opacity:.85; }
+  .clue-feedback{ margin-top:18px; font-family:'Space Mono',monospace; font-size:13px; color:var(--muted); min-height:20px; }
+  .clue-actions{ margin-top:18px; display:flex; justify-content:flex-end; }
+  #clueNext{
+    background:linear-gradient(90deg,var(--gold2),var(--gold)); border:none; color:#080d1c; font-weight:700;
+    padding:10px 22px; border-radius:100px; cursor:pointer; font-size:13px; display:none;
+  }
+
+  /* ---------- Final screen ---------- */
+  .final-card{ text-align:center; }
+  .final-card .stamp{
+    font-family:'Bebas Neue'; font-size:clamp(30px,6vw,52px); letter-spacing:1.5px; margin:6px 0 10px;
+  }
+  .final-card.pro .stamp{ color:var(--gold2); text-shadow:0 0 30px rgba(243,216,137,.4); }
+  .final-card.brush .stamp{ color:var(--wrong); }
+  .final-card .final-score{ font-family:'Space Mono',monospace; font-size:15px; color:var(--muted); margin-bottom:18px; }
+  .final-card p.note{ color:var(--cream); opacity:.8; font-size:14px; max-width:440px; margin:0 auto 20px; line-height:1.55; }
+  #playAgain{
+    background:linear-gradient(90deg,var(--gold2),var(--gold)); border:none; color:#080d1c; font-weight:700;
+    padding:12px 28px; border-radius:100px; cursor:pointer; font-size:13px;
+  }
+
+  @media(max-width:880px){
+    .stage-wrap{ grid-template-columns:1fr; }
+    .header-mid{ display:none; }
+  }
+  @media(max-width:560px){
+    .header{ padding:0 18px; }
+    .intro{ padding:36px 20px 18px; }
+    .stage-wrap{ padding:8px 16px 60px; }
+    .board{ gap:8px; }
+    .tile{ height:60px; font-size:17px; }
+    .cat-head{ font-size:15px; padding:10px 4px; }
+    .choices{ grid-template-columns:1fr; }
+  }
+
+  @media(prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<audio id="stvAudio" preload="none" muted loop>
+  <source src="https://listen.streamaudio.co/proxy/sanecatv/stream" type="audio/mpeg">
+</audio>
+
+<header class="header">
+  <div class="logo"><div class="mark">S</div>STV TRIVIA</div>
+  <div class="header-mid"><div class="dot"></div> LIVE ON STV RADIOMELTDOWN</div>
+  <div class="header-right">
+    <div class="score-pill" id="scorePill">$0</div>
+    <button id="audioBtn" aria-label="Toggle live audio" title="Toggle STV live audio">🔈</button>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="eyebrow">TIMEOUT SPORTS TALK · SPECIAL EDITION</div>
+  <h1>Two categories.<span>Ten clues. One frequency.</span></h1>
+  <p>Pick a tile, answer before the buzzer, and stack your points. Score high and you're a certified <strong>Sports Pro</strong> — score low and it's back to the film room to <strong>brush up on your form</strong>. STV's live signal plays underneath — tap the speaker to bring it up.</p>
+</section>
+
+<div class="stage-wrap">
+  <div class="board-card">
+    <div class="board-head">
+      <h2>ON-AIR BOARD</h2>
+      <button id="resetBtn">↺ New game</button>
+    </div>
+    <div class="board" id="board"><!-- category heads + tiles injected --></div>
+    <div class="progress-row">
+      <span id="progressLabel">0 / 10 CLUES PLAYED</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <div class="ad-rail">
+    <div class="ad-label"><div class="dot"></div> ON AIR PROMOS</div>
+    <div class="ad-viewport" id="adViewport"><!-- ad slides injected --></div>
+    <div class="ad-dots" id="adDots"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="clue-card" id="clueCard"><!-- clue or final content injected --></div>
+</div>
+
+<script>
+  /* ---------------- Data ---------------- */
+  const categories = [
+    {
+      name: 'SPORTS',
+      clues: [
+        { value:100, clue:"An NBA rim sits exactly this high off the court.", choices:["How high is 8 feet?","How high is 10 feet?","How high is 12 feet?","How high is 9 feet?"], correct:1 },
+        { value:200, clue:"This many players take the field for one soccer team during a match.", choices:["What is 9?","What is 10?","What is 11?","What is 12?"], correct:2 },
+        { value:300, clue:"In baseball, three of these in a row end a batter's turn at the plate.", choices:["What are strikes?","What are balls?","What are outs?","What are fouls?"], correct:0 },
+        { value:400, clue:"This classic Olympic distance race covers 26.2 miles.", choices:["What is the 10K?","What is the marathon?","What is the triathlon?","What is the steeplechase?"], correct:1 },
+        { value:500, clue:"In boxing, this is the heaviest weight class — no upper limit.", choices:["What is light heavyweight?","What is super heavyweight?","What is cruiserweight?","What is heavyweight?"], correct:3 },
+      ]
+    },
+    {
+      name: 'WILD KINGDOM',
+      clues: [
+        { value:100, clue:"This is the only mammal capable of true, sustained flight.", choices:["What is the flying squirrel?","What is the bat?","What is the sugar glider?","What is the colugo?"], correct:1 },
+        { value:200, clue:"A group of lions traveling or resting together is called this.", choices:["What is a pack?","What is a pride?","What is a troop?","What is a clan?"], correct:1 },
+        { value:300, clue:"This land animal can hit speeds over 60 mph in short bursts, faster than any other on land.", choices:["What is the pronghorn?","What is the lion?","What is the cheetah?","What is the springbok?"], correct:2 },
+        { value:400, clue:"This slow-growing pine species can live well over 4,000 years, among the oldest living things on Earth.", choices:["What is the giant sequoia?","What is the bristlecone pine?","What is the bald cypress?","What is the coast redwood?"], correct:1 },
+        { value:500, clue:"Wild kangaroos are found roaming free on this continent — and nowhere else in the wild.", choices:["What is Africa?","What is Asia?","What is South America?","What is Australia?"], correct:3 },
+      ]
+    }
+  ];
+
+  const adSlides = [
+    { tag:"PARTNER PROMO", title:"Mack Magic Mobile Bar", body:"Bartending & DJ services for your next event — booking now via radiomeltdown.store." },
+    { tag:"STV STORE", title:"Faire Fare Travels", body:"Curated flights, hotels, and all-inclusive escapes — luxury travel without the markup." },
+    { tag:"THE STATIC", title:"Vol. 1 · Issue 02", body:"The Bass Line That Built G-Funk — this issue's cover story, out now." },
+    { tag:"FILM", title:"The Wisemen (2025)", body:"A SanecaTV Broadcast Network original feature film. Now on the STV network page." },
+    { tag:"GAME SERIES", title:"Switchbladoku", body:"Sudoku with a soundtrack — load your own tracks and solve puzzles with STV in your ears." },
+    { tag:"WANT AIRPLAY?", title:"Submit Your Music", body:"STV Radiomeltdown supports independent artists — submit and get on air, free." },
+  ];
+
+  /* ---------------- State ---------------- */
+  let score = 0;
+  let played = 0;
+  const TOTAL_CLUES = categories.reduce((a,c)=>a+c.clues.length,0);
+  const PRO_THRESHOLD = 1800; // out of 3000 possible
+
+  const boardEl = document.getElementById('board');
+  const scorePill = document.getElementById('scorePill');
+  const overlay = document.getElementById('overlay');
+  const clueCard = document.getElementById('clueCard');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+
+  /* ---------------- Board render ---------------- */
+  function renderBoard(){
+    boardEl.innerHTML = '';
+    boardEl.style.gridTemplateRows = 'auto repeat(5, 1fr)';
+    boardEl.style.gridAutoFlow = 'column';
+    categories.forEach((cat, ci) => {
+      const head = document.createElement('div');
+      head.className = 'cat-head';
+      head.textContent = cat.name;
+      boardEl.appendChild(head);
+      cat.clues.forEach((cl, qi) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.dataset.cat = ci;
+        tile.dataset.q = qi;
+        tile.innerHTML = '$' + cl.value + '<div class="flip-glitch"></div>';
+        tile.addEventListener('click', () => openClue(ci, qi, tile));
+        boardEl.appendChild(tile);
+      });
+    });
+  }
+
+  function updateProgress(){
+    progressFill.style.width = (played / TOTAL_CLUES * 100) + '%';
+    progressLabel.textContent = played + ' / ' + TOTAL_CLUES + ' CLUES PLAYED';
+  }
+
+  /* ---------------- Clue flow ---------------- */
+  function openClue(ci, qi, tileEl){
+    if(tileEl.classList.contains('done')) return;
+    tileEl.classList.add('flipping');
+    setTimeout(() => tileEl.classList.remove('flipping'), 700);
+
+    const cat = categories[ci];
+    const cl = cat.clues[qi];
+
+    clueCard.innerHTML = `
+      <div class="clue-meta"><span>${cat.name} · $${cl.value}</span><span>SELECT THE MATCHING QUESTION</span></div>
+      <div class="clue-text">${cl.clue}</div>
+      <div class="choices" id="choicesWrap"></div>
+      <div class="clue-feedback" id="clueFeedback"></div>
+      <div class="clue-actions"><button id="clueNext">Back to board →</button></div>
+    `;
+    const wrap = document.getElementById('choicesWrap');
+    const feedback = document.getElementById('clueFeedback');
+    const nextBtn = document.getElementById('clueNext');
+
+    cl.choices.forEach((choice, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => {
+        const allBtns = wrap.querySelectorAll('.choice-btn');
+        allBtns.forEach(b => b.disabled = true);
+        const correct = idx === cl.correct;
+        btn.classList.add(correct ? 'correct' : 'wrong');
+        if(!correct) allBtns[cl.correct].classList.add('correct');
+
+        if(correct){
+          score += cl.value;
+          feedback.textContent = 'Correct — +$' + cl.value + ' added to your score.';
+          feedback.style.color = 'var(--correct)';
+        } else {
+          feedback.textContent = 'Not quite. Correct response: ' + cl.choices[cl.correct];
+          feedback.style.color = 'var(--wrong)';
+        }
+        scorePill.textContent = '$' + score;
+
+        const tile = document.querySelector(`.tile[data-cat="${ci}"][data-q="${qi}"]`);
+        tile.classList.add('done', correct ? 'correct' : 'wrong');
+        played++;
+        updateProgress();
+        nextBtn.style.display = 'inline-block';
+      });
+      wrap.appendChild(btn);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      closeOverlay();
+      if(played >= TOTAL_CLUES) setTimeout(showFinal, 250);
+    });
+
+    overlay.classList.add('show');
+  }
+
+  function closeOverlay(){
+    overlay.classList.remove('show');
+  }
+
+  /* ---------------- Final screen ---------------- */
+  function showFinal(){
+    const isPro = score >= PRO_THRESHOLD;
+    clueCard.innerHTML = `
+      <div class="final-card ${isPro ? 'pro' : 'brush'}">
+        <div class="clue-meta" style="justify-content:center;">FINAL SCORE</div>
+        <div class="stamp">${isPro ? "SPORTS PRO" : "BRUSH UP ON YOUR FORM"}</div>
+        <div class="final-score">$${score} / $${categories.reduce((a,c)=>a+c.clues.reduce((s,cl)=>s+cl.value,0),0)}</div>
+        <p class="note">${isPro
+          ? "Solid signal across the board — sports and wild kingdom both. STV's putting your name on the roster."
+          : "A few clues got past you tonight. Run it back — the board resets and the frequency's still live."}</p>
+        <button id="playAgain">↺ Play again</button>
+      </div>
+    `;
+    document.getElementById('playAgain').addEventListener('click', resetGame);
+    overlay.classList.add('show');
+  }
+
+  /* ---------------- Reset ---------------- */
+  function resetGame(){
+    score = 0; played = 0;
+    scorePill.textContent = '$0';
+    updateProgress();
+    closeOverlay();
+    renderBoard();
+  }
+  document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+  /* ---------------- Ad slideshow (video replacement) ---------------- */
+  const adViewport = document.getElementById('adViewport');
+  const adDots = document.getElementById('adDots');
+  let adIndex = 0;
+  let adTimer = null;
+
+  function renderAds(){
+    adViewport.innerHTML = '';
+    adDots.innerHTML = '';
+    adSlides.forEach((s, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'ad-slide' + (i === 0 ? ' active' : '');
+      slide.style.background = `linear-gradient(200deg, hsla(${(i*47)%360},55%,18%,.9), rgba(8,13,28,.95))`;
+      slide.innerHTML = `<span class="tag">${s.tag}</span><h3>${s.title}</h3><p>${s.body}</p>`;
+      adViewport.appendChild(slide);
+
+      const dot = document.createElement('div');
+      dot.className = 'ad-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goToAd(i));
+      adDots.appendChild(dot);
+    });
+  }
+
+  function goToAd(i){
+    document.querySelectorAll('.ad-slide').forEach((el, idx) => el.classList.toggle('active', idx === i));
+    document.querySelectorAll('.ad-dot').forEach((el, idx) => el.classList.toggle('active', idx === i));
+    adIndex = i;
+    restartAdTimer();
+  }
+
+  function restartAdTimer(){
+    if(adTimer) clearInterval(adTimer);
+    adTimer = setInterval(() => goToAd((adIndex + 1) % adSlides.length), 4800);
+  }
+
+  /* ---------------- Live audio (real STV stream) ---------------- */
+  const audioEl = document.getElementById('stvAudio');
+  const audioBtn = document.getElementById('audioBtn');
+  let audioOn = false;
+
+  audioBtn.addEventListener('click', () => {
+    audioOn = !audioOn;
+    audioEl.muted = !audioOn;
+    audioBtn.classList.toggle('on', audioOn);
+    audioBtn.textContent = audioOn ? '🔊' : '🔈';
+    if(audioOn){
+      audioEl.play().catch(() => {
+        // autoplay/stream block — surface a quiet fallback state
+        audioBtn.textContent = '🔈';
+        audioBtn.classList.remove('on');
+        audioOn = false;
+      });
+    } else {
+      audioEl.pause();
+    }
+  });
+
+  /* ---------------- Init ---------------- */
+  renderBoard();
+  updateProgress();
+  renderAds();
+  restartAdTimer();
+</script>
+
+</body>
+</html>
