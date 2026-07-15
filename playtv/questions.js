@@ -1,5 +1,4 @@
-<
-
+window.STVQuestions = [
  name: 'SPORTS',
   clues: [ 
     { value:100, clue:"An NBA rim sits exactly this high off the court.", choices:["What is 8 feet?","What is 10 feet?","What is 12 feet?","What is 9 feet?"], correct:1 },
