@@ -253,9 +253,6 @@
   @media(prefers-reduced-motion: reduce){
     *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
   }
-  <button id="cameraBtn">
-📹 Camera
-</button>
   
  .host-camera {
   position:fixed;
@@ -293,6 +290,10 @@
   font-size:10px;
   letter-spacing:2px;
 } 
+
+ #cameraBtn{
+  display:none;
+} 
   
 </style>
 </head>
@@ -307,6 +308,11 @@
   <div class="header-mid"><div class="dot"></div> LIVE ON STV RADIOMELTDOWN</div>
   <div class="header-right">
     <div class="score-pill" id="scorePill">$0</div>
+
+    <button id="cameraBtn">
+📹 Camera
+</button>
+    
     <button id="audioBtn" aria-label="Toggle live audio" title="Toggle STV live audio">Audio</button>
   </div>
 </header>
@@ -344,19 +350,23 @@
       </div>
     </div>
 
-  </div>
 
   <div class="cam-rail">
-    <div class="ad-label"><div class="dot"></div> STUDIO CAM · LIVE</div>
-    <div class="cam-viewport">
-      <iframe
-        src="https://vdo.ninja/?scene&room=whatsthe411&password=DfmbmuvdavLBPykP"
-        allow="autoplay; camera; microphone; fullscreen; display-capture"
-        loading="lazy"
-        title="STV studio camera feed via VDO.Ninja">
-      </iframe>
-    </div>
+  <div class="ad-label"><div class="dot"></div> STUDIO CAM · LIVE</div>
+
+  <div class="cam-viewport">
+    <iframe
+      src="https://vdo.ninja/?scene&room=whatsthe411&password=DfmbmuvdavLBPykP"
+      allow="autoplay; camera; microphone; fullscreen; display-capture"
+      loading="lazy">
+    </iframe>
   </div>
+</div>
+
+
+<!-- ADD THIS -->
+<div class="host-camera" id="hostCamera" style="display:none;">
+  <video id="hostVideo" autoplay muted playsinline></video>
 </div>
 
 <div class="overlay" id="overlay">
@@ -627,6 +637,7 @@
   document.getElementById('changeCatsBtn').addEventListener('click', () => {
     boardView.style.display = 'none';
     pickerView.style.display = 'block';
+    document.getElementById("cameraBtn").style.display="block";
     closeOverlay();
   });
 
@@ -846,17 +857,39 @@
   renderAds();
   restartAdTimer();
 
-const cameraBtn=document.getElementById("cameraBtn");
-const hostVideo=document.getElementById("hostVideo");
+const cameraBtn = document.getElementById("cameraBtn");
+const hostCamera = document.getElementById("hostCamera");
+const hostVideo = document.getElementById("hostVideo");
 
-cameraBtn.onclick=async()=>{
+let cameraOn = false;
 
-const stream = await navigator.mediaDevices.getUserMedia({
- video:true,
- audio:true
-});
+cameraBtn.onclick = async () => {
 
-hostVideo.srcObject=stream;
+  cameraOn = !cameraOn;
+
+  if(cameraOn){
+
+    hostCamera.style.display="block";
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:true,
+      audio:true
+    });
+
+    hostVideo.srcObject = stream;
+
+    cameraBtn.innerHTML="📴 Hide Camera";
+
+  } else {
+
+    hostCamera.style.display="none";
+
+    let tracks = hostVideo.srcObject?.getTracks();
+
+    tracks?.forEach(track=>track.stop());
+
+    cameraBtn.innerHTML="📹 Camera";
+  }
 
 };  
 </script>
