@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>STV TRIVIA LIVE — Sports &amp; Wild Kingdom</title>
+<title>STV GAME NIGHT LIVE — Knowledge League</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -93,7 +93,11 @@
   }
   #resetBtn:hover{ background:rgba(255,255,255,.12); }
 
-  .board{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .board{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:10px;
+}
   .cat-head{
     font-family:'Bebas Neue'; letter-spacing:1.5px; font-size:20px; text-align:center; color:#080d1c;
     background:linear-gradient(135deg,var(--gold2),var(--gold)); border-radius:12px; padding:14px 8px;
@@ -209,8 +213,24 @@
   @media(prefers-reduced-motion: reduce){
     *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
   }
+  .host-camera {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 5px solid var(--gold);
+  box-shadow: 0 0 30px rgba(216,178,90,.5);
+  background:#000;
+  z-index:3000;
+}
 </style>
 </head>
+  <div class="host-camera">
+  <video id="hostVideo" autoplay muted playsinline></video>
+</div>
 <body>
 
 <audio id="stvAudio" preload="none" muted loop>
@@ -227,9 +247,15 @@
 </header>
 
 <section class="intro">
-  <div class="eyebrow">TIMEOUT SPORTS TALK · SPECIAL EDITION</div>
-  <h1>Two categories.<span>Ten clues. One frequency.</span></h1>
-  <p>Pick a tile, answer before the buzzer, and stack your points. Score high and you're a certified <strong>Sports Pro</strong> — score low and it's back to the film room to <strong>brush up on your form</strong>. STV's live signal plays underneath — tap the speaker to bring it up.</p>
+  <div class="eyebrow">STV GAME NIGHT · LIVE KNOWLEDGE LEAGUE</div>
+
+<h1>22 Categories.<span>1100 Questions. One Network.</span></h1>
+
+<p>
+Choose a category, answer the challenge, and climb the leaderboard.
+From sports and science to superheroes, history, technology, and strange discoveries —
+Game Night brings competition, entertainment, and learning together.
+</p>
 </section>
 
 <div class="stage-wrap">
@@ -259,11 +285,28 @@
 <script>
   /* ---------------- Data ---------------- */
   const categories = [
-    {
-      {
-  name: 'SPORTS',
-  clues: [
+  SPORTS,
+  WILD KINGDOM,
+  COSMIC MYSTERIES,
+  EARTH IS WEIRD,
+  SUPERHERO EDITION,
+  WORLD HISTORY,
+  SCIENCE,
+  MOVIES,
+  MUSIC,
+  GAMING,
+  CARS & BIKES,
+  HUMAN BODY,
+  ACADEMIC GAMES,
+  MYSTERIES,
+  FOOD & TRAVEL,
+  TECH & AI,
+  BUSINESS,
+  BRAIN TEASERS
+];
 
+ name: 'SPORTS',
+  clues: [ 
     { value:100, clue:"An NBA rim sits exactly this high off the court.", choices:["What is 8 feet?","What is 10 feet?","What is 12 feet?","What is 9 feet?"], correct:1 },
 
     { value:200, clue:"This many players take the field for one soccer team during a match.", choices:["What is 9?","What is 10?","What is 11?","What is 12?"], correct:2 },
@@ -2764,10 +2807,39 @@
   ];
 
   /* ---------------- State ---------------- */
-  let score = 0;
-  let played = 0;
-  const TOTAL_CLUES = categories.reduce((a,c)=>a+c.clues.length,0);
-  const PRO_THRESHOLD = 1800; // out of 3000 possible
+  /* ---------------- State ---------------- */
+let score = 0;
+let played = 0;
+let currentRound = 1;
+
+const TOTAL_CLUES = categories.reduce((a,c)=>a+c.clues.length,0);
+const PRO_THRESHOLD = 1800;
+
+  const rounds = {
+  1:[
+    "SPORTS",
+    "WILD KINGDOM",
+    "MOVIES",
+    "MUSIC",
+    "GAMING"
+  ],
+
+  2:[
+    "WORLD HISTORY",
+    "SCIENCE",
+    "COSMIC MYSTERIES",
+    "SUPERHERO EDITION",
+    "TECH & AI"
+  ],
+
+  3:[
+    "ACADEMIC GAMES",
+    "HUMAN BODY",
+    "BUSINESS",
+    "CARS & BIKES",
+    "MYSTERIES"
+  ]
+};
 
   const boardEl = document.getElementById('board');
   const scorePill = document.getElementById('scorePill');
@@ -2779,8 +2851,8 @@
   /* ---------------- Board render ---------------- */
   function renderBoard(){
     boardEl.innerHTML = '';
-    boardEl.style.gridTemplateRows = 'auto repeat(5, 1fr)';
-    boardEl.style.gridAutoFlow = 'column';
+    boardEl.style.gridTemplateRows = 'auto repeat(5, 76px)';
+    boardEl.style.gridAutoFlow = 'row';
     categories.forEach((cat, ci) => {
       const head = document.createElement('div');
       head.className = 'cat-head';
@@ -2955,6 +3027,19 @@
   updateProgress();
   renderAds();
   restartAdTimer();
+const video = document.getElementById("hostVideo");
+
+navigator.mediaDevices.getUserMedia({
+  video:true,
+  audio:true
+})
+.then(stream=>{
+  video.srcObject = stream;
+})
+.catch(err=>{
+  console.log("Camera unavailable",err);
+});
+  
 </script>
 
 </body>
