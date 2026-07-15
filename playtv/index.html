@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STV TRIVIA LIVE — Category Picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#080d1c; --navy2:#101a35; --navy3:#16224a;
+    --gold:#d8b25a; --gold2:#f3d889; --gold-deep:#a77d2d;
+    --cream:#f5f1e6; --muted:#8b96b3; --border:rgba(216,178,90,.16);
+    --correct:#7bd88f; --wrong:#ff6b6b;
+    --radius:20px;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--cream);
+    min-height:100vh; overflow-x:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-2;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(216,178,90,.10), transparent 45%),
+      radial-gradient(circle at 90% 85%, rgba(216,178,90,.06), transparent 40%),
+      var(--navy);
+  }
+  body::after{
+    content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.05;
+    background:repeating-linear-gradient(0deg, #fff 0px, #fff 1px, transparent 1px, transparent 3px);
+  }
+
+  /* ---------- Header ---------- */
+  .header{
+    position:sticky; top:0; z-index:1000; height:72px; display:flex; align-items:center; justify-content:space-between;
+    padding:0 5vw; background:rgba(6,10,20,.78); backdrop-filter:blur(20px); border-bottom:1px solid var(--border);
+  }
+  .logo{ display:flex; align-items:center; gap:12px; font-weight:800; font-size:19px; letter-spacing:2px; }
+  .logo .mark{
+    width:36px; height:36px; border-radius:50%;
+    background:conic-gradient(from 90deg, var(--gold), var(--gold2), var(--gold));
+    display:flex; align-items:center; justify-content:center; color:#080d1c; font-family:'Bebas Neue'; font-size:15px;
+  }
+  .header-mid{ display:flex; align-items:center; gap:10px; font-family:'Space Mono',monospace; font-size:12px; letter-spacing:2px; color:var(--gold2); }
+  .header-mid .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold2); box-shadow:0 0 12px var(--gold2); animation:pulse 1.5s infinite; }
+  @keyframes pulse{ 50%{ opacity:.3; transform:scale(.7); } }
+  .header-right{ display:flex; align-items:center; gap:14px; }
+  .score-pill{
+    font-family:'Space Mono',monospace; font-weight:700; font-size:14px; color:#080d1c;
+    background:linear-gradient(90deg,var(--gold2),var(--gold)); padding:8px 16px; border-radius:100px;
+    min-width:92px; text-align:center;
+  }
+  #audioBtn{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.04);
+    color:var(--cream); cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;
+    transition:.2s;
+  }
+  #audioBtn:hover{ background:rgba(255,255,255,.1); }
+  #audioBtn.on{ border-color:var(--gold); color:var(--gold2); }
+
+  /* ---------- Intro ---------- */
+  .intro{ padding:44px 6vw 24px; max-width:1240px; margin:0 auto; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:12px;
+    letter-spacing:3px; color:var(--gold2); border:1px solid var(--border); padding:6px 14px; border-radius:100px;
+    background:rgba(216,178,90,.06); margin-bottom:18px;
+  }
+  .eyebrow::before{ content:"●"; font-size:8px; color:var(--gold); }
+  .intro h1{ font-family:'Bebas Neue'; font-size:clamp(36px,5.4vw,64px); line-height:.96; letter-spacing:1px; }
+  .intro h1 span{ display:block; color:var(--gold); }
+  .intro p{ color:var(--muted); font-size:16px; max-width:620px; margin-top:14px; line-height:1.6; }
+
+  /* ---------- Layout: board + ad rail ---------- */
+  .stage-wrap{
+    padding:10px 6vw 80px; max-width:1240px; margin:0 auto;
+    display:grid; grid-template-columns:1fr 320px; gap:26px; align-items:start;
+  }
+
+  .board-card{
+    border-radius:var(--radius); border:1px solid var(--border);
+    background:linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    padding:22px; position:relative; overflow:hidden;
+  }
+  .board-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+  .board-head h2{ font-family:'Bebas Neue'; font-size:24px; letter-spacing:2px; }
+  #resetBtn, #changeCatsBtn{
+    background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--cream);
+    font-family:'Space Mono',monospace; font-size:11px; padding:8px 14px; border-radius:100px; cursor:pointer; letter-spacing:1px;
+  }
+  #resetBtn:hover, #changeCatsBtn:hover{ background:rgba(255,255,255,.12); }
+  .head-btns{ display:flex; gap:8px; }
+
+  /* ---------- Category picker ---------- */
+  #pickerView{ }
+  .picker-sub{ font-family:'Space Mono',monospace; font-size:12px; letter-spacing:1.5px; color:var(--muted); margin-bottom:14px; }
+  .picker-sub strong{ color:var(--gold2); }
+  .picker-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .cat-pick{
+    border-radius:12px; border:1px solid var(--border);
+    background:linear-gradient(180deg, var(--navy3), var(--navy2));
+    padding:14px 16px; cursor:pointer; transition:.18s; text-align:left;
+  }
+  .cat-pick:hover{ border-color:var(--gold); transform:translateY(-1px); }
+  .cat-pick.selected{ border-color:var(--gold2); background:linear-gradient(180deg, rgba(216,178,90,.18), rgba(216,178,90,.06)); }
+  .cat-pick.lightning{ border-color:rgba(255,107,107,.3); }
+  .cat-pick.lightning.selected{ border-color:var(--wrong); background:linear-gradient(180deg, rgba(255,107,107,.16), rgba(255,107,107,.04)); }
+  .cat-pick .name{ font-family:'Bebas Neue'; font-size:18px; letter-spacing:.5px; }
+  .cat-pick .check{ font-family:'Space Mono',monospace; font-size:10px; color:var(--gold2); letter-spacing:1px; opacity:0; margin-top:4px; }
+  .cat-pick.selected .check{ opacity:1; }
+  .lr-badge{
+    display:inline-block; font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:1.5px;
+    color:var(--wrong); background:rgba(255,107,107,.12); border:1px solid rgba(255,107,107,.3);
+    padding:3px 8px; border-radius:100px; margin-bottom:8px;
+  }
+  #startGameBtn{
+    margin-top:18px; width:100%; background:linear-gradient(90deg,var(--gold2),var(--gold)); border:none; color:#080d1c;
+    font-weight:700; padding:14px; border-radius:100px; cursor:pointer; font-size:14px; letter-spacing:.5px;
+    opacity:.4; pointer-events:none; transition:.2s;
+  }
+  #startGameBtn.ready{ opacity:1; pointer-events:auto; }
+
+  /* ---------- Board ---------- */
+  #boardView{ display:none; }
+  .board{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+  .cat-head{
+    font-family:'Bebas Neue'; letter-spacing:1.5px; font-size:19px; text-align:center; color:#080d1c;
+    background:linear-gradient(135deg,var(--gold2),var(--gold)); border-radius:12px; padding:14px 6px;
+  }
+  .tile{
+    position:relative; border-radius:12px; border:1px solid var(--border);
+    background:linear-gradient(180deg, var(--navy3), var(--navy2));
+    font-family:'Space Mono',monospace; font-weight:700; font-size:22px; color:var(--gold2);
+    display:flex; align-items:center; justify-content:center; height:76px; cursor:pointer;
+    transition:transform .18s, box-shadow .18s; overflow:hidden;
+  }
+  .tile:hover:not(.done){ transform:translateY(-2px); box-shadow:0 8px 22px rgba(216,178,90,.14); border-color:var(--gold); }
+  .tile.done{ cursor:default; color:var(--muted); opacity:.4; }
+  .tile.done.correct{ color:var(--correct); opacity:.55; }
+  .tile.done.wrong{ color:var(--wrong); opacity:.55; }
+  .tile .flip-glitch{
+    position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,.5) 0 2px, transparent 2px 5px);
+    opacity:0; pointer-events:none;
+  }
+  .tile.flipping .flip-glitch{ animation:glitch .35s steps(2) 2; opacity:.5; }
+  @keyframes glitch{ 0%{opacity:.6;} 50%{opacity:0;} 100%{opacity:.6;} }
+
+  .progress-row{ margin-top:16px; display:flex; align-items:center; gap:10px; font-family:'Space Mono',monospace; font-size:12px; color:var(--muted); }
+  .progress-track{ flex:1; height:6px; border-radius:100px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--gold2)); transition:width .3s; }
+
+  /* ---------- Ad rail ---------- */
+  .ad-rail{
+    border-radius:var(--radius); border:1px solid var(--border);
+    background:linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .ad-label{
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--gold2);
+    padding:14px 16px 0; display:flex; align-items:center; gap:8px;
+  }
+  .ad-label .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold2); box-shadow:0 0 8px var(--gold2); }
+  .ad-viewport{ position:relative; height:260px; margin:12px 16px; border-radius:14px; overflow:hidden; border:1px solid var(--border); }
+  .ad-slide{
+    position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding:18px;
+    opacity:0; transform:scale(1.03); transition:opacity .6s ease, transform .6s ease; pointer-events:none;
+  }
+  .ad-slide.active{ opacity:1; transform:scale(1); pointer-events:auto; }
+  .ad-slide .tag{
+    align-self:flex-start; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:1.5px;
+    padding:3px 9px; border-radius:100px; background:rgba(4,7,13,.55); color:var(--gold2); margin-bottom:8px; border:1px solid var(--border);
+  }
+  .ad-slide h3{ font-family:'Bebas Neue'; font-size:23px; letter-spacing:.5px; line-height:1; }
+  .ad-slide p{ font-size:12.5px; color:var(--cream); opacity:.85; margin-top:6px; line-height:1.45; }
+  .ad-dots{ display:flex; gap:6px; padding:0 16px 16px; }
+  .ad-dot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); cursor:pointer; transition:.2s; }
+  .ad-dot.active{ background:var(--gold2); width:18px; border-radius:100px; }
+
+  /* ---------- Studio cam ---------- */
+  .cam-rail{
+    border-radius:var(--radius); border:1px solid var(--border); margin-top:18px;
+    background:linear-gradient(160deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    overflow:hidden;
+  }
+  .cam-viewport{ position:relative; height:180px; margin:12px 16px 16px; border-radius:14px; overflow:hidden; border:1px solid var(--border); background:#000; }
+  .cam-viewport iframe{ width:100%; height:100%; border:0; display:block; }
+
+  /* ---------- Clue modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,7,13,.82); backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center; z-index:2000; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .clue-card{
+    width:100%; max-width:640px; border-radius:22px; border:1px solid var(--border);
+    background:linear-gradient(165deg, var(--navy3), var(--navy2)); padding:34px 30px 28px;
+    animation:cardIn .3s cubic-bezier(.26,1.4,.4,1);
+  }
+  @keyframes cardIn{ from{ opacity:0; transform:scale(.92) translateY(10px);} to{ opacity:1; transform:scale(1) translateY(0);} }
+  .clue-meta{ display:flex; justify-content:space-between; align-items:center; font-family:'Space Mono',monospace; font-size:12px; color:var(--gold2); letter-spacing:1.5px; margin-bottom:14px; }
+  .timer-row{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .timer-track{ flex:1; height:6px; border-radius:100px; background:rgba(255,255,255,.08); overflow:hidden; }
+  .timer-fill{ height:100%; width:100%; background:linear-gradient(90deg,var(--wrong),#ffb199); transition:width .1s linear; }
+  .timer-num{ font-family:'Space Mono',monospace; font-size:12px; color:var(--wrong); font-weight:700; min-width:26px; text-align:right; }
+  .clue-text{ font-family:'Bebas Neue'; font-size:clamp(22px,3.4vw,30px); line-height:1.2; letter-spacing:.5px; margin-bottom:22px; }
+  .choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .choice-btn{
+    text-align:left; padding:13px 16px; border-radius:12px; border:1px solid var(--border);
+    background:rgba(255,255,255,.03); color:var(--cream); font-size:14px; cursor:pointer; transition:.18s;
+    font-family:'DM Sans',sans-serif;
+  }
+  .choice-btn:hover:not(:disabled){ background:rgba(216,178,90,.1); border-color:var(--gold); }
+  .choice-btn.correct{ background:rgba(123,216,143,.16); border-color:var(--correct); color:var(--correct); }
+  .choice-btn.wrong{ background:rgba(255,107,107,.14); border-color:var(--wrong); color:var(--wrong); }
+  .choice-btn:disabled{ cursor:default; opacity:.85; }
+  .clue-feedback{ margin-top:18px; font-family:'Space Mono',monospace; font-size:13px; color:var(--muted); min-height:20px; }
+  .clue-actions{ margin-top:18px; display:flex; justify-content:flex-end; }
+  #clueNext{
+    background:linear-gradient(90deg,var(--gold2),var(--gold)); border:none; color:#080d1c; font-weight:700;
+    padding:10px 22px; border-radius:100px; cursor:pointer; font-size:13px; display:none;
+  }
+
+  /* ---------- Final screen ---------- */
+  .final-card{ text-align:center; }
+  .final-card .stamp{
+    font-family:'Bebas Neue'; font-size:clamp(30px,6vw,52px); letter-spacing:1.5px; margin:6px 0 10px;
+  }
+  .final-card.pro .stamp{ color:var(--gold2); text-shadow:0 0 30px rgba(243,216,137,.4); }
+  .final-card.brush .stamp{ color:var(--wrong); }
+  .final-card .final-score{ font-family:'Space Mono',monospace; font-size:15px; color:var(--muted); margin-bottom:18px; }
+  .final-card p.note{ color:var(--cream); opacity:.8; font-size:14px; max-width:440px; margin:0 auto 20px; line-height:1.55; }
+  #playAgain{
+    background:linear-gradient(90deg,var(--gold2),var(--gold)); border:none; color:#080d1c; font-weight:700;
+    padding:12px 28px; border-radius:100px; cursor:pointer; font-size:13px;
+  }
+
+  @media(max-width:880px){
+    .stage-wrap{ grid-template-columns:1fr; }
+    .header-mid{ display:none; }
+  }
+  @media(max-width:560px){
+    .header{ padding:0 18px; }
+    .intro{ padding:36px 20px 18px; }
+    .stage-wrap{ padding:8px 16px 60px; }
+    .board{ gap:8px; }
+    .tile{ height:60px; font-size:17px; }
+    .cat-head{ font-size:14px; padding:10px 4px; }
+    .choices{ grid-template-columns:1fr; }
+    .picker-grid{ grid-template-columns:1fr; }
+  }
+
+  @media(prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<audio id="stvAudio" preload="none" muted loop>
+  <source src="https://listen.streamaudio.co/proxy/sanecatv/stream" type="audio/mpeg">
+</audio>
+
+<header class="header">
+  <div class="logo"><div class="mark">S</div>STV TRIVIA</div>
+  <div class="header-mid"><div class="dot"></div> LIVE ON STV RADIOMELTDOWN</div>
+  <div class="header-right">
+    <div class="score-pill" id="scorePill">$0</div>
+    <button id="audioBtn" aria-label="Toggle live audio" title="Toggle STV live audio">Audio</button>
+  </div>
+</header>
+
+<section class="intro">
+  <div class="eyebrow">STV GAME NIGHT · FULL CATEGORY BOARD</div>
+  <h1>Twenty-seven categories.<span>Pick two. One frequency.</span></h1>
+  <p>Choose two categories to build your board, then answer before the buzzer to stack your points. Five categories run as a Lightning Round — 10 seconds on the clock per clue. Score 90% or higher and you're certified — anything less and it's back to the film room. STV's live signal plays underneath, and the studio cam is live in the sidebar.</p>
+</section>
+
+<div class="stage-wrap">
+  <div class="board-card">
+
+    <div id="pickerView">
+      <div class="board-head">
+        <h2>CHOOSE YOUR BOARD</h2>
+      </div>
+      <div class="picker-sub">Select <strong>2</strong> categories to play — <span id="pickCount">0</span>/2 selected</div>
+      <div class="picker-grid" id="pickerGrid"><!-- category picker tiles injected --></div>
+      <button id="startGameBtn">Start game →</button>
+    </div>
+
+    <div id="boardView">
+      <div class="board-head">
+        <h2 id="boardTitle">ON-AIR BOARD</h2>
+        <div class="head-btns">
+          <button id="changeCatsBtn">↺ Change categories</button>
+          <button id="resetBtn">↺ Replay board</button>
+        </div>
+      </div>
+      <div class="board" id="board"><!-- category heads + tiles injected --></div>
+      <div class="progress-row">
+        <span id="progressLabel">0 / 10 CLUES PLAYED</span>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="cam-rail">
+    <div class="ad-label"><div class="dot"></div> STUDIO CAM · LIVE</div>
+    <div class="cam-viewport">
+      <iframe
+        src="https://vdo.ninja/?scene&room=whatsthe411&password=DfmbmuvdavLBPykP"
+        allow="autoplay; camera; microphone; fullscreen; display-capture"
+        loading="lazy"
+        title="STV studio camera feed via VDO.Ninja">
+      </iframe>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="clue-card" id="clueCard"><!-- clue or final content injected --></div>
+</div>
+  
+ <div class="ad-rail">
+    <div class="ad-label"><div class="dot"></div> ON AIR PROMOS</div>
+    <div class="ad-viewport" id="adViewport"><!-- ad slides injected --></div>
+    <div class="ad-dots" id="adDots"></div>
+  </div>
+<script>
+  /* ---------------- Full category library (22 categories x 5 clues) ---------------- */
+  const categoryLibrary = [
+    { name:'Sports', clues:[
+      { value:100, clue:"An NBA rim sits exactly this high off the court.", choices:["How high is 8 feet?","How high is 10 feet?","How high is 12 feet?","How high is 9 feet?"], correct:1 },
+      { value:200, clue:"This many players take the field for one soccer team during a match.", choices:["What is 9?","What is 10?","What is 11?","What is 12?"], correct:2 },
+      { value:300, clue:"In baseball, three of these in a row end a batter's turn at the plate.", choices:["What are strikes?","What are balls?","What are outs?","What are fouls?"], correct:0 },
+      { value:400, clue:"This classic Olympic distance race covers 26.2 miles.", choices:["What is the 10K?","What is the marathon?","What is the triathlon?","What is the steeplechase?"], correct:1 },
+      { value:500, clue:"In boxing, this is the heaviest weight class — no upper limit.", choices:["What is light heavyweight?","What is super heavyweight?","What is cruiserweight?","What is heavyweight?"], correct:3 },
+    ]},
+    { name:'Wild Kingdom', clues:[
+      { value:100, clue:"This is the only mammal capable of true, sustained flight.", choices:["What is the flying squirrel?","What is the bat?","What is the sugar glider?","What is the colugo?"], correct:1 },
+      { value:200, clue:"A group of lions traveling or resting together is called this.", choices:["What is a pack?","What is a pride?","What is a troop?","What is a clan?"], correct:1 },
+      { value:300, clue:"This land animal can hit speeds over 60 mph in short bursts, faster than any other on land.", choices:["What is the pronghorn?","What is the lion?","What is the cheetah?","What is the springbok?"], correct:2 },
+      { value:400, clue:"This slow-growing pine species can live well over 4,000 years, among the oldest living things on Earth.", choices:["What is the giant sequoia?","What is the bristlecone pine?","What is the bald cypress?","What is the coast redwood?"], correct:1 },
+      { value:500, clue:"Wild kangaroos are found roaming free on this continent — and nowhere else in the wild.", choices:["What is Africa?","What is Asia?","What is South America?","What is Australia?"], correct:3 },
+    ]},
+    { name:'Movies, TV & Streaming', clues:[
+      { value:100, clue:"This James Cameron film is the highest-grossing movie of all time, unadjusted for inflation.", choices:["What is Titanic?","What is Avatar?","What is Avengers: Endgame?","What is Star Wars: The Force Awakens?"], correct:1 },
+      { value:200, clue:"This streaming giant began as a DVD-by-mail rental service back in 1997.", choices:["What is Hulu?","What is Netflix?","What is Disney+?","What is Amazon Prime?"], correct:1 },
+      { value:300, clue:"This annual award show hands out the golden statuette known as Oscar.", choices:["What are the Golden Globes?","What are the Emmy Awards?","What are the Academy Awards?","What are the Grammy Awards?"], correct:2 },
+      { value:400, clue:"This sitcom, set at a fictional Scranton paper company, was based on a British series of the same name.", choices:["What is Parks and Recreation?","What is The Office?","What is Brooklyn Nine-Nine?","What is Community?"], correct:1 },
+      { value:500, clue:"This actor is the only person to play the Joker in more than one live-action feature film.", choices:["Who is Jack Nicholson?","Who is Heath Ledger?","Who is Joaquin Phoenix?","Who is Jared Leto?"], correct:2 },
+    ]},
+    { name:'Music History & Culture', clues:[
+      { value:100, clue:"This Detroit record label, founded by Berry Gordy in 1959, became known as 'Hitsville U.S.A.'", choices:["What is Stax?","What is Motown?","What is Def Jam?","What is Atlantic?"], correct:1 },
+      { value:200, clue:"This genre originated in the South Bronx in the 1970s at parties DJ'd by Kool Herc.", choices:["What is funk?","What is disco?","What is hip-hop?","What is reggae?"], correct:2 },
+      { value:300, clue:"This King of Rock and Roll recorded his first hit single at Sun Studio in Memphis.", choices:["Who is Chuck Berry?","Who is Elvis Presley?","Who is Buddy Holly?","Who is Little Richard?"], correct:1 },
+      { value:400, clue:"This reed instrument, central to jazz, was invented by Adolphe Sax.", choices:["What is the clarinet?","What is the trumpet?","What is the saxophone?","What is the trombone?"], correct:2 },
+      { value:500, clue:"This 1971 Marvin Gaye album, largely about war and social issues, is considered one of the greatest of all time.", choices:["What is Let's Get It On?","What is What's Going On?","What is Songs in the Key of Life?","What is Innervisions?"], correct:1 },
+    ]},
+    { name:'Tech & AI', clues:[
+      { value:100, clue:"This company's 1984 Super Bowl ad introduced the Macintosh computer.", choices:["What is IBM?","What is Microsoft?","What is Apple?","What is Commodore?"], correct:2 },
+      { value:200, clue:"This term describes a computer program's ability to learn patterns from data without explicit rules for every case.", choices:["What is cloud computing?","What is machine learning?","What is encryption?","What is virtualization?"], correct:1 },
+      { value:300, clue:"This chatbot, released by OpenAI in November 2022, popularized conversational AI for the mainstream public.", choices:["What is Siri?","What is Alexa?","What is ChatGPT?","What is Cortana?"], correct:2 },
+      { value:400, clue:"This co-founder of Apple, ousted in 1985, returned in 1997 to lead the company's turnaround.", choices:["Who is Steve Wozniak?","Who is Steve Jobs?","Who is Bill Gates?","Who is Tim Cook?"], correct:1 },
+      { value:500, clue:"This basic unit of computer information can be either a 0 or a 1.", choices:["What is a byte?","What is a pixel?","What is a bit?","What is a node?"], correct:2 },
+    ]},
+    { name:'Business & Money', clues:[
+      { value:100, clue:"This term describes a company's total value of outstanding shares.", choices:["What is net profit?","What is market capitalization?","What is gross revenue?","What is equity ratio?"], correct:1 },
+      { value:200, clue:"This retail giant, founded by Sam Walton in 1962, is the world's largest company by revenue.", choices:["What is Target?","What is Costco?","What is Walmart?","What is Kroger?"], correct:2 },
+      { value:300, clue:"This term describes when prices across an economy rise and purchasing power falls.", choices:["What is a recession?","What is deflation?","What is inflation?","What is stagnation?"], correct:2 },
+      { value:400, clue:"This coffee chain, founded in Seattle in 1971, is named after a character in 'Moby-Dick.'", choices:["What is Peet's?","What is Starbucks?","What is Dunkin'?","What is Tim Hortons?"], correct:1 },
+      { value:500, clue:"This financial term describes using borrowed capital to increase the potential return of an investment.", choices:["What is diversification?","What is leverage?","What is liquidity?","What is amortization?"], correct:1 },
+    ]},
+    { name:'World History', clues:[
+      { value:100, clue:"This wonder of the ancient world, built as a tomb, still stands in Giza, Egypt.", choices:["What is the Colossus of Rhodes?","What is the Great Pyramid of Giza?","What are the Hanging Gardens?","What is the Lighthouse of Alexandria?"], correct:1 },
+      { value:200, clue:"This wall, begun over 2,000 years ago, stretches thousands of miles across northern China.", choices:["What is Hadrian's Wall?","What is the Great Wall of China?","What is the Berlin Wall?","What is the Western Wall?"], correct:1 },
+      { value:300, clue:"This 1789 event marked the start of the French Revolution when a Paris prison was overrun.", choices:["What is the Reign of Terror?","What is the Storming of the Bastille?","What is the Treaty of Versailles?","What is the Tennis Court Oath?"], correct:1 },
+      { value:400, clue:"This trade network connected China to the Mediterranean, carrying goods like silk and spices for centuries.", choices:["What is the Amber Road?","What is the Silk Road?","What is the Incense Route?","What is the Spice Route?"], correct:1 },
+      { value:500, clue:"This ancient civilization built Machu Picchu high in the Andes Mountains of Peru.", choices:["What are the Aztec?","What are the Maya?","What are the Inca?","What are the Olmec?"], correct:2 },
+    ]},
+    { name:'Science & Unknown', clues:[
+      { value:100, clue:"This gas makes up about 78% of Earth's atmosphere, more than any other.", choices:["What is oxygen?","What is nitrogen?","What is carbon dioxide?","What is argon?"], correct:1 },
+      { value:200, clue:"This scientist's theory of general relativity described gravity as the curving of space-time.", choices:["Who is Isaac Newton?","Who is Albert Einstein?","Who is Niels Bohr?","Who is Stephen Hawking?"], correct:1 },
+      { value:300, clue:"This is the closest star to Earth, providing nearly all of our planet's light and heat.", choices:["What is Proxima Centauri?","What is Sirius?","What is the Sun?","What is Alpha Centauri?"], correct:2 },
+      { value:400, clue:"This scale measures the acidity or alkalinity of a solution, ranging from 0 to 14.", choices:["What is the Richter scale?","What is the pH scale?","What is the Kelvin scale?","What is the Beaufort scale?"], correct:1 },
+      { value:500, clue:"This subatomic particle carries a negative electric charge and orbits an atom's nucleus.", choices:["What is a proton?","What is a neutron?","What is an electron?","What is a photon?"], correct:2 },
+    ]},
+    { name:'Gaming & Internet Culture', clues:[
+      { value:100, clue:"This Nintendo plumber made his debut in the 1981 arcade game 'Donkey Kong.'", choices:["Who is Luigi?","Who is Mario?","Who is Wario?","Who is Yoshi?"], correct:1 },
+      { value:200, clue:"This battle royale game, released in 2017, popularized the genre with its shrinking play zone.", choices:["What is Fortnite?","What is Apex Legends?","What is PUBG?","What is Warzone?"], correct:2 },
+      { value:300, clue:"This term describes content, images, or ideas that spread rapidly across the internet.", choices:["What is a meme?","What is a hashtag?","What is a thread?","What is a feed?"], correct:0 },
+      { value:400, clue:"This company created both the PlayStation console and the Walkman.", choices:["What is Sega?","What is Sony?","What is Microsoft?","What is Nintendo?"], correct:1 },
+      { value:500, clue:"This 2009 sandbox game, built entirely from blocks, became one of the best-selling video games ever.", choices:["What is Roblox?","What is Terraria?","What is Minecraft?","What is Fortnite?"], correct:2 },
+    ]},
+    { name:'Food, Culture & Travel', clues:[
+      { value:100, clue:"This spicy Korean fermented cabbage dish is a staple side at nearly every meal.", choices:["What is kimchi?","What is miso?","What is natto?","What is tempeh?"], correct:0 },
+      { value:200, clue:"This Italian dish of flat dough topped with sauce and cheese originated in Naples.", choices:["What is pasta?","What is pizza?","What is focaccia?","What is a calzone?"], correct:1 },
+      { value:300, clue:"This city, home to the Eiffel Tower, is the capital of France.", choices:["What is Lyon?","What is Marseille?","What is Paris?","What is Nice?"], correct:2 },
+      { value:400, clue:"This tiny Southeast Asian nation is both a country and a single city.", choices:["What is Singapore?","What is Monaco?","What is Hong Kong?","What is Macau?"], correct:0 },
+      { value:500, clue:"This spice, derived from a crocus flower, is the most expensive by weight in the world.", choices:["What is saffron?","What is vanilla?","What is cardamom?","What is cinnamon?"], correct:0 },
+    ]},
+    { name:'Cars & Bikes', clues:[
+      { value:100, clue:"This carmaker's Model T, introduced in 1908, made automobiles affordable for the average American.", choices:["What is Chevrolet?","What is Ford?","What is Chrysler?","What is Dodge?"], correct:1 },
+      { value:200, clue:"This German automaker's logo is a three-pointed star.", choices:["What is BMW?","What is Audi?","What is Mercedes-Benz?","What is Porsche?"], correct:2 },
+      { value:300, clue:"This annual motorcycle race is held every year on the Isle of Man, known for its dangerous road course.", choices:["What is the Isle of Man TT?","What is MotoGP?","What is the Daytona 200?","What is the Suzuka 8 Hours?"], correct:0 },
+      { value:400, clue:"This Italian brand, whose logo features a rearing horse, makes some of the world's most coveted sports cars.", choices:["What is Lamborghini?","What is Maserati?","What is Ferrari?","What is Alfa Romeo?"], correct:2 },
+      { value:500, clue:"This annual race, held every Memorial Day weekend, is known as 'The Greatest Spectacle in Racing.'", choices:["What is the Daytona 500?","What is the Indianapolis 500?","What is the Monaco Grand Prix?","What is the Le Mans 24 Hours?"], correct:1 },
+    ]},
+    { name:'Brain Teasers', clues:[
+      { value:100, clue:"I have keys but no locks, space but no room, and you can enter but not go inside. What am I?", choices:["What is a piano?","What is a keyboard?","What is a map?","What is a house?"], correct:1 },
+      { value:200, clue:"The more you take, the more you leave behind. What are they?", choices:["What are memories?","What are footsteps?","What are seconds?","What are photos?"], correct:1 },
+      { value:300, clue:"What has a face and two hands but no arms or legs?", choices:["What is a clock?","What is a doll?","What is a statue?","What is a watchmaker?"], correct:0 },
+      { value:400, clue:"What comes once in a minute, twice in a moment, but never in a thousand years?", choices:["What is the letter M?","What is a heartbeat?","What is a second?","What is a blink?"], correct:0 },
+      { value:500, clue:"If you drop me I'm sure to crack, but give me a smile and I'll always smile back. What am I?", choices:["What is a mirror?","What is an egg?","What is a window?","What is a vase?"], correct:0 },
+    ]},
+    { name:'Legends & Icons', clues:[
+      { value:100, clue:"This civil rights leader delivered the 'I Have a Dream' speech at the March on Washington in 1963.", choices:["Who is Malcolm X?","Who is Martin Luther King Jr.?","Who is John Lewis?","Who is Thurgood Marshall?"], correct:1 },
+      { value:200, clue:"This boxer, born Cassius Clay, famously declared himself 'The Greatest.'", choices:["Who is Joe Frazier?","Who is Muhammad Ali?","Who is George Foreman?","Who is Sugar Ray Robinson?"], correct:1 },
+      { value:300, clue:"This physicist developed the theory of relativity and won the 1921 Nobel Prize in Physics.", choices:["Who is Niels Bohr?","Who is Albert Einstein?","Who is Max Planck?","Who is Werner Heisenberg?"], correct:1 },
+      { value:400, clue:"This aviator became the first woman to fly solo across the Atlantic Ocean in 1932.", choices:["Who is Bessie Coleman?","Who is Amelia Earhart?","Who is Harriet Quimby?","Who is Jacqueline Cochran?"], correct:1 },
+      { value:500, clue:"This South African leader spent 27 years in prison before becoming his country's first Black president.", choices:["Who is Desmond Tutu?","Who is Nelson Mandela?","Who is Steve Biko?","Who is Thabo Mbeki?"], correct:1 },
+    ]},
+    { name:'Movies & TV Deep Cuts', clues:[
+      { value:100, clue:"In 'Pulp Fiction,' this glowing item inside a briefcase is never shown to the audience.", choices:["What is the gun?","What is the briefcase's contents?","What is the watch?","What is the wallet?"], correct:1 },
+      { value:200, clue:"This cult sitcom, set at Greendale Community College, was created by Dan Harmon.", choices:["What is Community?","What is Parks and Recreation?","What is The Good Place?","What is Superstore?"], correct:0 },
+      { value:300, clue:"This 1999 film's twist reveals that Bruce Willis's character was dead the entire time.", choices:["What is Fight Club?","What is The Sixth Sense?","What is The Others?","What is Shutter Island?"], correct:1 },
+      { value:400, clue:"This anime franchise follows Goku and the Z-Fighters defending Earth from increasingly powerful threats.", choices:["What is Naruto?","What is One Piece?","What is Dragon Ball Z?","What is Bleach?"], correct:2 },
+      { value:500, clue:"This actor voiced Woody in the 'Toy Story' films and starred in 'Cast Away.'", choices:["Who is Tim Allen?","Who is Tom Hanks?","Who is Kevin Costner?","Who is Bill Murray?"], correct:1 },
+    ]},
+    { name:'Music Deep Cuts', clues:[
+      { value:100, clue:"This artist's alter ego, Sasha Fierce, appeared on her 2008 double album.", choices:["Who is Rihanna?","Who is Beyoncé?","Who is Alicia Keys?","Who is Ciara?"], correct:1 },
+      { value:200, clue:"This producer duo, made up of Chad Hugo and Pharrell Williams, is known by this name.", choices:["What is The Neptunes?","What is Timbaland & Magoo?","What is OutKast?","What is Organized Noize?"], correct:0 },
+      { value:300, clue:"This rapper's 1994 debut album 'Illmatic' is widely regarded as one of hip-hop's greatest records.", choices:["Who is Nas?","Who is Jay-Z?","Who is The Notorious B.I.G.?","Who is Rakim?"], correct:0 },
+      { value:400, clue:"This Detroit rapper's alter ego is named Slim Shady.", choices:["Who is 50 Cent?","Who is Eminem?","Who is D12?","Who is Royce da 5'9\"?"], correct:1 },
+      { value:500, clue:"This girl group, formed in Houston in the late 1990s, launched Beyoncé's career.", choices:["What is TLC?","What is En Vogue?","What is Destiny's Child?","What is SWV?"], correct:2 },
+    ]},
+    { name:'Human Body & Weird Science', clues:[
+      { value:100, clue:"This is the largest organ in the human body.", choices:["What is the liver?","What is the skin?","What are the lungs?","What is the brain?"], correct:1 },
+      { value:200, clue:"This long nerve runs from the brainstem down through the chest and abdomen, affecting digestion and heart rate.", choices:["What is the sciatic nerve?","What is the vagus nerve?","What is the optic nerve?","What is the femoral nerve?"], correct:1 },
+      { value:300, clue:"This is the only bone in the human body not connected to another bone.", choices:["What is the hyoid bone?","What is the coccyx?","What is the patella?","What is the sternum?"], correct:0 },
+      { value:400, clue:"This organ produces insulin to help regulate blood sugar levels.", choices:["What is the liver?","What is the kidney?","What is the pancreas?","What is the spleen?"], correct:2 },
+      { value:500, clue:"This reflex causes some people to sneeze uncontrollably when they step into bright light.", choices:["What is the photic sneeze reflex?","What is light sensitivity syndrome?","What is solar rhinitis?","What is the bright-eye reflex?"], correct:0 },
+    ]},
+    { name:'Academic Games', clues:[
+      { value:100, clue:"This branch of math deals with shapes, sizes, and properties of space.", choices:["What is algebra?","What is geometry?","What is calculus?","What is trigonometry?"], correct:1 },
+      { value:200, clue:"This 1787 document established the framework of the United States government.", choices:["What is the Declaration of Independence?","What is the Constitution?","What is the Bill of Rights?","What are the Federalist Papers?"], correct:1 },
+      { value:300, clue:"This Shakespeare play tells the story of a Danish prince seeking revenge for his father's murder.", choices:["What is Macbeth?","What is Othello?","What is Hamlet?","What is King Lear?"], correct:2 },
+      { value:400, clue:"This chemical element has the symbol 'Fe' on the periodic table.", choices:["What is fluorine?","What is iron?","What is lead?","What is tin?"], correct:1 },
+      { value:500, clue:"This process describes how plants convert sunlight, water, and carbon dioxide into energy.", choices:["What is respiration?","What is photosynthesis?","What is fermentation?","What is transpiration?"], correct:1 },
+    ]},
+    { name:'Olympiad Mode', clues:[
+      { value:100, clue:"This number is both the only even prime number and the smallest prime.", choices:["What is one?","What is two?","What is three?","What is zero?"], correct:1 },
+      { value:200, clue:"This constant, approximately 3.14159, represents the ratio of a circle's circumference to its diameter.", choices:["What is pi?","What is Euler's number?","What is the golden ratio?","What is Avogadro's number?"], correct:0 },
+      { value:300, clue:"In physics, this law states that for every action there is an equal and opposite reaction.", choices:["What is Newton's First Law?","What is Newton's Second Law?","What is Newton's Third Law?","What is the Law of Conservation of Energy?"], correct:2 },
+      { value:400, clue:"This type of triangle has all three sides and all three angles equal.", choices:["What is isosceles?","What is equilateral?","What is scalene?","What is right?"], correct:1 },
+      { value:500, clue:"This branch of mathematics studies rates of change and was developed independently by Newton and Leibniz.", choices:["What is algebra?","What is statistics?","What is calculus?","What is number theory?"], correct:2 },
+    ]},
+    { name:'Cosmic Mysteries', clues:[
+      { value:100, clue:"This is the largest planet in our solar system.", choices:["What is Saturn?","What is Jupiter?","What is Neptune?","What is Uranus?"], correct:1 },
+      { value:200, clue:"This dwarf planet, discovered in 1930, was reclassified from full planet status in 2006.", choices:["What is Pluto?","What is Eris?","What is Ceres?","What is Makemake?"], correct:0 },
+      { value:300, clue:"This phenomenon occurs when a massive star collapses into a point of infinite density.", choices:["What is a supernova?","What is a black hole?","What is a neutron star?","What is a quasar?"], correct:1 },
+      { value:400, clue:"This barred spiral galaxy is home to our solar system.", choices:["What is Andromeda?","What is the Milky Way?","What is Triangulum?","What is the Sombrero Galaxy?"], correct:1 },
+      { value:500, clue:"This theory describes the origin of the universe as an expansion from an extremely hot, dense point roughly 13.8 billion years ago.", choices:["What is the Steady State theory?","What is the Big Bang theory?","What is inflation theory?","What is multiverse theory?"], correct:1 },
+    ]},
+    { name:'Earth Is Weird', clues:[
+      { value:100, clue:"This layer of Earth, located beneath the crust, is made of hot, slowly flowing rock.", choices:["What is the core?","What is the mantle?","What is the crust?","What is the lithosphere?"], correct:1 },
+      { value:200, clue:"This natural phenomenon produces colorful lights in the sky near the polar regions.", choices:["What is an aurora?","What is a rainbow?","What is a halo?","What is a mirage?"], correct:0 },
+      { value:300, clue:"This is the deepest known point in Earth's oceans, located in the Pacific.", choices:["What is the Mariana Trench?","What is the Puerto Rico Trench?","What is the Java Trench?","What is the Tonga Trench?"], correct:0 },
+      { value:400, clue:"This desert, the largest hot desert in the world, spans much of North Africa.", choices:["What is the Gobi?","What is the Sahara?","What is the Kalahari?","What is the Arabian Desert?"], correct:1 },
+      { value:500, clue:"This tall, anvil-shaped cloud type is associated with thunderstorms.", choices:["What is cirrus?","What is stratus?","What is cumulonimbus?","What is nimbostratus?"], correct:2 },
+    ]},
+    { name:'Mysteries, Unsolved & Strange History', clues:[
+      { value:100, clue:"This ancient Egyptian queen's tomb has never been definitively found, unlike her husband King Tut's.", choices:["Who is Cleopatra?","Who is Nefertiti?","Who is Hatshepsut?","Who is Ankhesenamun?"], correct:1 },
+      { value:200, clue:"This ghost ship was found adrift in the Atlantic in 1872 with no crew aboard.", choices:["What is the Flying Dutchman?","What is the Mary Celeste?","What is the SS Baychimo?","What is the Carroll A. Deering?"], correct:1 },
+      { value:300, clue:"This aviator disappeared over the Pacific Ocean in 1937 during an attempt to fly around the world.", choices:["Who is Amelia Earhart?","Who is Charles Lindbergh?","Who is Howard Hughes?","Who is Wiley Post?"], correct:0 },
+      { value:400, clue:"This ancient stone monument in England is believed to have been built in stages, starting around 3000 BC.", choices:["What is Stonehenge?","What is Avebury?","What is Newgrange?","What are the Carnac stones?"], correct:0 },
+      { value:500, clue:"This lost city, said to have sunk beneath the ocean, was first described by the philosopher Plato.", choices:["What is Atlantis?","What is El Dorado?","What is Lemuria?","What is Shangri-La?"], correct:0 },
+    ]},
+    { name:'Superhero Edition', clues:[
+      { value:100, clue:"This Kryptonian superhero is known as the Man of Steel.", choices:["Who is Batman?","Who is Superman?","Who is Green Lantern?","Who is The Flash?"], correct:1 },
+      { value:200, clue:"This Marvel scientist transforms into a green rage monster when angry.", choices:["Who is Thor?","Who is The Hulk?","Who is Iron Man?","Who is Wolverine?"], correct:1 },
+      { value:300, clue:"This billionaire inventor built a suit of armor to become Iron Man.", choices:["Who is Bruce Wayne?","Who is Tony Stark?","Who is Reed Richards?","Who is Hank Pym?"], correct:1 },
+      { value:400, clue:"This DC villain, the Joker's frequent partner, is a former psychiatrist named Harleen Quinzel.", choices:["Who is Poison Ivy?","Who is Harley Quinn?","Who is Catwoman?","Who is Talia al Ghul?"], correct:1 },
+      { value:500, clue:"This team of mutants, led by Professor X, fights for peaceful coexistence between mutants and humans.", choices:["What are the Avengers?","What is the Justice League?","What are the X-Men?","What are the Fantastic Four?"], correct:2 },
+    ]},
+    { name:'90s Culture Edition', lightning:true, clues:[
+      { value:100, clue:"This screeching, warbling sound played every time a computer connected to the internet in the 90s.", choices:["What is the dial-up modem tone?","What is a busy signal?","What is a fax tone?","What is a pager beep?"], correct:0 },
+      { value:200, clue:"This animated Saturday morning series followed five kids who could transform into superpowered eco-warriors to fight pollution.", choices:["What is Captain Planet and the Planeteers?","What is Teenage Mutant Ninja Turtles?","What is Recess?","What is Doug?"], correct:0 },
+      { value:300, clue:"This portable cassette player, later replaced by the Discman, defined how a generation listened to music on the go.", choices:["What is a Walkman?","What is a boombox?","What is an iPod?","What is a CD changer?"], correct:0 },
+      { value:400, clue:"This ultra-wide-leg denim brand became a defining piece of 90s streetwear.", choices:["What is JNCO?","What is Levi's 501?","What is Dickies?","What is Carhartt?"], correct:0 },
+      { value:500, clue:"This 1990s toy craze involved small collectible beanbag animals, each with its own heart-shaped tag.", choices:["What are Beanie Babies?","What are Pogs?","What are Tamagotchis?","What are Polly Pockets?"], correct:0 },
+    ]},
+    { name:'Black Excellence & Hidden History', lightning:true, clues:[
+      { value:100, clue:"This inventor patented an improved traffic signal and an early gas mask in the early 20th century.", choices:["Who is Garrett Morgan?","Who is Lewis Latimer?","Who is George Washington Carver?","Who is Elijah McCoy?"], correct:0 },
+      { value:200, clue:"This mathematician's orbital calculations at NASA were vital to John Glenn's 1962 spaceflight, later depicted in 'Hidden Figures.'", choices:["Who is Katherine Johnson?","Who is Mae Jemison?","Who is Dorothy Vaughan?","Who is Mary Jackson?"], correct:0 },
+      { value:300, clue:"This surgeon performed one of the first successful open-heart surgeries in 1893 in Chicago.", choices:["Who is Daniel Hale Williams?","Who is Charles Drew?","Who is Ben Carson?","Who is Louis Wade Sullivan?"], correct:0 },
+      { value:400, clue:"This entrepreneur built a line of hair care products into one of the first fortunes ever made by a self-made American woman.", choices:["Who is Madam C.J. Walker?","Who is Annie Turnbo Malone?","Who is Marjorie Stewart Joyner?","Who is Maggie Lena Walker?"], correct:0 },
+      { value:500, clue:"This physician developed pioneering methods for storing blood plasma, leading to the modern blood bank.", choices:["Who is Charles Drew?","Who is Daniel Hale Williams?","Who is Ben Carson?","Who is Patricia Bath?"], correct:0 },
+    ]},
+    { name:'Kitchen Stadium', lightning:true, clues:[
+      { value:100, clue:"This French mother sauce, made from butter, flour, and milk, is the base for richer sauces like mornay.", choices:["What is béchamel?","What is velouté?","What is hollandaise?","What is espagnole?"], correct:0 },
+      { value:200, clue:"This cooking method quickly cooks food in a small amount of hot oil while stirring constantly over high heat.", choices:["What is stir-frying?","What is braising?","What is poaching?","What is blanching?"], correct:0 },
+      { value:300, clue:"This knife technique produces thin, ribbon-like strips, often used on herbs like basil.", choices:["What is chiffonade?","What is julienne?","What is brunoise?","What is batonnet?"], correct:0 },
+      { value:400, clue:"This umami-rich Japanese seasoning, made from fermented soybeans, forms the base of a classic soup.", choices:["What is miso?","What is soy sauce?","What is dashi?","What is mirin?"], correct:0 },
+      { value:500, clue:"This spice blend, essential to Cajun and Creole cooking, typically includes paprika, cayenne, garlic, and oregano.", choices:["What is Cajun seasoning?","What is garam masala?","What is Old Bay?","What is za'atar?"], correct:0 },
+    ]},
+    { name:'Myth vs Fact', lightning:true, clues:[
+      { value:100, clue:"Goldfish do not actually have only a three-second memory — is this a myth or a fact?", choices:["What is a fact?","What is a myth?","What is unproven?","What is disputed?"], correct:0 },
+      { value:200, clue:"Humans only use 10% of their brains — is this a myth or a fact?", choices:["What is a fact?","What is a myth?","What is unproven?","What is disputed?"], correct:1 },
+      { value:300, clue:"Honey never spoils if stored properly, and edible honey has been found in ancient Egyptian tombs — is this a myth or a fact?", choices:["What is a fact?","What is a myth?","What is unproven?","What is disputed?"], correct:0 },
+      { value:400, clue:"Cracking your knuckles causes arthritis — is this a myth or a fact?", choices:["What is a fact?","What is a myth?","What is unproven?","What is disputed?"], correct:1 },
+      { value:500, clue:"It's possible to sneeze with your eyes open, despite the common claim otherwise — is this a myth or a fact?", choices:["What is a fact?","What is a myth?","What is unproven?","What is disputed?"], correct:0 },
+    ]},
+    { name:'Wildcard Category', lightning:true, clues:[
+      { value:100, clue:"This many strings does a standard classical guitar have.", choices:["What is four?","What is five?","What is six?","What is seven?"], correct:2 },
+      { value:200, clue:"This is the only country in the world with a national flag that isn't rectangular.", choices:["What is Nepal?","What is Switzerland?","What is Bhutan?","What is Vatican City?"], correct:0 },
+      { value:300, clue:"This many bones are in the adult human body.", choices:["What is 186?","What is 206?","What is 226?","What is 246?"], correct:1 },
+      { value:400, clue:"This planet spins nearly on its side, with an axial tilt of roughly 98 degrees.", choices:["What is Uranus?","What is Neptune?","What is Venus?","What is Saturn?"], correct:0 },
+      { value:500, clue:"This many time zones does Russia span, more than any other country.", choices:["What is nine?","What is eleven?","What is thirteen?","What is fifteen?"], correct:1 },
+    ]},
+  ];
+
+  const adSlides = [
+    { tag:"PARTNER PROMO", title:"Mack Magic Mobile Bar", body:"Bartending & DJ services for your next event — booking now via radiomeltdown.store." },
+    { tag:"STV STORE", title:"Faire Fare Travels", body:"Curated flights, hotels, and all-inclusive escapes — luxury travel without the markup." },
+    { tag:"THE STATIC", title:"Vol. 1 · Issue 02", body:"The Bass Line That Built G-Funk — this issue's cover story, out now." },
+    { tag:"CONCERT", title:"Emil Gordon Sr Live", body:"A SanecaTV Broadcast Network behind the scenes look Aug 28 2026" },
+    { tag:"GAME SERIES", title:"Switchbladoku", body:"Sudoku with a soundtrack — load your own tracks and solve puzzles with STV in your ears." },
+    { tag:"WANT AIRPLAY?", title:"Submit Your Music", body:"STV Radiomeltdown supports independent artists — submit and get on air, free." },
+  ];
+
+  /* ---------------- State ---------------- */
+  let score = 0;
+  let played = 0;
+  let selectedIndexes = [];
+  let categories = []; // the two chosen categories for the active game
+  let TOTAL_CLUES = 0;
+  let PRO_THRESHOLD = 0;
+
+  const pickerGrid = document.getElementById('pickerGrid');
+  const pickCountEl = document.getElementById('pickCount');
+  const startGameBtn = document.getElementById('startGameBtn');
+  const pickerView = document.getElementById('pickerView');
+  const boardView = document.getElementById('boardView');
+  const boardTitle = document.getElementById('boardTitle');
+  const boardEl = document.getElementById('board');
+  const scorePill = document.getElementById('scorePill');
+  const overlay = document.getElementById('overlay');
+  const clueCard = document.getElementById('clueCard');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+
+  /* ---------------- Picker render ---------------- */
+  function renderPicker(){
+    pickerGrid.innerHTML = '';
+    categoryLibrary.forEach((cat, i) => {
+      const el = document.createElement('button');
+      el.className = 'cat-pick' + (cat.lightning ? ' lightning' : '');
+      el.innerHTML = `${cat.lightning ? '<div class="lr-badge">LIGHTNING ROUND</div>' : ''}<div class="name">${cat.name}</div><div class="check">SELECTED</div>`;
+      el.addEventListener('click', () => togglePick(i, el));
+      pickerGrid.appendChild(el);
+    });
+  }
+
+  function togglePick(i, el){
+    const idx = selectedIndexes.indexOf(i);
+    if(idx > -1){
+      selectedIndexes.splice(idx, 1);
+      el.classList.remove('selected');
+    } else {
+      if(selectedIndexes.length >= 2) return;
+      selectedIndexes.push(i);
+      el.classList.add('selected');
+    }
+    pickCountEl.textContent = selectedIndexes.length;
+    startGameBtn.classList.toggle('ready', selectedIndexes.length === 2);
+  }
+
+  startGameBtn.addEventListener('click', () => {
+    if(selectedIndexes.length !== 2) return;
+    categories = selectedIndexes.map(i => categoryLibrary[i]);
+    startGame();
+  });
+
+  document.getElementById('changeCatsBtn').addEventListener('click', () => {
+    boardView.style.display = 'none';
+    pickerView.style.display = 'block';
+    closeOverlay();
+  });
+
+  /* ---------------- Board render ---------------- */
+  function startGame(){
+    TOTAL_CLUES = categories.reduce((a,c)=>a+c.clues.length,0);
+    PRO_THRESHOLD = Math.round(categories.reduce((a,c)=>a+c.clues.reduce((s,cl)=>s+cl.value,0),0) * 0.9);
+    boardTitle.textContent = categories.map(c => c.name).join(' · ').toUpperCase();
+    pickerView.style.display = 'none';
+    boardView.style.display = 'block';
+    resetGame();
+  }
+
+  function renderBoard(){
+    boardEl.innerHTML = '';
+    boardEl.style.gridTemplateRows = 'auto repeat(5, 1fr)';
+    boardEl.style.gridAutoFlow = 'column';
+    categories.forEach((cat, ci) => {
+      const head = document.createElement('div');
+      head.className = 'cat-head';
+      head.textContent = cat.name;
+      boardEl.appendChild(head);
+      cat.clues.forEach((cl, qi) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.dataset.cat = ci;
+        tile.dataset.q = qi;
+        tile.innerHTML = '$' + cl.value + '<div class="flip-glitch"></div>';
+        tile.addEventListener('click', () => openClue(ci, qi, tile));
+        boardEl.appendChild(tile);
+      });
+    });
+  }
+
+  function updateProgress(){
+    progressFill.style.width = (played / TOTAL_CLUES * 100) + '%';
+    progressLabel.textContent = played + ' / ' + TOTAL_CLUES + ' CLUES PLAYED';
+  }
+
+  /* ---------------- Clue flow ---------------- */
+  const LIGHTNING_SECONDS = 10;
+  let lightningTimer = null;
+
+  function openClue(ci, qi, tileEl){
+    if(tileEl.classList.contains('done')) return;
+    tileEl.classList.add('flipping');
+    setTimeout(() => tileEl.classList.remove('flipping'), 700);
+
+    const cat = categories[ci];
+    const cl = cat.clues[qi];
+    const isLightning = !!cat.lightning;
+
+    clueCard.innerHTML = `
+      <div class="clue-meta"><span>${cat.name}${isLightning ? ' · LIGHTNING ROUND' : ''} · $${cl.value}</span><span>SELECT THE MATCHING QUESTION</span></div>
+      ${isLightning ? `<div class="timer-row"><div class="timer-track"><div class="timer-fill" id="timerFill"></div></div><div class="timer-num" id="timerNum">${LIGHTNING_SECONDS}</div></div>` : ''}
+      <div class="clue-text">${cl.clue}</div>
+      <div class="choices" id="choicesWrap"></div>
+      <div class="clue-feedback" id="clueFeedback"></div>
+      <div class="clue-actions"><button id="clueNext">Back to board →</button></div>
+    `;
+    const wrap = document.getElementById('choicesWrap');
+    const feedback = document.getElementById('clueFeedback');
+    const nextBtn = document.getElementById('clueNext');
+
+    function lockAnswer(chosenIdx){
+      if(lightningTimer){ clearInterval(lightningTimer); lightningTimer = null; }
+      const allBtns = wrap.querySelectorAll('.choice-btn');
+      allBtns.forEach(b => b.disabled = true);
+      const correct = chosenIdx === cl.correct;
+      if(chosenIdx !== null) allBtns[chosenIdx].classList.add(correct ? 'correct' : 'wrong');
+      if(!correct) allBtns[cl.correct].classList.add('correct');
+
+      if(correct){
+        score += cl.value;
+        feedback.textContent = 'Correct — +$' + cl.value + ' added to your score.';
+        feedback.style.color = 'var(--correct)';
+      } else if(chosenIdx === null){
+        feedback.textContent = "Time's up. Correct response: " + cl.choices[cl.correct];
+        feedback.style.color = 'var(--wrong)';
+      } else {
+        feedback.textContent = 'Not quite. Correct response: ' + cl.choices[cl.correct];
+        feedback.style.color = 'var(--wrong)';
+      }
+      scorePill.textContent = '$' + score;
+
+      const tile = document.querySelector(`.tile[data-cat="${ci}"][data-q="${qi}"]`);
+      tile.classList.add('done', correct ? 'correct' : 'wrong');
+      played++;
+      updateProgress();
+      nextBtn.style.display = 'inline-block';
+    }
+
+    cl.choices.forEach((choice, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => lockAnswer(idx));
+      wrap.appendChild(btn);
+    });
+
+    if(isLightning){
+      const fillEl = document.getElementById('timerFill');
+      const numEl = document.getElementById('timerNum');
+      let remaining = LIGHTNING_SECONDS * 10;
+      lightningTimer = setInterval(() => {
+        remaining--;
+        fillEl.style.width = (remaining / (LIGHTNING_SECONDS * 10) * 100) + '%';
+        numEl.textContent = Math.ceil(remaining / 10);
+        if(remaining <= 0){
+          clearInterval(lightningTimer);
+          lightningTimer = null;
+          lockAnswer(null);
+        }
+      }, 100);
+    }
+
+    nextBtn.addEventListener('click', () => {
+      closeOverlay();
+      if(played >= TOTAL_CLUES) setTimeout(showFinal, 250);
+    });
+
+    overlay.classList.add('show');
+  }
+
+  function closeOverlay(){
+    if(lightningTimer){ clearInterval(lightningTimer); lightningTimer = null; }
+    overlay.classList.remove('show');
+  }
+
+  /* ---------------- Final screen ---------------- */
+  function showFinal(){
+    const total = categories.reduce((a,c)=>a+c.clues.reduce((s,cl)=>s+cl.value,0),0);
+    const isPro = score >= PRO_THRESHOLD;
+    clueCard.innerHTML = `
+      <div class="final-card ${isPro ? 'pro' : 'brush'}">
+        <div class="clue-meta" style="justify-content:center;">FINAL SCORE</div>
+        <div class="stamp">${isPro ? "CERTIFIED PRO" : "BRUSH UP ON YOUR FORM"}</div>
+        <div class="final-score">$${score} / $${total}</div>
+        <p class="note">${isPro
+          ? "Solid signal across both categories. STV's putting your name on the roster."
+          : "A few clues got past you tonight. Run it back — the board resets and the frequency's still live."}</p>
+        <button id="playAgain">↺ Play again</button>
+      </div>
+    `;
+    document.getElementById('playAgain').addEventListener('click', resetGame);
+    overlay.classList.add('show');
+  }
+
+  /* ---------------- Reset ---------------- */
+  function resetGame(){
+    score = 0; played = 0;
+    scorePill.textContent = '$0';
+    updateProgress();
+    closeOverlay();
+    renderBoard();
+  }
+  document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+  /* ---------------- Ad slideshow ---------------- */
+  const adViewport = document.getElementById('adViewport');
+  const adDots = document.getElementById('adDots');
+  let adIndex = 0;
+  let adTimer = null;
+
+  function renderAds(){
+    adViewport.innerHTML = '';
+    adDots.innerHTML = '';
+    adSlides.forEach((s, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'ad-slide' + (i === 0 ? ' active' : '');
+      slide.style.background = `linear-gradient(200deg, hsla(${(i*47)%360},55%,18%,.9), rgba(8,13,28,.95))`;
+      slide.innerHTML = `<span class="tag">${s.tag}</span><h3>${s.title}</h3><p>${s.body}</p>`;
+      adViewport.appendChild(slide);
+
+      const dot = document.createElement('div');
+      dot.className = 'ad-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goToAd(i));
+      adDots.appendChild(dot);
+    });
+  }
+
+  function goToAd(i){
+    document.querySelectorAll('.ad-slide').forEach((el, idx) => el.classList.toggle('active', idx === i));
+    document.querySelectorAll('.ad-dot').forEach((el, idx) => el.classList.toggle('active', idx === i));
+    adIndex = i;
+    restartAdTimer();
+  }
+
+  function restartAdTimer(){
+    if(adTimer) clearInterval(adTimer);
+    adTimer = setInterval(() => goToAd((adIndex + 1) % adSlides.length), 4800);
+  }
+
+  /* ---------------- Live audio ---------------- */
+  const audioEl = document.getElementById('stvAudio');
+  const audioBtn = document.getElementById('audioBtn');
+  let audioOn = false;
+
+  audioBtn.addEventListener('click', () => {
+    audioOn = !audioOn;
+    audioEl.muted = !audioOn;
+    audioBtn.classList.toggle('on', audioOn);
+    audioBtn.textContent = audioOn ? 'Audio On' : 'Audio';
+    if(audioOn){
+      audioEl.play().catch(() => {
+        audioBtn.textContent = 'Audio';
+        audioBtn.classList.remove('on');
+        audioOn = false;
+      });
+    } else {
+      audioEl.pause();
+    }
+  });
+
+  /* ---------------- Init ---------------- */
+  renderPicker();
+  renderAds();
+  restartAdTimer();
+</script>
+
+</body>
+</html>
