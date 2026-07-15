@@ -2079,7 +2079,6 @@ window.STVQuestions = [
 
     { value:500, clue:"The universe began according to the widely accepted theory called this.", choices:["Big Bang Theory","Steady State Theory","Flat Earth Theory","Solar Theory"], correct:0 }
 
-
   ]
 }
 
@@ -2490,20 +2489,4 @@ window.STVQuestions = [
     { value:500, clue:"The term 'multiverse' describes this concept.", choices:["Multiple realities or universes","One timeline only","A superhero costume","A power source"], correct:0 }
 
   ]
-}
-window.STVQuestions = [
-  {
-    name: "SUPERHERO EDITION",
-    clues: [
-      {
-        value:100,
-        clue:"This superhero is known as the Man of Steel.",
-        choices:["Superman","Batman","Iron Man","Thor"],
-        correct:0
-      }
-    ]
-  }
-
-  // all 22 categories here
-];
-  
+};
