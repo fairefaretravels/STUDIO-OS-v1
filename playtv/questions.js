@@ -2492,5 +2492,19 @@
 
   ]
 }
+window.STVQuestions = [
+  {
+    name: "SUPERHERO EDITION",
+    clues: [
+      {
+        value:100,
+        clue:"This superhero is known as the Man of Steel.",
+        choices:["Superman","Batman","Iron Man","Thor"],
+        correct:0
+      }
+    ]
+  }
 
+  // all 22 categories here
+];
   
